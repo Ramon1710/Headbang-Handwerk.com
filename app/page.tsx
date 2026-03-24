@@ -167,11 +167,11 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-20 max-w-7xl lg:mt-32">
-            <div className="border-t border-[#9b5a2c]/70 px-2 pt-10 sm:px-4 sm:pt-12 lg:px-0 lg:pt-20">
+          <section className="mx-auto mt-24 max-w-7xl lg:mt-40">
+            <div className="border-t border-[#9b5a2c]/70 px-2 pt-12 sm:px-4 sm:pt-14 lg:px-0 lg:pt-24">
               <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
                 <div>
-                  <p className="mb-5 text-2xl font-black tracking-[0.02em] text-[#f0b86a] sm:text-[2rem]">
+                  <p className="mb-6 text-2xl font-black tracking-[0.02em] text-[#f0b86a] sm:text-[2rem]">
                     🤘 Werde Teil der Bewegung
                   </p>
                   <p className="max-w-4xl text-lg leading-8 text-[#eadbc7] sm:text-xl sm:leading-9">
