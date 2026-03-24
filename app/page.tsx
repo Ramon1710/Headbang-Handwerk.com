@@ -193,6 +193,8 @@ export default function HomePage() {
                       <p className="mt-2 pb-1 text-lg font-black leading-[1.2] text-[#ffb14d]">Erlebnis statt Bannerdenken</p>
                     </div>
                   </div>
+
+                  <div aria-hidden="true" className="h-6 sm:h-8 lg:h-10" />
                 </div>
               </div>
             </div>
