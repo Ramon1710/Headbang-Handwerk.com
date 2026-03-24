@@ -38,6 +38,7 @@ export default function HomePage() {
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,5,3,0.08)_0%,rgba(8,5,3,0.28)_100%)]" />
           </div>
+        </div>
       </main>
     </>
   );
