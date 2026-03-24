@@ -130,16 +130,16 @@ export default function HomePage() {
                   </Button>
                 </div>
 
-                <div className="mt-12 grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.13)_0%,rgba(255,155,57,0.02)_100%)] px-5 py-5 ring-1 ring-[#92592f]/45">
+                <div className="mt-12 grid gap-6 sm:grid-cols-3">
+                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.13)_0%,rgba(255,155,57,0.02)_100%)] px-6 py-6 ring-1 ring-[#92592f]/45">
                     <p className="text-2xl font-black text-[#ffbe6f]">Wacken 2027</p>
                     <p className="mt-1 text-sm leading-6 text-[#dbc4aa]">Nächster großer Meilenstein im Projekt</p>
                   </div>
-                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.13)_0%,rgba(255,155,57,0.02)_100%)] px-5 py-5 ring-1 ring-[#92592f]/45">
+                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.13)_0%,rgba(255,155,57,0.02)_100%)] px-6 py-6 ring-1 ring-[#92592f]/45">
                     <p className="text-2xl font-black text-[#ffbe6f]">Live-Demos</p>
                     <p className="mt-1 text-sm leading-6 text-[#dbc4aa]">Handwerk als Erlebnis statt nur als Botschaft</p>
                   </div>
-                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.13)_0%,rgba(255,155,57,0.02)_100%)] px-5 py-5 ring-1 ring-[#92592f]/45">
+                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.13)_0%,rgba(255,155,57,0.02)_100%)] px-6 py-6 ring-1 ring-[#92592f]/45">
                     <p className="text-2xl font-black text-[#ffbe6f]">Partnernetzwerk</p>
                     <p className="mt-1 text-sm leading-6 text-[#dbc4aa]">Betriebe, Innungen und Unterstützer an einem Ort</p>
                   </div>
@@ -196,9 +196,9 @@ export default function HomePage() {
 
           <section className="mx-auto mt-10 max-w-7xl lg:mt-14">
             <div className="overflow-hidden rounded-[1.7rem] border border-[#704321]/55 bg-[linear-gradient(90deg,rgba(30,18,12,0.96)_0%,rgba(16,10,8,0.86)_50%,rgba(30,18,12,0.96)_100%)] shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
-              <div className="grid gap-4 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-4 lg:gap-6 lg:px-8">
+              <div className="grid gap-6 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-4 lg:gap-7 lg:px-8">
                 {highlightStats.map((item) => (
-                  <div key={item.label} className="rounded-2xl bg-black/15 px-4 py-4 ring-1 ring-white/6">
+                  <div key={item.label} className="rounded-2xl bg-black/15 px-5 py-5 ring-1 ring-white/6">
                     <p className="text-3xl font-black text-[#ffd08f]">{item.value}</p>
                     <p className="mt-2 text-sm leading-6 text-[#e5d5c0]">{item.label}</p>
                   </div>
@@ -207,8 +207,8 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-18 max-w-7xl lg:mt-24">
-            <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
+          <section className="mx-auto mt-20 max-w-7xl lg:mt-28">
+            <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
               <div className="text-panel text-panel-roomy">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Was wir hier eigentlich bauen</p>
                 <h2 className="mt-5 text-4xl font-black leading-tight text-[#fff0da] sm:text-[3rem]">
@@ -227,11 +227,11 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              <div className="grid gap-5 md:grid-cols-3">
+              <div className="grid gap-6 md:grid-cols-3 lg:gap-7">
                 {promiseCards.map(({ title, text, icon: Icon }) => (
                   <div
                     key={title}
-                    className="rounded-[1.7rem] border border-[#714422]/45 bg-[linear-gradient(180deg,rgba(27,17,12,0.9)_0%,rgba(14,10,8,0.58)_100%)] p-6 shadow-[0_18px_44px_rgba(0,0,0,0.2)]"
+                    className="rounded-[1.7rem] border border-[#714422]/45 bg-[linear-gradient(180deg,rgba(27,17,12,0.9)_0%,rgba(14,10,8,0.58)_100%)] p-7 shadow-[0_18px_44px_rgba(0,0,0,0.2)]"
                   >
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.16)_0%,rgba(255,155,57,0.04)_100%)] ring-1 ring-[#a76737]/40">
                       <Icon className="h-5 w-5 text-[#ffab4e]" />
@@ -244,9 +244,9 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-18 max-w-7xl lg:mt-24">
-            <div className="rounded-[2rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(36,22,14,0.88)_0%,rgba(14,9,7,0.7)_100%)] p-7 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-8 lg:p-10">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <section className="mx-auto mt-20 max-w-7xl lg:mt-28">
+            <div className="rounded-[2rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(36,22,14,0.88)_0%,rgba(14,9,7,0.7)_100%)] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-10 lg:p-12">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <div className="max-w-3xl">
                   <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">So funktioniert die Beteiligung</p>
                   <h2 className="mt-4 text-4xl font-black text-[#fff0da] sm:text-[3rem]">Vom Interesse bis zur Festivalpräsenz.</h2>
@@ -256,9 +256,9 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div className="mt-10 grid gap-5 lg:grid-cols-4">
+              <div className="mt-12 grid gap-6 lg:grid-cols-4 lg:gap-7">
                 {processSteps.map((step) => (
-                  <div key={step.number} className="rounded-[1.6rem] bg-black/18 px-5 py-6 ring-1 ring-white/7 backdrop-blur-sm">
+                  <div key={step.number} className="rounded-[1.6rem] bg-black/18 px-6 py-7 ring-1 ring-white/7 backdrop-blur-sm">
                     <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#ffbf76]">{step.number}</p>
                     <h3 className="mt-4 text-xl font-black text-[#fff0da]">{step.title}</h3>
                     <p className="mt-4 text-sm leading-7 text-[#dbc4aa] sm:text-[0.97rem]">{step.text}</p>
@@ -268,9 +268,9 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-18 max-w-7xl lg:mt-24">
-            <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
-              <div className="rounded-[1.9rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(37,23,14,0.84)_0%,rgba(15,10,8,0.52)_100%)] p-7 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-8 lg:p-10">
+          <section className="mx-auto mt-20 max-w-7xl lg:mt-28">
+            <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+              <div className="rounded-[1.9rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(37,23,14,0.84)_0%,rgba(15,10,8,0.52)_100%)] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-9 lg:p-11">
                 <div className="flex items-center gap-3 text-[#ffc97a]">
                   <ShieldCheck className="h-5 w-5 text-[#ff9d3c]" />
                   <p className="text-sm font-semibold uppercase tracking-[0.24em]">Warum das funktioniert</p>
@@ -281,19 +281,19 @@ export default function HomePage() {
                 <p className="mt-6 text-lg leading-8 text-[#ead9c3] sm:text-[1.08rem] sm:leading-9">
                   Genau darin liegt das Prinzip dieser Startseite: Sie stellt nicht zuerst Details aus, sondern das Ergebnis. Wer hier landet, versteht direkt, worum es geht, warum das Projekt relevant ist und wie man konkret Teil davon wird.
                 </p>
-                <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-2xl bg-black/18 px-5 py-5 ring-1 ring-white/7">
+                <div className="mt-10 grid gap-5 sm:grid-cols-2">
+                  <div className="rounded-2xl bg-black/18 px-6 py-6 ring-1 ring-white/7">
                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">Für Betriebe</p>
                     <p className="mt-2 text-base leading-7 text-[#f0e1cf]">Mehr Sichtbarkeit, stärkere Differenzierung und neue Gesprächsanlässe.</p>
                   </div>
-                  <div className="rounded-2xl bg-black/18 px-5 py-5 ring-1 ring-white/7">
+                  <div className="rounded-2xl bg-black/18 px-6 py-6 ring-1 ring-white/7">
                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">Für Nachwuchs</p>
                     <p className="mt-2 text-base leading-7 text-[#f0e1cf]">Ein direkter, ungezwungener Zugang zu Berufen, Menschen und echtem Können.</p>
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-[1.9rem] border border-[#704321]/50 bg-[linear-gradient(180deg,rgba(24,16,11,0.92)_0%,rgba(12,8,6,0.88)_100%)] p-7 shadow-[0_20px_50px_rgba(0,0,0,0.28)] sm:p-8">
+              <div className="rounded-[1.9rem] border border-[#704321]/50 bg-[linear-gradient(180deg,rgba(24,16,11,0.92)_0%,rgba(12,8,6,0.88)_100%)] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.28)] sm:p-9">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Aktuelle Information</p>
                 <h3 className="mt-4 text-3xl font-black text-[#ffd08f] sm:text-[2.3rem]">Wacken 2027 steht im Fokus.</h3>
                 <div className="mt-6 space-y-5 text-base leading-8 text-[#ead9c3]">
@@ -301,7 +301,7 @@ export default function HomePage() {
                   <p>Mit Live-Demos, Mitmach-Aktionen und starken Partnern entsteht ein Format, das Handwerk nicht kleiner erklärt, sondern größer inszeniert.</p>
                   <p>Gesucht werden Unternehmen, Unterstützer und Branchenpartner, die früh Teil dieses Projekts werden wollen.</p>
                 </div>
-                <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+                <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:gap-5">
                   <Button href="/sponsoren" size="lg" className="justify-center">
                     Sponsoring ansehen
                   </Button>
@@ -313,7 +313,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-18 max-w-7xl lg:mt-26">
+          <section className="mx-auto mt-20 max-w-7xl lg:mt-28">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Nächste Anlässe</p>
@@ -325,7 +325,7 @@ export default function HomePage() {
               </Button>
             </div>
 
-            <div className="mt-10 grid gap-6 lg:grid-cols-3">
+            <div className="mt-12 grid gap-7 lg:grid-cols-3">
               {featuredEvents.map((event) => (
                 <div
                   key={event.id}
@@ -359,7 +359,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-18 max-w-7xl lg:mt-26">
+          <section className="mx-auto mt-20 max-w-7xl lg:mt-28">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Einstieg für Partner</p>
@@ -371,7 +371,7 @@ export default function HomePage() {
               </Button>
             </div>
 
-            <div className="mt-10 grid gap-6 lg:grid-cols-3">
+            <div className="mt-12 grid gap-7 lg:grid-cols-3">
               {featuredPackages.map((pkg) => (
                 <div
                   key={pkg.id}
