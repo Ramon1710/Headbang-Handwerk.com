@@ -1,97 +1,192 @@
 import Image from 'next/image';
-import { Hammer, Flame, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
+import {
+  ArrowRight,
+  Calendar,
+  CheckCircle2,
+  Flame,
+  Hammer,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+  Target,
+  Users,
+} from 'lucide-react';
 import { Navigation } from '@/components/navigation';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
+import { events, sponsorPackages } from '@/lib/data';
+import { formatPrice } from '@/lib/utils';
 import headbangStandImage from '../Headbang Stand Bild.png';
 import wackenBackgroundImage from '../Wacken Hintergrund Bild.png';
 
-const goals = [
-  'Nachwuchs begeistern',
-  'Handwerk sichtbar machen',
-  'Unternehmen eine neue Bühne bieten',
+const promiseCards = [
+  {
+    title: 'Sichtbarkeit mit Haltung',
+    text: 'Wir bringen Marken, Betriebe und Innungen in einen Kontext, der auffällt und glaubwürdig wirkt.',
+    icon: Flame,
+  },
+  {
+    title: 'Nachwuchs, der wirklich hinschaut',
+    text: 'Festivalumfelder schaffen Aufmerksamkeit, Nähe und echte Gespräche statt austauschbarer Werbekontakte.',
+    icon: Users,
+  },
+  {
+    title: 'Handwerk zum Anfassen',
+    text: 'Live-Demos, Mitmachaktionen und Standkonzepte machen Können sichtbar, nicht nur behauptet.',
+    icon: Hammer,
+  },
 ];
+
+const processSteps = [
+  {
+    number: '01',
+    title: 'Projekt auswählen',
+    text: 'Du entscheidest, ob du Wacken 2027, kommende Festivals oder einzelne Aktivierungen unterstützen willst.',
+  },
+  {
+    number: '02',
+    title: 'Passendes Paket finden',
+    text: 'Von sichtbarer Grundpräsenz bis zur prominenten Partnerrolle stimmen wir die Beteiligung auf dein Ziel ab.',
+  },
+  {
+    number: '03',
+    title: 'Aktivierung gemeinsam planen',
+    text: 'Wir übersetzen Marke, Gewerk und Botschaft in einen Auftritt, der im Festival funktioniert.',
+  },
+  {
+    number: '04',
+    title: 'Vor Ort Wirkung erzeugen',
+    text: 'Am Stand entstehen Erlebnisse, Gespräche, Content und Kontakte, die weit über das Festival hinaus wirken.',
+  },
+];
+
+const focusPoints = [
+  'Wacken 2027 als nächster großer Meilenstein',
+  'Partner, Sponsoren und Betriebe als sichtbarer Teil des Projekts',
+  'Interaktive Formate statt statischer Werbeflächen',
+  'Klare Ansprache für Nachwuchs, Öffentlichkeit und Branche',
+];
+
+const highlightStats = [
+  { value: '2027', label: 'Zieljahr für den nächsten großen Wacken-Auftritt' },
+  { value: '3+', label: 'Festivalformate bereits in Planung oder Vorbereitung' },
+  { value: '4', label: 'Sponsoring-Stufen für unterschiedliche Partnerziele' },
+  { value: '100%', label: 'Fokus auf echtes Erleben statt austauschbarer Werbung' },
+];
+
+const featuredEvents = events.slice(0, 3);
+const featuredPackages = sponsorPackages.slice(0, 3);
+
+const statusLabels: Record<(typeof featuredEvents)[number]['status'], string> = {
+  confirmed: 'Bestätigt',
+  planned: 'Geplant',
+  completed: 'Abgeschlossen',
+};
 
 export default function HomePage() {
   return (
     <>
       <Navigation />
       <main
-        className="relative isolate min-h-screen overflow-hidden"
+        className="relative isolate overflow-hidden"
         style={{
-          backgroundImage: `linear-gradient(rgba(6, 3, 2, 0.82), rgba(6, 3, 2, 0.95)), url(${wackenBackgroundImage.src})`,
+          backgroundImage: `linear-gradient(rgba(5, 3, 2, 0.78), rgba(5, 3, 2, 0.96)), url(${wackenBackgroundImage.src})`,
           backgroundPosition: 'center top, center top',
           backgroundRepeat: 'no-repeat, no-repeat',
           backgroundSize: 'cover, cover',
         }}
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_14%,rgba(255,136,32,0.18)_0%,transparent_32%),radial-gradient(circle_at_86%_18%,rgba(255,168,76,0.14)_0%,transparent_26%),linear-gradient(180deg,rgba(8,5,3,0.26)_0%,rgba(8,5,3,0.84)_100%)]" />
-        <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.018)_1px,transparent_1px)] [background-size:120px_120px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgba(255,143,42,0.22)_0%,transparent_32%),radial-gradient(circle_at_88%_14%,rgba(255,168,76,0.15)_0%,transparent_26%),linear-gradient(180deg,rgba(8,5,3,0.18)_0%,rgba(8,5,3,0.82)_100%)]" />
+        <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:120px_120px]" />
 
-        <div className="relative z-10 px-4 pb-24 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pb-36">
-          <section className="mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:items-start lg:gap-20">
+        <div className="relative z-10 px-4 pb-24 pt-10 sm:px-6 lg:px-8 lg:pb-32">
+          <section className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:pt-8">
             <div className="relative">
-              <div className="absolute -left-10 top-4 hidden h-40 w-40 rounded-full bg-orange-500/12 blur-3xl lg:block" />
+              <div className="absolute -left-10 top-6 hidden h-44 w-44 rounded-full bg-orange-500/14 blur-3xl lg:block" />
 
               <div className="relative text-panel text-panel-roomy sm:p-11 lg:p-14">
-                <div className="mb-10 inline-flex items-center gap-2 rounded-full border border-[#7e4d2a] bg-[#1b120d]/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#f4c481] backdrop-blur-sm sm:text-sm">
-                  <Flame className="h-4 w-4 text-[#ff9b39]" />
-                  Festival. Handwerk. Haltung.
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#80502b] bg-[#1b120d]/82 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#f4c481] backdrop-blur-sm sm:text-xs">
+                  <Sparkles className="h-4 w-4 text-[#ff9b39]" />
+                  Startseite mit klarem Projektfokus
                 </div>
 
-                <h1 className="max-w-4xl text-5xl font-black leading-[0.98] text-[#fbf1e4] sm:text-6xl lg:text-[4.7rem] xl:text-[5.2rem]">
-                  Handwerk trifft Metal. Leidenschaft trifft Zukunft.
+                <h1 className="mt-8 max-w-4xl text-5xl font-black leading-[0.95] text-[#fbf1e4] sm:text-6xl lg:text-[4.65rem] xl:text-[5.15rem]">
+                  Handwerk sichtbar machen.
+                  <br />
+                  Dort, wo Energie entsteht.
                 </h1>
 
-                <div className="mt-14 space-y-10 text-base leading-8 text-[#e6d7c2] sm:text-lg sm:leading-9 lg:space-y-12">
-                  <div className="border-l-2 border-[#ff8f2a]/65 pl-5 sm:pl-6">
-                    <p>
-                      Wir bringen das Handwerk dorthin, wo Energie, Gemeinschaft und Begeisterung aufeinandertreffen – auf die größten Metal-Festivals Europas.
-                    </p>
-                  </div>
+                <p className="mt-8 max-w-3xl text-lg leading-8 text-[#e9dac6] sm:text-[1.18rem] sm:leading-9">
+                  Headbang Handwerk bringt Betriebe, Marken und Nachwuchs in ein Umfeld, das Aufmerksamkeit nicht erkauft, sondern erzeugt. Auf den größten Metal-Festivals Europas wird Handwerk live erlebbar, modern inszeniert und glaubwürdig vermittelt.
+                </p>
 
-                  <div className="text-panel bg-[linear-gradient(180deg,rgba(26,17,12,0.68)_0%,rgba(15,10,8,0.24)_100%)] px-6 py-6 sm:px-7 sm:py-7">
-                    <p>
-                      Mit Headbang Handwerk e.V. schaffen wir eine Plattform, die zeigt, wie modern, vielseitig und kraftvoll das Handwerk wirklich ist. Zwischen Bühne, Feuer und tausenden Festivalbesuchern entsteht ein Ort, an dem echtes Können erlebbar wird: live, zum Anfassen und zum Mitmachen.
-                    </p>
+                <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                  <Button href="/sponsoren" size="lg" className="min-w-56 justify-center">
+                    Jetzt Partner werden
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                  <Button href="/veranstaltungen" size="lg" variant="secondary" className="min-w-56 justify-center">
+                    Veranstaltungen ansehen
+                  </Button>
+                </div>
+
+                <div className="mt-12 grid gap-4 sm:grid-cols-3">
+                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.13)_0%,rgba(255,155,57,0.02)_100%)] px-5 py-5 ring-1 ring-[#92592f]/45">
+                    <p className="text-2xl font-black text-[#ffbe6f]">Wacken 2027</p>
+                    <p className="mt-1 text-sm leading-6 text-[#dbc4aa]">Nächster großer Meilenstein im Projekt</p>
+                  </div>
+                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.13)_0%,rgba(255,155,57,0.02)_100%)] px-5 py-5 ring-1 ring-[#92592f]/45">
+                    <p className="text-2xl font-black text-[#ffbe6f]">Live-Demos</p>
+                    <p className="mt-1 text-sm leading-6 text-[#dbc4aa]">Handwerk als Erlebnis statt nur als Botschaft</p>
+                  </div>
+                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.13)_0%,rgba(255,155,57,0.02)_100%)] px-5 py-5 ring-1 ring-[#92592f]/45">
+                    <p className="text-2xl font-black text-[#ffbe6f]">Partnernetzwerk</p>
+                    <p className="mt-1 text-sm leading-6 text-[#dbc4aa]">Betriebe, Innungen und Unterstützer an einem Ort</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="lg:sticky lg:top-30">
-              <div className="relative mx-auto max-w-2xl lg:max-w-none">
-                <div className="absolute -inset-6 rounded-[2.2rem] bg-[radial-gradient(circle,rgba(255,128,26,0.25)_0%,rgba(255,128,26,0.04)_48%,rgba(255,128,26,0)_72%)] blur-2xl" />
-                <div className="absolute -right-4 top-8 hidden h-36 w-36 rounded-full bg-orange-500/16 blur-3xl sm:block" />
+            <div className="relative lg:pt-10">
+              <div className="absolute -inset-6 rounded-[2.4rem] bg-[radial-gradient(circle,rgba(255,128,26,0.24)_0%,rgba(255,128,26,0.04)_48%,rgba(255,128,26,0)_72%)] blur-2xl" />
+              <div className="relative overflow-hidden rounded-[2.2rem] border border-[#8f562b]/55 bg-[linear-gradient(180deg,rgba(30,20,14,0.96)_0%,rgba(13,9,7,0.94)_100%)] p-3 shadow-[0_32px_90px_rgba(0,0,0,0.52)] sm:p-4">
+                <div className="absolute left-5 top-5 z-10 inline-flex items-center gap-2 rounded-full bg-black/60 px-3 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#f8c887] ring-1 ring-[#936038]/65 backdrop-blur-sm sm:text-xs">
+                  <Flame className="h-3.5 w-3.5 text-[#ffab4e]" />
+                  Live am Stand
+                </div>
 
-                <div className="relative overflow-hidden rounded-[2.1rem] border border-[#8f562b]/55 bg-[linear-gradient(180deg,rgba(34,22,15,0.96)_0%,rgba(14,10,8,0.94)_100%)] p-3 shadow-[0_32px_90px_rgba(0,0,0,0.52)] sm:p-4">
-                  <div className="absolute left-5 top-5 z-10 inline-flex items-center gap-2 rounded-full bg-black/55 px-3 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#f8c887] ring-1 ring-[#936038]/65 backdrop-blur-sm sm:text-xs">
-                    <Sparkles className="h-3.5 w-3.5 text-[#ffab4e]" />
-                    Live am Stand
+                <div className="relative overflow-hidden rounded-[1.7rem] ring-1 ring-white/8">
+                  <Image
+                    src={headbangStandImage}
+                    alt="Headbang Handwerk Stand auf einem Festival"
+                    priority
+                    className="h-auto w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,4,2,0.02)_0%,rgba(7,4,2,0.34)_100%)]" />
+                </div>
+
+                <div className="mt-6 grid gap-4">
+                  <div className="rounded-[1.6rem] bg-[#120d0a]/92 px-5 py-5 ring-1 ring-white/7">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#ffbf76]">Projektfokus</p>
+                        <p className="mt-2 text-2xl font-black text-[#fff0da]">Wacken Open Air 2027</p>
+                      </div>
+                      <Target className="mt-1 h-5 w-5 flex-shrink-0 text-[#ff9d3c]" />
+                    </div>
+                    <p className="mt-4 text-sm leading-7 text-[#dcc8b0] sm:text-[0.98rem]">
+                      Der nächste große Schritt ist ein eigener Stand mit starken Partnern, sichtbaren Aktionen und einer klaren Botschaft: Handwerk gehört mitten ins Leben und auf große Bühnen.
+                    </p>
                   </div>
 
-                  <div className="relative overflow-hidden rounded-[1.55rem] ring-1 ring-white/8">
-                    <Image
-                      src={headbangStandImage}
-                      alt="Headbang Handwerk Stand auf einem Festival"
-                      priority
-                      className="h-auto w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,4,2,0.03)_0%,rgba(7,4,2,0.32)_100%)]" />
-                  </div>
-
-                  <div className="mt-7 grid gap-4 sm:grid-cols-3 lg:mt-8">
-                    <div className="rounded-2xl bg-[#120d0a]/90 px-4 py-4 text-center ring-1 ring-white/6">
-                      <p className="text-2xl font-black text-[#ffb14d]">Metal</p>
-                      <p className="mt-1 text-xs uppercase tracking-[0.2em] text-[#cbb59a]">Atmosphäre</p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-2xl bg-[#120d0a]/90 px-5 py-4 ring-1 ring-white/6">
+                      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">Ansprache</p>
+                      <p className="mt-2 text-lg font-black text-[#ffb14d]">Laut. Echt. Nahbar.</p>
                     </div>
-                    <div className="rounded-2xl bg-[#120d0a]/90 px-4 py-4 text-center ring-1 ring-white/6">
-                      <p className="text-2xl font-black text-[#ffb14d]">Handwerk</p>
-                      <p className="mt-1 text-xs uppercase tracking-[0.2em] text-[#cbb59a]">Erlebbar</p>
-                    </div>
-                    <div className="rounded-2xl bg-[#120d0a]/90 px-4 py-4 text-center ring-1 ring-white/6">
-                      <p className="text-2xl font-black text-[#ffb14d]">Energie</p>
-                      <p className="mt-1 text-xs uppercase tracking-[0.2em] text-[#cbb59a]">Direkt vor Ort</p>
+                    <div className="rounded-2xl bg-[#120d0a]/90 px-5 py-4 ring-1 ring-white/6">
+                      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">Wirkung</p>
+                      <p className="mt-2 text-lg font-black text-[#ffb14d]">Erlebnis statt Bannerdenken</p>
                     </div>
                   </div>
                 </div>
@@ -99,96 +194,243 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-12 max-w-7xl lg:mt-24">
-            <div className="overflow-hidden rounded-[1.6rem] border border-[#714422]/50 bg-[linear-gradient(90deg,rgba(30,18,12,0.94)_0%,rgba(18,11,8,0.86)_48%,rgba(30,18,12,0.94)_100%)] shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
-              <div className="grid gap-6 px-5 py-6 sm:px-6 sm:py-7 lg:grid-cols-[auto_1fr] lg:items-start lg:gap-10 lg:px-8 lg:py-8">
-                <div className="flex items-center gap-3 text-[#ffbe6f] lg:pt-1">
-                  <Sparkles className="h-4 w-4 flex-shrink-0 text-[#ff9f35]" />
-                  <span className="text-sm font-bold uppercase tracking-[0.24em]">Aktuelle Informationen</span>
-                </div>
-                <div className="space-y-4 text-sm leading-7 text-[#ead9c3] sm:text-base sm:leading-8 lg:space-y-5">
-                  <p className="text-lg font-black text-[#ffd08f] sm:text-[1.22rem]">
-                    🔥 Wacken 2027 – wir sind dabei!
-                  </p>
-                  <p>
-                    Headbang Handwerk plant den nächsten großen Schritt:
-                    <br />
-                    👉 einen eigenen Stand auf dem Wacken Open Air 2027.
-                  </p>
-                  <p>
-                    Mit Live-Demos, Mitmach-Aktionen und starken Partnern bringen wir das Handwerk direkt ins Festival – laut, sichtbar und zum Anfassen.
-                  </p>
-                  <p>
-                    <span className="font-bold text-[#ffcf92]">Unser Ziel:</span>
-                    <br />
-                    Das Handwerk dort zeigen, wo Begeisterung entsteht.
-                  </p>
-                  <p className="font-bold text-[#ffcf92]">🤘 Jetzt Partner werden</p>
-                  <p>
-                    Für Wacken 2027 suchen wir Unternehmen, die Teil dieses Projekts werden wollen.
-                  </p>
-                </div>
+          <section className="mx-auto mt-10 max-w-7xl lg:mt-14">
+            <div className="overflow-hidden rounded-[1.7rem] border border-[#704321]/55 bg-[linear-gradient(90deg,rgba(30,18,12,0.96)_0%,rgba(16,10,8,0.86)_50%,rgba(30,18,12,0.96)_100%)] shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
+              <div className="grid gap-4 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-4 lg:gap-6 lg:px-8">
+                {highlightStats.map((item) => (
+                  <div key={item.label} className="rounded-2xl bg-black/15 px-4 py-4 ring-1 ring-white/6">
+                    <p className="text-3xl font-black text-[#ffd08f]">{item.value}</p>
+                    <p className="mt-2 text-sm leading-6 text-[#e5d5c0]">{item.label}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </section>
 
-          <section className="mt-16 w-full lg:mt-28">
-            <div className="grid gap-8 lg:gap-14">
-              <div className="mx-auto w-full max-w-5xl rounded-[1.9rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(41,24,14,0.84)_0%,rgba(18,11,8,0.5)_100%)] p-7 text-center shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-8 lg:p-10">
-                <div className="mb-7 flex items-center justify-center gap-3 text-[#ffc97a]">
-                  <Hammer className="h-5 w-5 text-[#ff9d3c]" />
-                  <p className="text-2xl font-black tracking-[0.03em] sm:text-[1.9rem]">Unser Ziel ist klar:</p>
-                </div>
-                <ul className="grid gap-4 sm:grid-cols-3 sm:gap-5">
-                  {goals.map((goal) => (
-                    <li
-                      key={goal}
-                      className="group flex items-center justify-center gap-3 rounded-2xl bg-[linear-gradient(180deg,rgba(255,150,56,0.12)_0%,rgba(255,150,56,0.02)_100%)] px-4 py-5 text-center ring-1 ring-[#8c542b]/45 transition-all duration-200 hover:-translate-y-0.5 hover:ring-[#c87835]"
-                    >
-                      <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[#ffad56]" />
-                      <span className="text-sm font-semibold text-[#f7e7d3] sm:text-base">{goal}</span>
+          <section className="mx-auto mt-18 max-w-7xl lg:mt-24">
+            <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
+              <div className="text-panel text-panel-roomy">
+                <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Was wir hier eigentlich bauen</p>
+                <h2 className="mt-5 text-4xl font-black leading-tight text-[#fff0da] sm:text-[3rem]">
+                  Kein Messestand wie jeder andere.
+                </h2>
+                <p className="mt-6 text-lg leading-8 text-[#e7d8c4] sm:text-[1.08rem] sm:leading-9">
+                  Headbang Handwerk verbindet Festivalenergie mit echter Handwerkskompetenz. Das Prinzip dahinter ist einfach: erst Aufmerksamkeit, dann Nähe, dann Relevanz. So wird aus Sichtbarkeit konkrete Bindung.
+                </p>
+                <ul className="mt-8 space-y-4">
+                  {focusPoints.map((point) => (
+                    <li key={point} className="flex items-start gap-3 text-[#eedfcb]">
+                      <CheckCircle2 className="mt-1 h-5 w-5 flex-shrink-0 text-[#ffad56]" />
+                      <span className="leading-7">{point}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="mx-auto grid w-full max-w-6xl gap-8 lg:gap-10 xl:grid-cols-2">
-                <div className="rounded-[1.6rem] bg-black/20 px-6 py-7 ring-1 ring-white/7 backdrop-blur-sm sm:px-7 sm:py-8">
-                  <p className="text-lg leading-8 text-[#ead9c3] sm:text-[1.08rem] sm:leading-9">
-                    Gemeinsam mit Partnern aus der Wirtschaft, Innungen und Betrieben präsentieren wir das Handwerk nicht als Pflicht – sondern als Erlebnis.
-                  </p>
+              <div className="grid gap-5 md:grid-cols-3">
+                {promiseCards.map(({ title, text, icon: Icon }) => (
+                  <div
+                    key={title}
+                    className="rounded-[1.7rem] border border-[#714422]/45 bg-[linear-gradient(180deg,rgba(27,17,12,0.9)_0%,rgba(14,10,8,0.58)_100%)] p-6 shadow-[0_18px_44px_rgba(0,0,0,0.2)]"
+                  >
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.16)_0%,rgba(255,155,57,0.04)_100%)] ring-1 ring-[#a76737]/40">
+                      <Icon className="h-5 w-5 text-[#ffab4e]" />
+                    </div>
+                    <h3 className="mt-5 text-xl font-black text-[#fff0da]">{title}</h3>
+                    <p className="mt-4 text-sm leading-7 text-[#d9c3a8] sm:text-[0.97rem]">{text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="mx-auto mt-18 max-w-7xl lg:mt-24">
+            <div className="rounded-[2rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(36,22,14,0.88)_0%,rgba(14,9,7,0.7)_100%)] p-7 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-8 lg:p-10">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                <div className="max-w-3xl">
+                  <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">So funktioniert die Beteiligung</p>
+                  <h2 className="mt-4 text-4xl font-black text-[#fff0da] sm:text-[3rem]">Vom Interesse bis zur Festivalpräsenz.</h2>
                 </div>
-                <div className="rounded-[1.6rem] bg-black/20 px-6 py-7 ring-1 ring-white/7 backdrop-blur-sm sm:px-7 sm:py-8">
-                  <p className="text-lg leading-8 text-[#ead9c3] sm:text-[1.08rem] sm:leading-9">
-                    Ob durch interaktive Aktionen, Live-Demonstrationen oder innovative Standkonzepte: Wir zeigen, dass Handwerk genauso laut, ehrlich und leidenschaftlich ist wie die Musik, die diese Festivals prägt.
-                  </p>
+                <p className="max-w-2xl text-base leading-7 text-[#dcc8b0] sm:text-[1.02rem] sm:leading-8">
+                  Die Startseite führt jetzt klarer durch das Projekt: zuerst der Nutzen, dann der Ablauf, danach die konkreten Einstiegspunkte für Sponsoren und Unterstützer.
+                </p>
+              </div>
+
+              <div className="mt-10 grid gap-5 lg:grid-cols-4">
+                {processSteps.map((step) => (
+                  <div key={step.number} className="rounded-[1.6rem] bg-black/18 px-5 py-6 ring-1 ring-white/7 backdrop-blur-sm">
+                    <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#ffbf76]">{step.number}</p>
+                    <h3 className="mt-4 text-xl font-black text-[#fff0da]">{step.title}</h3>
+                    <p className="mt-4 text-sm leading-7 text-[#dbc4aa] sm:text-[0.97rem]">{step.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="mx-auto mt-18 max-w-7xl lg:mt-24">
+            <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+              <div className="rounded-[1.9rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(37,23,14,0.84)_0%,rgba(15,10,8,0.52)_100%)] p-7 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-8 lg:p-10">
+                <div className="flex items-center gap-3 text-[#ffc97a]">
+                  <ShieldCheck className="h-5 w-5 text-[#ff9d3c]" />
+                  <p className="text-sm font-semibold uppercase tracking-[0.24em]">Warum das funktioniert</p>
+                </div>
+                <h2 className="mt-5 text-4xl font-black leading-tight text-[#fff0da] sm:text-[2.8rem]">
+                  Handwerk wird nicht erklärt. Es wird erlebt.
+                </h2>
+                <p className="mt-6 text-lg leading-8 text-[#ead9c3] sm:text-[1.08rem] sm:leading-9">
+                  Genau darin liegt das Prinzip dieser Startseite: Sie stellt nicht zuerst Details aus, sondern das Ergebnis. Wer hier landet, versteht direkt, worum es geht, warum das Projekt relevant ist und wie man konkret Teil davon wird.
+                </p>
+                <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-2xl bg-black/18 px-5 py-5 ring-1 ring-white/7">
+                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">Für Betriebe</p>
+                    <p className="mt-2 text-base leading-7 text-[#f0e1cf]">Mehr Sichtbarkeit, stärkere Differenzierung und neue Gesprächsanlässe.</p>
+                  </div>
+                  <div className="rounded-2xl bg-black/18 px-5 py-5 ring-1 ring-white/7">
+                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">Für Nachwuchs</p>
+                    <p className="mt-2 text-base leading-7 text-[#f0e1cf]">Ein direkter, ungezwungener Zugang zu Berufen, Menschen und echtem Können.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-[1.9rem] border border-[#704321]/50 bg-[linear-gradient(180deg,rgba(24,16,11,0.92)_0%,rgba(12,8,6,0.88)_100%)] p-7 shadow-[0_20px_50px_rgba(0,0,0,0.28)] sm:p-8">
+                <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Aktuelle Information</p>
+                <h3 className="mt-4 text-3xl font-black text-[#ffd08f] sm:text-[2.3rem]">Wacken 2027 steht im Fokus.</h3>
+                <div className="mt-6 space-y-5 text-base leading-8 text-[#ead9c3]">
+                  <p>Headbang Handwerk plant den nächsten großen Schritt: einen eigenen Stand auf dem Wacken Open Air 2027.</p>
+                  <p>Mit Live-Demos, Mitmach-Aktionen und starken Partnern entsteht ein Format, das Handwerk nicht kleiner erklärt, sondern größer inszeniert.</p>
+                  <p>Gesucht werden Unternehmen, Unterstützer und Branchenpartner, die früh Teil dieses Projekts werden wollen.</p>
+                </div>
+                <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+                  <Button href="/sponsoren" size="lg" className="justify-center">
+                    Sponsoring ansehen
+                  </Button>
+                  <Button href="/kontakt" size="lg" variant="secondary" className="justify-center">
+                    Kontakt aufnehmen
+                  </Button>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="mx-auto mt-24 max-w-7xl lg:mt-40">
-            <div className="border-t border-[#9b5a2c]/70 px-2 pt-12 sm:px-4 sm:pt-14 lg:px-0 lg:pt-24">
-              <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
+          <section className="mx-auto mt-18 max-w-7xl lg:mt-26">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-3xl">
+                <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Nächste Anlässe</p>
+                <h2 className="mt-4 text-4xl font-black text-[#fff0da] sm:text-[3rem]">Veranstaltungen mit echter Bühne für das Handwerk.</h2>
+              </div>
+              <Button href="/veranstaltungen" variant="secondary" size="lg">
+                Alle Termine ansehen
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="mt-10 grid gap-6 lg:grid-cols-3">
+              {featuredEvents.map((event) => (
+                <div
+                  key={event.id}
+                  className="rounded-[1.7rem] border border-[#6e4325]/45 bg-[linear-gradient(180deg,rgba(26,17,12,0.94)_0%,rgba(13,9,7,0.78)_100%)] p-6 shadow-[0_18px_44px_rgba(0,0,0,0.24)]"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="inline-flex rounded-full border border-[#84502c] bg-[#1b120d] px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-[#ffbf76]">
+                      {statusLabels[event.status]}
+                    </span>
+                    <Calendar className="h-4 w-4 flex-shrink-0 text-[#ff9d3c]" />
+                  </div>
+                  <h3 className="mt-5 text-2xl font-black text-[#fff0da]">{event.festivalName}</h3>
+                  <div className="mt-5 space-y-3 text-sm text-[#dbc4aa]">
+                    <div className="flex items-center gap-2 leading-6">
+                      <Calendar className="h-4 w-4 flex-shrink-0 text-[#ff9d3c]" />
+                      <span>{event.date}</span>
+                    </div>
+                    <div className="flex items-center gap-2 leading-6">
+                      <MapPin className="h-4 w-4 flex-shrink-0 text-[#ff9d3c]" />
+                      <span>{event.location}</span>
+                    </div>
+                  </div>
+                  <p className="mt-5 text-sm leading-7 text-[#e8d8c3]">{event.description}</p>
+                  <div className="mt-6">
+                    <Button href={event.ctaUrl || '/kontakt'} size="sm" variant="secondary" className="w-full justify-center">
+                      {event.ctaText}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="mx-auto mt-18 max-w-7xl lg:mt-26">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-3xl">
+                <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Einstieg für Partner</p>
+                <h2 className="mt-4 text-4xl font-black text-[#fff0da] sm:text-[3rem]">Sponsoring-Pakete mit klarer Staffelung.</h2>
+              </div>
+              <Button href="/sponsoren" variant="ghost" size="lg">
+                Alle Pakete im Detail
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="mt-10 grid gap-6 lg:grid-cols-3">
+              {featuredPackages.map((pkg) => (
+                <div
+                  key={pkg.id}
+                  className={`rounded-[1.8rem] border p-6 shadow-[0_18px_44px_rgba(0,0,0,0.24)] ${
+                    pkg.highlighted
+                      ? 'border-[#d07a34] bg-[linear-gradient(180deg,rgba(86,40,11,0.56)_0%,rgba(19,13,9,0.84)_100%)]'
+                      : 'border-[#6e4325]/45 bg-[linear-gradient(180deg,rgba(26,17,12,0.94)_0%,rgba(13,9,7,0.78)_100%)]'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-2xl font-black text-[#fff0da]">{pkg.name}</p>
+                      <p className="mt-2 text-3xl font-black text-[#ffbe6f]">{formatPrice(pkg.price)}</p>
+                    </div>
+                    {pkg.highlighted ? (
+                      <span className="inline-flex rounded-full bg-[#ff9d3c] px-3 py-1 text-[0.7rem] font-black uppercase tracking-[0.18em] text-black">
+                        Empfohlen
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-3 text-sm uppercase tracking-[0.18em] text-[#caa985]">{pkg.visibility}</p>
+                  <ul className="mt-6 space-y-3">
+                    {pkg.features.slice(0, 4).map((feature) => (
+                      <li key={feature} className="flex items-start gap-3 text-sm leading-6 text-[#ead9c3]">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#ffad56]" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-6">
+                    <Button href="/sponsoren" variant={pkg.highlighted ? 'primary' : 'secondary'} size="sm" className="w-full justify-center">
+                      Paket ansehen
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="mx-auto mt-20 max-w-7xl lg:mt-28">
+            <div className="border-t border-[#9b5a2c]/70 px-2 pt-12 sm:px-4 sm:pt-14 lg:px-0 lg:pt-20">
+              <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
                 <div>
-                  <p className="mb-6 text-2xl font-black tracking-[0.02em] text-[#f0b86a] sm:text-[2rem]">
-                    🤘 Werde Teil der Bewegung
-                  </p>
-                  <p className="max-w-4xl text-lg leading-8 text-[#eadbc7] sm:text-xl sm:leading-9">
-                    Unterstütze uns dabei, das Handwerk neu zu denken und sichtbar zu machen. Als Partner, Sponsor oder Unterstützer bringst du deine Marke dorthin, wo echte Aufmerksamkeit entsteht – mitten ins Leben.
-                  </p>
-                  <p className="mt-8 max-w-4xl text-2xl font-black leading-tight text-[#fff2de] sm:text-3xl">
-                    Headbang Handwerk – weil echtes Handwerk keine Bühne braucht. Wir bauen sie einfach.
+                  <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Letzter Abschnitt, klare Handlung</p>
+                  <h2 className="mt-5 max-w-4xl text-4xl font-black leading-tight text-[#fff2de] sm:text-[3rem]">
+                    Wenn das Handwerk dorthin soll, wo echte Aufmerksamkeit entsteht, dann beginnt es genau hier.
+                  </h2>
+                  <p className="mt-6 max-w-4xl text-lg leading-8 text-[#eadbc7] sm:text-xl sm:leading-9">
+                    Unterstütze Headbang Handwerk als Partner, Sponsor oder Unterstützer und positioniere deine Marke in einem Projekt, das Haltung, Erlebnis und Sichtbarkeit zusammenbringt.
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-4 sm:flex-row lg:flex-col xl:flex-row">
-                  <Button href="#" size="lg">
-                    Jetzt Unterstützen
+                  <Button href="/sponsoren" size="lg">
+                    Jetzt unterstützen
                     <ArrowRight className="h-4 w-4" />
                   </Button>
-                  <Button href="#" size="lg" variant="secondary">
-                    Sponsor werden
+                  <Button href="/kontakt" size="lg" variant="secondary">
+                    Ansprechpartner kontaktieren
                   </Button>
                 </div>
               </div>
