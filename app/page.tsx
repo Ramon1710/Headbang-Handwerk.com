@@ -116,11 +116,11 @@ export default function HomePage() {
                   Dort, wo Energie entsteht.
                 </h1>
 
-                <p className="mt-8 max-w-3xl text-lg leading-8 text-[#e9dac6] sm:text-[1.18rem] sm:leading-9">
+                <p className="mt-8 mb-[2.25rem] max-w-3xl text-lg leading-8 text-[#e9dac6] sm:mb-[2.75rem] sm:text-[1.18rem] sm:leading-9 lg:mb-[3.25rem]">
                   Headbang Handwerk bringt Betriebe, Marken und Nachwuchs in ein Umfeld, das Aufmerksamkeit nicht erkauft, sondern erzeugt. Auf den größten Metal-Festivals Europas wird Handwerk live erlebbar, modern inszeniert und glaubwürdig vermittelt.
                 </p>
 
-                <div className="mt-16 flex flex-col gap-4 sm:flex-row lg:mt-20">
+                <div className="mt-0 flex flex-col gap-4 sm:flex-row">
                   <Button href="/sponsoren" size="lg" className="min-w-56 justify-center">
                     Jetzt Partner werden
                     <ArrowRight className="h-4 w-4" />
