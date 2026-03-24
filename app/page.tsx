@@ -21,19 +21,14 @@ import wackenBackgroundImage from '../Wacken Hintergrund Bild.png';
 
 const promiseCards = [
   {
-    title: 'Sichtbarkeit mit Haltung',
-    text: 'Wir bringen Marken, Betriebe und Innungen in einen Kontext, der auffällt und glaubwürdig wirkt.',
+    title: 'Als Erlebnis, nicht als Pflicht',
+    text: 'Gemeinsam mit Partnern aus der Wirtschaft, Innungen und Betrieben präsentieren wir das Handwerk nicht als Pflicht – sondern als Erlebnis.',
     icon: Flame,
   },
   {
-    title: 'Nachwuchs, der wirklich hinschaut',
-    text: 'Festivalumfelder schaffen Aufmerksamkeit, Nähe und echte Gespräche statt austauschbarer Werbekontakte.',
+    title: 'Laut. Ehrlich. Leidenschaftlich.',
+    text: 'Ob durch interaktive Aktionen, Live-Demonstrationen oder innovative Standkonzepte: Wir zeigen, dass Handwerk genauso laut, ehrlich und leidenschaftlich ist wie die Musik, die diese Festivals prägt.',
     icon: Users,
-  },
-  {
-    title: 'Handwerk zum Anfassen',
-    text: 'Live-Demos, Mitmachaktionen und Standkonzepte machen Können sichtbar, nicht nur behauptet.',
-    icon: Hammer,
   },
 ];
 
@@ -61,10 +56,9 @@ const processSteps = [
 ];
 
 const focusPoints = [
-  'Wacken 2027 als nächster großer Meilenstein',
-  'Partner, Sponsoren und Betriebe als sichtbarer Teil des Projekts',
-  'Interaktive Formate statt statischer Werbeflächen',
-  'Klare Ansprache für Nachwuchs, Öffentlichkeit und Branche',
+  'Nachwuchs begeistern',
+  'Handwerk sichtbar machen',
+  'Unternehmen eine neue Bühne bieten',
 ];
 
 const highlightStats = [
@@ -111,13 +105,15 @@ export default function HomePage() {
                 </div>
 
                 <h1 className="mt-8 max-w-4xl text-5xl font-black leading-[0.95] text-[#fbf1e4] sm:text-6xl lg:text-[4.65rem] xl:text-[5.15rem]">
-                  Handwerk sichtbar machen.
-                  <br />
-                  Dort, wo Energie entsteht.
+                  Handwerk trifft Metal. Leidenschaft trifft Zukunft.
                 </h1>
 
                 <p className="mt-8 max-w-3xl text-lg leading-8 text-[#e9dac6] sm:text-[1.18rem] sm:leading-9">
-                  Headbang Handwerk bringt Betriebe, Marken und Nachwuchs in ein Umfeld, das Aufmerksamkeit nicht erkauft, sondern erzeugt. Auf den größten Metal-Festivals Europas wird Handwerk live erlebbar, modern inszeniert und glaubwürdig vermittelt.
+                  Wir bringen das Handwerk dorthin, wo Energie, Gemeinschaft und Begeisterung aufeinandertreffen – auf die größten Metal-Festivals Europas.
+                </p>
+
+                <p className="mt-6 max-w-3xl text-lg leading-8 text-[#e9dac6] sm:text-[1.08rem] sm:leading-9">
+                  Mit Headbang Handwerk e.V. schaffen wir eine Plattform, die zeigt, wie modern, vielseitig und kraftvoll das Handwerk wirklich ist. Zwischen Bühne, Feuer und tausenden Festivalbesuchern entsteht ein Ort, an dem echtes Können erlebbar wird: live, zum Anfassen und zum Mitmachen.
                 </p>
 
                 <div aria-hidden="true" className="h-8 sm:h-10 lg:h-14" />
@@ -218,13 +214,10 @@ export default function HomePage() {
           <section className="mx-auto max-w-7xl py-12 lg:py-[6rem]">
             <div className="grid gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-[4.5rem]">
               <div className="rounded-[1.75rem] border border-white/8 bg-[linear-gradient(180deg,rgba(18,12,9,0.16)_0%,rgba(18,12,9,0.05)_100%)] px-8 py-8 shadow-[0_16px_40px_rgba(0,0,0,0.1)] backdrop-blur-[10px] sm:px-10 sm:py-10 lg:px-12 lg:py-12">
-                <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Was wir hier eigentlich bauen</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Unser Ziel ist klar</p>
                 <h2 className="mt-5 text-4xl font-black leading-tight text-[#fff0da] sm:text-[3rem]">
-                  Kein Messestand wie jeder andere.
+                  Handwerk sichtbar machen.
                 </h2>
-                <p className="mt-6 text-lg leading-8 text-[#e7d8c4] sm:text-[1.08rem] sm:leading-9">
-                  Headbang Handwerk verbindet Festivalenergie mit echter Handwerkskompetenz. Das Prinzip dahinter ist einfach: erst Aufmerksamkeit, dann Nähe, dann Relevanz. So wird aus Sichtbarkeit konkrete Bindung.
-                </p>
                 <ul className="mt-8 space-y-4">
                   {focusPoints.map((point) => (
                     <li key={point} className="flex items-start gap-3 text-[#eedfcb]">
@@ -235,7 +228,7 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              <div className="grid gap-8 pt-6 md:grid-cols-3 lg:gap-10 lg:pt-12">
+              <div className="grid gap-8 pt-6 md:grid-cols-2 lg:gap-10 lg:pt-12">
                 {promiseCards.map(({ title, text, icon: Icon }) => (
                   <div
                     key={title}
@@ -434,12 +427,17 @@ export default function HomePage() {
             <div className="border-t border-[#9b5a2c]/70 px-2 pt-20 sm:px-4 sm:pt-20 lg:px-0 lg:pt-28">
               <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Letzter Abschnitt, klare Handlung</p>
+                  <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Werde Teil der Bewegung</p>
                   <h2 className="mt-5 max-w-4xl text-4xl font-black leading-tight text-[#fff2de] sm:text-[3rem]">
-                    Wenn das Handwerk dorthin soll, wo echte Aufmerksamkeit entsteht, dann beginnt es genau hier.
+                    Unterstütze uns dabei, das Handwerk neu zu denken und sichtbar zu machen.
                   </h2>
                   <p className="mt-6 max-w-4xl text-lg leading-8 text-[#eadbc7] sm:text-xl sm:leading-9">
-                    Unterstütze Headbang Handwerk als Partner, Sponsor oder Unterstützer und positioniere deine Marke in einem Projekt, das Haltung, Erlebnis und Sichtbarkeit zusammenbringt.
+                    Als Partner, Sponsor oder Unterstützer bringst du deine Marke dorthin, wo echte Aufmerksamkeit entsteht – mitten ins Leben.
+                  </p>
+                  <p className="mt-8 max-w-4xl text-2xl font-black leading-tight text-[#fff2de] sm:text-3xl">
+                    Headbang Handwerk – weil echtes Handwerk keine Bühne braucht.
+                    <br />
+                    Wir bauen sie einfach.
                   </p>
                 </div>
 
