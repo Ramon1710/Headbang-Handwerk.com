@@ -99,7 +99,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgba(255,143,42,0.22)_0%,transparent_32%),radial-gradient(circle_at_88%_14%,rgba(255,168,76,0.15)_0%,transparent_26%),linear-gradient(180deg,rgba(8,5,3,0.18)_0%,rgba(8,5,3,0.82)_100%)]" />
         <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:120px_120px]" />
 
-        <div className="relative z-10 px-4 pb-24 pt-10 sm:px-6 lg:px-8 lg:pb-32">
+        <div className="relative z-10 px-4 pb-28 pt-10 sm:px-6 lg:px-8 lg:pb-40">
           <section className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:pt-8">
             <div className="relative">
               <div className="absolute -left-10 top-6 hidden h-44 w-44 rounded-full bg-orange-500/14 blur-3xl lg:block" />
@@ -194,7 +194,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-10 max-w-7xl lg:mt-14">
+          <section className="mx-auto mt-14 max-w-7xl lg:mt-20">
             <div className="overflow-hidden rounded-[1.7rem] border border-[#704321]/55 bg-[linear-gradient(90deg,rgba(30,18,12,0.96)_0%,rgba(16,10,8,0.86)_50%,rgba(30,18,12,0.96)_100%)] shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
               <div className="grid gap-6 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-4 lg:gap-7 lg:px-8">
                 {highlightStats.map((item) => (
@@ -207,7 +207,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-20 max-w-7xl lg:mt-28">
+          <section className="mx-auto mt-24 max-w-7xl lg:mt-36">
             <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
               <div className="text-panel text-panel-roomy">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Was wir hier eigentlich bauen</p>
@@ -244,7 +244,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-24 max-w-7xl lg:mt-32">
+          <section className="mx-auto mt-28 max-w-7xl lg:mt-40">
             <div className="grid gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-20">
               <div className="max-w-3xl lg:pt-2">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">So funktioniert die Beteiligung</p>
@@ -255,7 +255,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="mt-12 grid gap-8 lg:grid-cols-4 lg:gap-8 xl:gap-10">
+            <div className="mt-16 grid gap-8 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-12 xl:gap-x-10">
               {processSteps.map((step) => (
                 <div
                   key={step.number}
@@ -269,7 +269,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-24 max-w-7xl lg:mt-32">
+          <section className="mx-auto mt-28 max-w-7xl lg:mt-40">
             <div className="grid gap-12 lg:grid-cols-[1.03fr_0.97fr] lg:gap-18 xl:gap-20">
               <div className="rounded-[2rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(37,23,14,0.84)_0%,rgba(15,10,8,0.52)_100%)] p-9 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-10 lg:p-12">
                 <div className="flex items-center gap-3 text-[#ffc97a]">
@@ -282,7 +282,7 @@ export default function HomePage() {
                 <p className="mt-6 text-lg leading-8 text-[#ead9c3] sm:text-[1.08rem] sm:leading-9">
                   Genau darin liegt das Prinzip dieser Startseite: Sie stellt nicht zuerst Details aus, sondern das Ergebnis. Wer hier landet, versteht direkt, worum es geht, warum das Projekt relevant ist und wie man konkret Teil davon wird.
                 </p>
-                <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:gap-7">
+                <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:gap-8">
                   <div className="rounded-[1.6rem] bg-black/18 px-7 py-7 ring-1 ring-white/7">
                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">Für Betriebe</p>
                     <p className="mt-2 text-base leading-7 text-[#f0e1cf]">Mehr Sichtbarkeit, stärkere Differenzierung und neue Gesprächsanlässe.</p>
@@ -302,7 +302,7 @@ export default function HomePage() {
                   <p>Mit Live-Demos, Mitmach-Aktionen und starken Partnern entsteht ein Format, das Handwerk nicht kleiner erklärt, sondern größer inszeniert.</p>
                   <p>Gesucht werden Unternehmen, Unterstützer und Branchenpartner, die früh Teil dieses Projekts werden wollen.</p>
                 </div>
-                <div className="mt-12 flex flex-col gap-4 sm:flex-row sm:gap-5">
+                <div className="mt-14 flex flex-col gap-4 sm:flex-row sm:gap-5">
                   <Button href="/sponsoren" size="lg" className="justify-center">
                     Sponsoring ansehen
                   </Button>
@@ -314,7 +314,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-24 max-w-7xl lg:mt-32">
+          <section className="mx-auto mt-28 max-w-7xl lg:mt-40">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Nächste Anlässe</p>
@@ -326,7 +326,7 @@ export default function HomePage() {
               </Button>
             </div>
 
-            <div className="mt-14 grid gap-8 lg:grid-cols-3 xl:gap-10">
+            <div className="mt-18 grid gap-8 lg:grid-cols-3 lg:gap-y-12 xl:gap-x-10">
               {featuredEvents.map((event) => (
                 <div
                   key={event.id}
@@ -360,7 +360,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-24 max-w-7xl lg:mt-32">
+          <section className="mx-auto mt-28 max-w-7xl lg:mt-40">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Einstieg für Partner</p>
@@ -372,7 +372,7 @@ export default function HomePage() {
               </Button>
             </div>
 
-            <div className="mt-14 grid gap-8 lg:grid-cols-3 xl:gap-10">
+            <div className="mt-18 grid gap-8 lg:grid-cols-3 lg:gap-y-12 xl:gap-x-10">
               {featuredPackages.map((pkg) => (
                 <div
                   key={pkg.id}
@@ -412,7 +412,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-20 max-w-7xl lg:mt-28">
+          <section className="mx-auto mt-28 max-w-7xl lg:mt-40">
             <div className="border-t border-[#9b5a2c]/70 px-2 pt-12 sm:px-4 sm:pt-14 lg:px-0 lg:pt-20">
               <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
                 <div>
