@@ -1,6 +1,4 @@
-import Image from 'next/image';
 import { Instagram, Facebook, Youtube } from 'lucide-react';
-import headbangLogo from '../Headbang Handwerk e.V. Logo.png';
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -8,11 +6,7 @@ export function Footer() {
   return (
     <footer className="relative mt-16 border-t border-[#4f2d1a] bg-[linear-gradient(180deg,#0c0705_0%,#090604_100%)]">
       <div className="fire-divider" />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-14 text-center">
-        <a href="/" className="inline-flex justify-center mb-8" aria-label="Headbang Handwerk Startseite">
-          <Image src={headbangLogo} alt="Headbang Handwerk Logo" className="w-52 h-auto" />
-        </a>
-
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 text-center">
         <p className="text-[1.9rem] sm:text-[2.2rem] font-semibold text-[#f2ba63] mb-5">
           Headbang Handwerk
           <span className="text-[#f0e7da]"> - wir bringen das Handwerk auf die Bühne.</span>
@@ -35,7 +29,7 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="pt-5 border-t border-[#3d2415] flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 text-sm text-[#d6c3ad]">
+        <div className="pt-5 border-t border-[#3d2415] flex flex-wrap items-center justify-center gap-x-5 gap-y-3 text-sm text-[#d6c3ad] text-center">
           <p>© {year} Headbang Handwerk e.V.</p>
           <a href="/impressum" className="hover:text-[#ffb85e] transition-colors">Impressum</a>
           <a href="/datenschutz" className="hover:text-[#ffb85e] transition-colors">Datenschutz</a>

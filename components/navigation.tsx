@@ -29,7 +29,7 @@ export function Navigation() {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+        'sticky top-0 left-0 right-0 z-50 transition-all duration-300',
         scrolled
           ? 'bg-[#100a07]/95 backdrop-blur-md border-b border-[#4a2b19] shadow-[0_14px_45px_rgba(0,0,0,0.65)]'
           : 'bg-[#090604]/88 border-b border-[#4a2b19]/80'

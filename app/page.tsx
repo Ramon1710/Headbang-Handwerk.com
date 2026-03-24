@@ -28,7 +28,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_14%,rgba(255,136,32,0.18)_0%,transparent_32%),radial-gradient(circle_at_86%_18%,rgba(255,168,76,0.14)_0%,transparent_26%),linear-gradient(180deg,rgba(8,5,3,0.26)_0%,rgba(8,5,3,0.84)_100%)]" />
         <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.018)_1px,transparent_1px)] [background-size:120px_120px]" />
 
-        <div className="relative z-10 px-4 pb-20 pt-28 sm:px-6 sm:pt-32 lg:px-8 lg:pb-28">
+        <div className="relative z-10 px-4 pb-20 pt-10 sm:px-6 sm:pt-12 lg:px-8 lg:pb-28">
           <section className="mx-auto grid max-w-7xl grid-cols-1 gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-start lg:gap-14">
             <div className="relative">
               <div className="absolute -left-10 top-4 hidden h-40 w-40 rounded-full bg-orange-500/12 blur-3xl lg:block" />
@@ -59,7 +59,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="lg:sticky lg:top-28">
+            <div className="lg:sticky lg:top-30">
               <div className="relative mx-auto max-w-2xl lg:max-w-none">
                 <div className="absolute -inset-6 rounded-[2.2rem] bg-[radial-gradient(circle,rgba(255,128,26,0.25)_0%,rgba(255,128,26,0.04)_48%,rgba(255,128,26,0)_72%)] blur-2xl" />
                 <div className="absolute -right-4 top-8 hidden h-36 w-36 rounded-full bg-orange-500/16 blur-3xl sm:block" />
@@ -114,17 +114,17 @@ export default function HomePage() {
           </section>
 
           <section className="mx-auto mt-10 max-w-7xl lg:mt-12">
-            <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-              <div className="rounded-[1.9rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(41,24,14,0.84)_0%,rgba(18,11,8,0.5)_100%)] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-7 lg:p-8">
-                <div className="mb-5 flex items-center gap-3 text-[#ffc97a]">
+            <div className="grid gap-6">
+              <div className="mx-auto w-full max-w-4xl rounded-[1.9rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(41,24,14,0.84)_0%,rgba(18,11,8,0.5)_100%)] p-6 text-center shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-7 lg:p-8">
+                <div className="mb-5 flex items-center justify-center gap-3 text-[#ffc97a]">
                   <Hammer className="h-5 w-5 text-[#ff9d3c]" />
                   <p className="text-2xl font-black tracking-[0.03em] sm:text-[1.9rem]">Unser Ziel ist klar:</p>
                 </div>
-                <ul className="grid gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-1">
+                <ul className="grid gap-3 sm:grid-cols-3 sm:gap-4">
                   {goals.map((goal) => (
                     <li
                       key={goal}
-                      className="group flex items-center gap-3 rounded-2xl bg-[linear-gradient(180deg,rgba(255,150,56,0.12)_0%,rgba(255,150,56,0.02)_100%)] px-4 py-4 ring-1 ring-[#8c542b]/45 transition-all duration-200 hover:-translate-y-0.5 hover:ring-[#c87835]"
+                      className="group flex items-center justify-center gap-3 rounded-2xl bg-[linear-gradient(180deg,rgba(255,150,56,0.12)_0%,rgba(255,150,56,0.02)_100%)] px-4 py-4 text-center ring-1 ring-[#8c542b]/45 transition-all duration-200 hover:-translate-y-0.5 hover:ring-[#c87835]"
                     >
                       <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[#ffad56]" />
                       <span className="text-sm font-semibold text-[#f7e7d3] sm:text-base">{goal}</span>
@@ -133,7 +133,7 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              <div className="grid gap-6">
+              <div className="grid gap-6 xl:grid-cols-2">
                 <div className="rounded-[1.6rem] bg-black/20 px-6 py-6 ring-1 ring-white/7 backdrop-blur-sm sm:px-7 sm:py-7">
                   <p className="text-lg leading-8 text-[#ead9c3] sm:text-[1.08rem] sm:leading-9">
                     Gemeinsam mit Partnern aus der Wirtschaft, Innungen und Betrieben präsentieren wir das Handwerk nicht als Pflicht – sondern als Erlebnis.
@@ -149,8 +149,7 @@ export default function HomePage() {
           </section>
 
           <section className="mx-auto mt-14 max-w-7xl lg:mt-18">
-            <div className="section-shell overflow-hidden rounded-[2rem] p-6 sm:p-8 lg:p-10">
-              <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,153,51,0.9),transparent)]" />
+            <div className="border-t border-[#9b5a2c]/70 px-2 pt-8 sm:px-4 sm:pt-10 lg:px-0 lg:pt-12">
               <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-10">
                 <div>
                   <p className="mb-4 text-2xl font-black tracking-[0.02em] text-[#f0b86a] sm:text-[2rem]">
