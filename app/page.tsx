@@ -120,7 +120,7 @@ export default function HomePage() {
                   Headbang Handwerk bringt Betriebe, Marken und Nachwuchs in ein Umfeld, das Aufmerksamkeit nicht erkauft, sondern erzeugt. Auf den größten Metal-Festivals Europas wird Handwerk live erlebbar, modern inszeniert und glaubwürdig vermittelt.
                 </p>
 
-                <div className="mt-14 flex flex-col gap-4 sm:flex-row lg:mt-16">
+                <div className="mt-16 flex flex-col gap-4 sm:flex-row lg:mt-20">
                   <Button href="/sponsoren" size="lg" className="min-w-56 justify-center">
                     Jetzt Partner werden
                     <ArrowRight className="h-4 w-4" />
@@ -130,7 +130,7 @@ export default function HomePage() {
                   </Button>
                 </div>
 
-                <div className="mt-12 grid gap-6 sm:grid-cols-3">
+                <div className="mt-[4.5rem] grid gap-6 sm:grid-cols-3 lg:mt-[6rem]">
                   <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.08)_0%,rgba(255,155,57,0.015)_100%)] px-6 py-6 ring-1 ring-[#92592f]/28 backdrop-blur-[6px]">
                     <p className="text-2xl font-black text-[#ffbe6f]">Wacken 2027</p>
                     <p className="mt-1 text-sm leading-6 text-[#dbc4aa]">Nächster großer Meilenstein im Projekt</p>
