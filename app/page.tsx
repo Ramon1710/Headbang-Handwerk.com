@@ -28,13 +28,13 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_14%,rgba(255,136,32,0.18)_0%,transparent_32%),radial-gradient(circle_at_86%_18%,rgba(255,168,76,0.14)_0%,transparent_26%),linear-gradient(180deg,rgba(8,5,3,0.26)_0%,rgba(8,5,3,0.84)_100%)]" />
         <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.018)_1px,transparent_1px)] [background-size:120px_120px]" />
 
-        <div className="relative z-10 px-4 pb-20 pt-10 sm:px-6 sm:pt-12 lg:px-8 lg:pb-28">
-          <section className="mx-auto grid max-w-7xl grid-cols-1 gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-start lg:gap-14">
+        <div className="relative z-10 px-4 pb-24 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pb-32">
+          <section className="mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:items-start lg:gap-16">
             <div className="relative">
               <div className="absolute -left-10 top-4 hidden h-40 w-40 rounded-full bg-orange-500/12 blur-3xl lg:block" />
 
-              <div className="relative text-panel text-panel-roomy sm:p-10 lg:p-12">
-                <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#7e4d2a] bg-[#1b120d]/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#f4c481] backdrop-blur-sm sm:text-sm">
+              <div className="relative text-panel text-panel-roomy sm:p-11 lg:p-14">
+                <div className="mb-10 inline-flex items-center gap-2 rounded-full border border-[#7e4d2a] bg-[#1b120d]/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#f4c481] backdrop-blur-sm sm:text-sm">
                   <Flame className="h-4 w-4 text-[#ff9b39]" />
                   Festival. Handwerk. Haltung.
                 </div>
@@ -43,14 +43,14 @@ export default function HomePage() {
                   Handwerk trifft Metal. Leidenschaft trifft Zukunft.
                 </h1>
 
-                <div className="mt-10 space-y-7 text-base leading-8 text-[#e6d7c2] sm:text-lg sm:leading-9">
+                <div className="mt-14 space-y-10 text-base leading-8 text-[#e6d7c2] sm:text-lg sm:leading-9 lg:space-y-12">
                   <div className="border-l-2 border-[#ff8f2a]/65 pl-5 sm:pl-6">
                     <p>
                       Wir bringen das Handwerk dorthin, wo Energie, Gemeinschaft und Begeisterung aufeinandertreffen – auf die größten Metal-Festivals Europas.
                     </p>
                   </div>
 
-                  <div className="text-panel text-panel-tight bg-[linear-gradient(180deg,rgba(26,17,12,0.68)_0%,rgba(15,10,8,0.24)_100%)]">
+                  <div className="text-panel bg-[linear-gradient(180deg,rgba(26,17,12,0.68)_0%,rgba(15,10,8,0.24)_100%)] px-6 py-6 sm:px-7 sm:py-7">
                     <p>
                       Mit Headbang Handwerk e.V. schaffen wir eine Plattform, die zeigt, wie modern, vielseitig und kraftvoll das Handwerk wirklich ist. Zwischen Bühne, Feuer und tausenden Festivalbesuchern entsteht ein Ort, an dem echtes Können erlebbar wird: live, zum Anfassen und zum Mitmachen.
                     </p>
@@ -80,7 +80,7 @@ export default function HomePage() {
                     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,4,2,0.03)_0%,rgba(7,4,2,0.32)_100%)]" />
                   </div>
 
-                  <div className="mt-5 grid gap-4 sm:grid-cols-3">
+                  <div className="mt-7 grid gap-4 sm:grid-cols-3 lg:mt-8">
                     <div className="rounded-2xl bg-[#120d0a]/90 px-4 py-4 text-center ring-1 ring-white/6">
                       <p className="text-2xl font-black text-[#ffb14d]">Metal</p>
                       <p className="mt-1 text-xs uppercase tracking-[0.2em] text-[#cbb59a]">Atmosphäre</p>
@@ -99,14 +99,14 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-8 max-w-7xl lg:mt-10">
+          <section className="mx-auto mt-12 max-w-7xl lg:mt-16">
             <div className="overflow-hidden rounded-[1.6rem] border border-[#714422]/50 bg-[linear-gradient(90deg,rgba(30,18,12,0.94)_0%,rgba(18,11,8,0.86)_48%,rgba(30,18,12,0.94)_100%)] shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
-              <div className="grid gap-5 px-5 py-5 sm:px-6 lg:grid-cols-[auto_1fr] lg:items-start lg:gap-8 lg:px-8">
+              <div className="grid gap-6 px-5 py-6 sm:px-6 sm:py-7 lg:grid-cols-[auto_1fr] lg:items-start lg:gap-10 lg:px-8 lg:py-8">
                 <div className="flex items-center gap-3 text-[#ffbe6f] lg:pt-1">
                   <Sparkles className="h-4 w-4 flex-shrink-0 text-[#ff9f35]" />
                   <span className="text-sm font-bold uppercase tracking-[0.24em]">Aktuelle Informationen</span>
                 </div>
-                <div className="space-y-3 text-sm leading-7 text-[#ead9c3] sm:text-base sm:leading-8">
+                <div className="space-y-4 text-sm leading-7 text-[#ead9c3] sm:text-base sm:leading-8 lg:space-y-5">
                   <p className="text-lg font-black text-[#ffd08f] sm:text-[1.22rem]">
                     🔥 Wacken 2027 – wir sind dabei!
                   </p>
@@ -132,18 +132,18 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mt-10 w-full lg:mt-12">
-            <div className="grid gap-6">
-              <div className="mx-auto w-full max-w-5xl rounded-[1.9rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(41,24,14,0.84)_0%,rgba(18,11,8,0.5)_100%)] p-6 text-center shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-7 lg:p-8">
-                <div className="mb-5 flex items-center justify-center gap-3 text-[#ffc97a]">
+          <section className="mt-14 w-full lg:mt-18">
+            <div className="grid gap-8 lg:gap-10">
+              <div className="mx-auto w-full max-w-5xl rounded-[1.9rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(41,24,14,0.84)_0%,rgba(18,11,8,0.5)_100%)] p-7 text-center shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-8 lg:p-10">
+                <div className="mb-7 flex items-center justify-center gap-3 text-[#ffc97a]">
                   <Hammer className="h-5 w-5 text-[#ff9d3c]" />
                   <p className="text-2xl font-black tracking-[0.03em] sm:text-[1.9rem]">Unser Ziel ist klar:</p>
                 </div>
-                <ul className="grid gap-3 sm:grid-cols-3 sm:gap-4">
+                <ul className="grid gap-4 sm:grid-cols-3 sm:gap-5">
                   {goals.map((goal) => (
                     <li
                       key={goal}
-                      className="group flex items-center justify-center gap-3 rounded-2xl bg-[linear-gradient(180deg,rgba(255,150,56,0.12)_0%,rgba(255,150,56,0.02)_100%)] px-4 py-4 text-center ring-1 ring-[#8c542b]/45 transition-all duration-200 hover:-translate-y-0.5 hover:ring-[#c87835]"
+                      className="group flex items-center justify-center gap-3 rounded-2xl bg-[linear-gradient(180deg,rgba(255,150,56,0.12)_0%,rgba(255,150,56,0.02)_100%)] px-4 py-5 text-center ring-1 ring-[#8c542b]/45 transition-all duration-200 hover:-translate-y-0.5 hover:ring-[#c87835]"
                     >
                       <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[#ffad56]" />
                       <span className="text-sm font-semibold text-[#f7e7d3] sm:text-base">{goal}</span>
@@ -152,13 +152,13 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              <div className="mx-auto grid w-full max-w-6xl gap-6 xl:grid-cols-2">
-                <div className="rounded-[1.6rem] bg-black/20 px-6 py-6 ring-1 ring-white/7 backdrop-blur-sm sm:px-7 sm:py-7">
+              <div className="mx-auto grid w-full max-w-6xl gap-8 xl:grid-cols-2">
+                <div className="rounded-[1.6rem] bg-black/20 px-6 py-7 ring-1 ring-white/7 backdrop-blur-sm sm:px-7 sm:py-8">
                   <p className="text-lg leading-8 text-[#ead9c3] sm:text-[1.08rem] sm:leading-9">
                     Gemeinsam mit Partnern aus der Wirtschaft, Innungen und Betrieben präsentieren wir das Handwerk nicht als Pflicht – sondern als Erlebnis.
                   </p>
                 </div>
-                <div className="rounded-[1.6rem] bg-black/20 px-6 py-6 ring-1 ring-white/7 backdrop-blur-sm sm:px-7 sm:py-7">
+                <div className="rounded-[1.6rem] bg-black/20 px-6 py-7 ring-1 ring-white/7 backdrop-blur-sm sm:px-7 sm:py-8">
                   <p className="text-lg leading-8 text-[#ead9c3] sm:text-[1.08rem] sm:leading-9">
                     Ob durch interaktive Aktionen, Live-Demonstrationen oder innovative Standkonzepte: Wir zeigen, dass Handwerk genauso laut, ehrlich und leidenschaftlich ist wie die Musik, die diese Festivals prägt.
                   </p>
@@ -167,17 +167,17 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-14 max-w-7xl lg:mt-18">
-            <div className="border-t border-[#9b5a2c]/70 px-2 pt-8 sm:px-4 sm:pt-10 lg:px-0 lg:pt-12">
-              <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-10">
+          <section className="mx-auto mt-18 max-w-7xl lg:mt-24">
+            <div className="border-t border-[#9b5a2c]/70 px-2 pt-10 sm:px-4 sm:pt-12 lg:px-0 lg:pt-16">
+              <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-12">
                 <div>
-                  <p className="mb-4 text-2xl font-black tracking-[0.02em] text-[#f0b86a] sm:text-[2rem]">
+                  <p className="mb-5 text-2xl font-black tracking-[0.02em] text-[#f0b86a] sm:text-[2rem]">
                     🤘 Werde Teil der Bewegung
                   </p>
                   <p className="max-w-4xl text-lg leading-8 text-[#eadbc7] sm:text-xl sm:leading-9">
                     Unterstütze uns dabei, das Handwerk neu zu denken und sichtbar zu machen. Als Partner, Sponsor oder Unterstützer bringst du deine Marke dorthin, wo echte Aufmerksamkeit entsteht – mitten ins Leben.
                   </p>
-                  <p className="mt-6 max-w-4xl text-2xl font-black leading-tight text-[#fff2de] sm:text-3xl">
+                  <p className="mt-8 max-w-4xl text-2xl font-black leading-tight text-[#fff2de] sm:text-3xl">
                     Headbang Handwerk – weil echtes Handwerk keine Bühne braucht. Wir bauen sie einfach.
                   </p>
                 </div>
