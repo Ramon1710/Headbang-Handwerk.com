@@ -38,8 +38,8 @@ function CheckoutContent() {
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6">
-        <h1 className="text-3xl font-black text-white mb-8">
+      <div className="content-flow max-w-2xl mx-auto px-4 sm:px-6">
+        <h1 className="text-3xl font-black text-white">
           Paket <span className="text-orange-500">{pkg.name}</span> buchen
         </h1>
 
@@ -88,7 +88,7 @@ function CheckoutContent() {
           )}
         </Button>
 
-        <p className="text-gray-600 text-xs mt-4 text-center">
+        <p className="text-gray-600 text-xs text-center">
           Sichere Zahlung via Stripe. Nach Zahlungseingang erhaltet ihr eine Bestätigung per E-Mail.
         </p>
       </div>

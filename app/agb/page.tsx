@@ -13,7 +13,7 @@ export default function AGBPage() {
           <h1 className="text-4xl font-black text-white mb-10 text-center">
             Allgemeine Geschäftsbedingungen
           </h1>
-          <div className="legal-copy text-gray-300 space-y-8">
+          <div className="legal-copy content-flow text-gray-300">
             <section>
               <h2 className="text-white text-xl font-bold mb-3">§ 1 Geltungsbereich</h2>
               <p className="text-sm leading-relaxed">

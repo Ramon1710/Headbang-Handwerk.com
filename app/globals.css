@@ -89,6 +89,31 @@ h6 {
   text-align: center;
 }
 
+.content-flow > * + * {
+  margin-top: 1.5rem;
+}
+
+.content-flow h1 + p,
+.content-flow h2 + p,
+.content-flow h3 + p,
+.content-flow h4 + p,
+.content-flow h5 + p,
+.content-flow h6 + p {
+  margin-top: 0.85rem;
+}
+
+.content-flow p + p,
+.content-flow p + ul,
+.content-flow p + ol,
+.content-flow ul + p,
+.content-flow ol + p {
+  margin-top: 1.25rem;
+}
+
+.content-flow section > * + * {
+  margin-top: 0.9rem;
+}
+
 .section-shell {
   position: relative;
   isolation: isolate;

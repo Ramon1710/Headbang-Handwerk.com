@@ -11,7 +11,7 @@ export default function ImpressumPage() {
       <main className="min-h-screen bg-transparent pt-28 pb-24">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <h1 className="text-4xl font-black text-white mb-10 text-center">Impressum</h1>
-          <div className="legal-copy text-gray-300 space-y-8">
+          <div className="legal-copy content-flow text-gray-300">
             <h2 className="text-white text-xl font-bold">Angaben gemäß § 5 TMG</h2>
             <p>
               Headbang Handwerk<br />

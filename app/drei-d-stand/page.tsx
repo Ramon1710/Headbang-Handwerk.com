@@ -20,12 +20,12 @@ export default function DreiDStandPage() {
       <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="mb-14">
+          <div className="content-flow mb-14">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-400 text-sm font-medium mb-6">
               <Layers className="w-3.5 h-3.5" />
               Messestand-Konfiguration
             </div>
-            <h1 className="text-4xl sm:text-5xl font-black text-white mb-4">
+            <h1 className="text-4xl sm:text-5xl font-black text-white">
               3D-Stand &{' '}
               <span className="text-orange-500">Bannerflächen</span>
             </h1>

@@ -25,8 +25,8 @@ export default function SponsorenPage() {
       <Navigation />
       <main className="min-h-screen bg-transparent pt-28 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14 max-w-3xl mx-auto">
-            <h1 className="text-4xl sm:text-5xl font-black text-white mb-4">
+          <div className="content-flow text-center mb-14 max-w-3xl mx-auto">
+            <h1 className="text-4xl sm:text-5xl font-black text-white">
               Sponsoring{' '}
               <span className="text-orange-500">Pakete</span>
             </h1>
@@ -54,9 +54,9 @@ export default function SponsorenPage() {
             ))}
           </div>
 
-          <div className="section-shell text-center p-8">
-            <h3 className="text-white font-bold text-xl mb-2">Individuelles Paket gewünscht?</h3>
-            <p className="text-gray-300 text-sm mb-6 max-w-lg mx-auto">
+          <div className="section-shell content-flow text-center p-8">
+            <h3 className="text-white font-bold text-xl">Individuelles Paket gewünscht?</h3>
+            <p className="text-gray-300 text-sm max-w-lg mx-auto">
               Ihr habt besondere Anforderungen oder wollt etwas ganz Eigenes? Wir erstellen
               euch gerne ein maßgeschneidertes Angebot.
             </p>

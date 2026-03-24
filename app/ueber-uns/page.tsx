@@ -20,12 +20,12 @@ export default function UeberUnsPage() {
       <Navigation />
       <main className="min-h-screen bg-transparent pt-28 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="copy-center mb-16">
+          <div className="copy-center content-flow mb-16">
             <h1 className="text-4xl sm:text-5xl font-black text-white mb-6">
               Über{' '}
               <span className="text-orange-500">uns</span>
             </h1>
-            <p className="text-gray-400 text-lg leading-relaxed mb-6">
+            <p className="text-gray-400 text-lg leading-relaxed">
               Headbang Handwerk wurde mit einer einfachen Idee gegründet: Das Handwerk braucht
               neue Wege, um junge Menschen zu begeistern. Und Festivals sind genau der richtige
               Ort dafür.

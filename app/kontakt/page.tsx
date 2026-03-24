@@ -15,11 +15,11 @@ export default function KontaktPage() {
       <main className="min-h-screen bg-transparent pt-28 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-1 text-center text-panel text-panel-roomy h-fit">
-              <h1 className="text-4xl font-black text-white mb-4">
+            <div className="lg:col-span-1 content-flow text-center text-panel text-panel-roomy h-fit">
+              <h1 className="text-4xl font-black text-white">
                 <span className="text-orange-500">Kontakt</span>
               </h1>
-              <p className="text-gray-300 leading-relaxed mb-8 max-w-md mx-auto">
+              <p className="text-gray-300 leading-relaxed max-w-md mx-auto">
                 Habt ihr Fragen, wollt ihr Sponsor werden oder sucht ihr eine Bannerfläche?
                 Schreibt uns – wir antworten innerhalb von 1–2 Werktagen.
               </p>

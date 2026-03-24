@@ -10,13 +10,13 @@ export default function DankePage() {
     <>
       <Navigation />
       <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-20 flex items-center justify-center">
-        <div className="text-center max-w-lg mx-auto px-4">
-          <div className="text-6xl mb-6">🤘</div>
-          <h1 className="text-4xl font-black text-white mb-4">
+        <div className="content-flow text-center max-w-lg mx-auto px-4">
+          <div className="text-6xl">🤘</div>
+          <h1 className="text-4xl font-black text-white">
             Danke für dein{' '}
             <span className="text-orange-500">Sponsoring!</span>
           </h1>
-          <p className="text-gray-400 text-lg mb-8">
+          <p className="text-gray-400 text-lg">
             Zahlung erfolgreich! Wir freuen uns riesig über deine Unterstützung. Du erhältst in
             Kürze eine Bestätigung per E-Mail.
           </p>
