@@ -194,7 +194,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-18 max-w-7xl py-8 lg:mt-24 lg:py-14">
+          <section className="mx-auto mt-[4.5rem] max-w-7xl py-8 lg:mt-[6rem] lg:py-[3.5rem]">
             <div className="overflow-hidden rounded-[1.7rem] border border-[#704321]/55 bg-[linear-gradient(90deg,rgba(30,18,12,0.96)_0%,rgba(16,10,8,0.86)_50%,rgba(30,18,12,0.96)_100%)] shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
               <div className="grid gap-6 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-4 lg:gap-7 lg:px-8">
                 {highlightStats.map((item) => (
@@ -207,8 +207,8 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-28 max-w-7xl py-12 lg:mt-44 lg:py-24">
-            <div className="grid gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-18">
+          <section className="mx-auto mt-[7rem] max-w-7xl py-12 lg:mt-[11rem] lg:py-[6rem]">
+            <div className="grid gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-[4.5rem]">
               <div className="text-panel text-panel-roomy">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Was wir hier eigentlich bauen</p>
                 <h2 className="mt-5 text-4xl font-black leading-tight text-[#fff0da] sm:text-[3rem]">
@@ -244,7 +244,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-32 max-w-7xl py-14 lg:mt-48 lg:py-28">
+          <section className="mx-auto mt-[8rem] max-w-7xl py-[3.5rem] lg:mt-[12rem] lg:py-[7rem]">
             <div className="grid gap-16 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-24">
               <div className="max-w-3xl lg:pt-2">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">So funktioniert die Beteiligung</p>
@@ -269,7 +269,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-32 max-w-7xl py-14 lg:mt-48 lg:py-28">
+          <section className="mx-auto mt-[8rem] max-w-7xl py-[3.5rem] lg:mt-[12rem] lg:py-[7rem]">
             <div className="grid gap-16 lg:grid-cols-[1.03fr_0.97fr] lg:gap-20 xl:gap-24">
               <div className="rounded-[2rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(37,23,14,0.84)_0%,rgba(15,10,8,0.52)_100%)] p-9 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-10 lg:p-12">
                 <div className="flex items-center gap-3 text-[#ffc97a]">
@@ -282,7 +282,7 @@ export default function HomePage() {
                 <p className="mt-6 text-lg leading-8 text-[#ead9c3] sm:text-[1.08rem] sm:leading-9">
                   Genau darin liegt das Prinzip dieser Startseite: Sie stellt nicht zuerst Details aus, sondern das Ergebnis. Wer hier landet, versteht direkt, worum es geht, warum das Projekt relevant ist und wie man konkret Teil davon wird.
                 </p>
-                <div className="mt-18 grid gap-8 sm:grid-cols-2 lg:gap-10">
+                <div className="mt-[4.5rem] grid gap-8 sm:grid-cols-2 lg:gap-10">
                   <div className="rounded-[1.6rem] bg-black/18 px-7 py-7 ring-1 ring-white/7">
                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">Für Betriebe</p>
                     <p className="mt-2 text-base leading-7 text-[#f0e1cf]">Mehr Sichtbarkeit, stärkere Differenzierung und neue Gesprächsanlässe.</p>
@@ -302,7 +302,7 @@ export default function HomePage() {
                   <p>Mit Live-Demos, Mitmach-Aktionen und starken Partnern entsteht ein Format, das Handwerk nicht kleiner erklärt, sondern größer inszeniert.</p>
                   <p>Gesucht werden Unternehmen, Unterstützer und Branchenpartner, die früh Teil dieses Projekts werden wollen.</p>
                 </div>
-                <div className="mt-18 flex flex-col gap-5 sm:flex-row sm:gap-6">
+                <div className="mt-[4.5rem] flex flex-col gap-5 sm:flex-row sm:gap-6">
                   <Button href="/sponsoren" size="lg" className="justify-center">
                     Sponsoring ansehen
                   </Button>
@@ -314,7 +314,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-32 max-w-7xl py-14 lg:mt-48 lg:py-28">
+          <section className="mx-auto mt-[8rem] max-w-7xl py-[3.5rem] lg:mt-[12rem] lg:py-[7rem]">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Nächste Anlässe</p>
@@ -360,7 +360,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-32 max-w-7xl py-14 lg:mt-48 lg:py-28">
+          <section className="mx-auto mt-[8rem] max-w-7xl py-[3.5rem] lg:mt-[12rem] lg:py-[7rem]">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Einstieg für Partner</p>
@@ -412,7 +412,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-32 max-w-7xl py-16 lg:mt-48 lg:py-32">
+          <section className="mx-auto mt-[8rem] max-w-7xl py-[4rem] lg:mt-[12rem] lg:py-[8rem]">
             <div className="border-t border-[#9b5a2c]/70 px-2 pt-20 sm:px-4 sm:pt-20 lg:px-0 lg:pt-28">
               <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
                 <div>
