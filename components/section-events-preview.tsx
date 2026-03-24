@@ -12,17 +12,17 @@ export function SectionEventsPreview() {
   };
 
   return (
-    <section className="py-20 bg-[#0f0f0f]">
+    <section className="py-24 bg-transparent">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4">
-          <div>
+        <div className="copy-center mb-12">
+          <div className="text-panel text-panel-tight">
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-2">
               Nächste{' '}
               <span className="text-orange-500">Veranstaltungen</span>
             </h2>
             <p className="text-gray-400">Festival-Saison 2025 – Wir sind dabei!</p>
           </div>
-          <Button href="/veranstaltungen" variant="secondary">
+          <Button href="/veranstaltungen" variant="secondary" className="mt-6">
             Alle Termine <ArrowRight className="w-4 h-4" />
           </Button>
         </div>

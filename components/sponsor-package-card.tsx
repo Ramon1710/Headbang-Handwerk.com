@@ -11,10 +11,10 @@ export function SponsorPackageCard({ pkg }: SponsorPackageCardProps) {
   return (
     <div
       className={[
-        'relative rounded-xl border p-6 flex flex-col transition-all duration-300',
+        'relative rounded-[1.8rem] p-7 flex flex-col transition-all duration-300 text-center',
         pkg.highlighted
-          ? 'border-orange-500 bg-gradient-to-b from-orange-950/30 to-[#141414] shadow-xl shadow-orange-500/10'
-          : 'border-[#2a2a2a] bg-[#141414] hover:border-orange-500/40',
+          ? 'bg-[linear-gradient(180deg,rgba(84,36,8,0.48)_0%,rgba(18,12,8,0.34)_100%)] ring-1 ring-orange-400/35 shadow-[0_22px_56px_rgba(255,120,0,0.12)]'
+          : 'bg-[linear-gradient(180deg,rgba(28,18,12,0.72)_0%,rgba(12,9,7,0.3)_100%)] ring-1 ring-white/6 hover:ring-orange-500/30 shadow-[0_20px_50px_rgba(0,0,0,0.22)]',
       ].join(' ')}
     >
       {pkg.highlighted && (
@@ -30,12 +30,12 @@ export function SponsorPackageCard({ pkg }: SponsorPackageCardProps) {
         <div className="text-3xl font-black text-orange-500 mb-1">
           {formatPrice(pkg.price)}
         </div>
-        <p className="text-gray-500 text-sm">{pkg.visibility}</p>
+        <p className="text-gray-400 text-sm max-w-xs mx-auto">{pkg.visibility}</p>
       </div>
 
       <ul className="space-y-2.5 mb-8 flex-1">
         {pkg.features.map((feature) => (
-          <li key={feature} className="flex items-start gap-2.5 text-sm text-gray-300">
+          <li key={feature} className="flex items-start justify-center gap-2.5 text-sm text-gray-200 text-center">
             <Check className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
             {feature}
           </li>

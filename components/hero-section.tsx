@@ -1,81 +1,84 @@
-import { ArrowRight, ChevronDown, Zap, Users, Building2 } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Button } from './ui/button';
+import headbangStandImage from '../Headbang Stand Bild.png';
 
-const stats = [
-  { value: '5+', label: 'Festivals 2025' },
-  { value: '200.000+', label: 'Besucher gesamt' },
-  { value: '20+', label: 'Partner & Sponsoren' },
+const bullets = [
+  'Nachwuchs begeistern',
+  'Handwerk erlebbar machen',
+  'Unternehmen eine neue Bühne bieten',
 ];
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#0a0a0a]">
-      {/* Background pattern */}
+    <section className="relative overflow-hidden bg-transparent pt-28 pb-14 sm:pt-32 sm:pb-16">
       <div
-        className="absolute inset-0 opacity-20"
+        className="absolute inset-0 opacity-45"
         style={{
           backgroundImage:
-            'repeating-linear-gradient(45deg, #1a1a1a 0px, #1a1a1a 1px, transparent 1px, transparent 60px)',
+            'radial-gradient(circle at 24% 8%, rgba(255,134,24,0.2), transparent 38%), radial-gradient(circle at 86% 18%, rgba(255,112,0,0.16), transparent 35%)',
         }}
       />
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-950/30 via-transparent to-transparent" />
-      <div className="absolute top-1/3 -left-32 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/3 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,3,2,0.78)_0%,rgba(6,3,2,0.62)_38%,rgba(6,3,2,0.74)_100%)]" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
-        <div className="max-w-4xl">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-400 text-sm font-medium mb-8">
-            <Zap className="w-3.5 h-3.5" />
-            Festival Season 2025 – Jetzt dabei sein!
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+          <div className="text-center lg:text-center text-panel text-panel-roomy">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] mb-6 text-[#f6be61] drop-shadow-[0_3px_12px_rgba(0,0,0,0.65)]">
+              Handwerk
+              <br />
+              trifft Metal.
+            </h1>
+
+            <p className="text-2xl sm:text-3xl text-[#f4ebdf] leading-tight mb-8 max-w-2xl mx-auto">
+              Wir bringen das Handwerk auf die größten Metal-Festivals Europas.
+            </p>
+
+            <ul className="space-y-3 mb-9 max-w-2xl mx-auto">
+              {bullets.map((text) => (
+                <li key={text} className="flex items-center justify-center gap-3 text-[#f0dfca] text-xl text-center">
+                  <CheckCircle2 className="w-7 h-7 text-[#ffb24e] flex-shrink-0 mt-0.5" />
+                  <span>{text}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button href="/sponsoren" size="lg">
+                Jetzt unterstützen
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+              <Button href="/veranstaltungen" size="lg" variant="secondary">
+                Events ansehen
+              </Button>
+            </div>
           </div>
 
-          {/* Headline */}
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-6">
-            Handwerk
-            <br />
-            trifft{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-400">
-              Metal.
-            </span>
-          </h1>
-
-          {/* Subheadline */}
-          <p className="text-xl text-gray-400 leading-relaxed mb-10 max-w-2xl">
-            Wir bringen das Handwerk auf die lautesten Festivals Europas – für Nachwuchs,
-            Sichtbarkeit und ein unvergessliches Erlebnis.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-wrap gap-4 mb-16">
-            <Button href="/sponsoren" size="lg">
-              Jetzt unterstützen
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-            <Button href="/veranstaltungen" size="lg" variant="secondary">
-              Nächste Veranstaltungen
-            </Button>
-            <Button href="/kontakt" size="lg" variant="ghost">
-              Sponsor werden
-            </Button>
-          </div>
-
-          {/* Stats */}
-          <div className="flex flex-wrap gap-8">
-            {stats.map(({ value, label }) => (
-              <div key={label}>
-                <div className="text-3xl font-black text-orange-500">{value}</div>
-                <div className="text-sm text-gray-500 mt-0.5">{label}</div>
-              </div>
-            ))}
+          <div className="relative">
+            <div className="absolute -inset-3 rounded-2xl bg-[radial-gradient(circle,rgba(255,131,24,0.35)_0%,rgba(255,131,24,0)_68%)] blur-2xl" />
+            <div className="relative rounded-2xl overflow-hidden border border-[#7b4a26] shadow-[0_25px_60px_rgba(0,0,0,0.55)]">
+              <Image
+                src={headbangStandImage}
+                alt="Headbang Handwerk Stand auf einem Festival"
+                className="w-full h-auto object-cover"
+                priority
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-600 animate-bounce">
-        <ChevronDown className="w-5 h-5" />
+      <div className="relative max-w-4xl mx-auto mt-16 px-4 sm:px-6">
+        <div className="fire-divider mb-9" />
+        <div className="section-shell p-8 sm:p-10 text-center">
+          <div className="text-panel text-panel-tight max-w-2xl mx-auto">
+            <h2 className="text-4xl sm:text-5xl text-[#f2b85d] mb-4">Werde Teil der Bewegung</h2>
+            <p className="text-xl text-[#e6d5c0] mb-7">
+              Unterstütze uns und bring deine Marke dorthin, wo echte Aufmerksamkeit entsteht.
+            </p>
+            <Button href="/sponsoren" size="lg">Jetzt unterstützen</Button>
+          </div>
+        </div>
       </div>
     </section>
   );

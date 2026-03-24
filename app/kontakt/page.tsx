@@ -12,43 +12,42 @@ export default function KontaktPage() {
   return (
     <>
       <Navigation />
-      <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
+      <main className="min-h-screen bg-transparent pt-28 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Left: Info */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 text-center text-panel text-panel-roomy h-fit">
               <h1 className="text-4xl font-black text-white mb-4">
                 <span className="text-orange-500">Kontakt</span>
               </h1>
-              <p className="text-gray-400 leading-relaxed mb-8">
+              <p className="text-gray-300 leading-relaxed mb-8 max-w-md mx-auto">
                 Habt ihr Fragen, wollt ihr Sponsor werden oder sucht ihr eine Bannerfläche?
                 Schreibt uns – wir antworten innerhalb von 1–2 Werktagen.
               </p>
 
-              <div className="space-y-4">
+              <div className="space-y-4 max-w-sm mx-auto">
                 <a
                   href="mailto:info@headbang-handwerk.com"
-                  className="flex items-center gap-3 text-gray-400 hover:text-orange-400 transition-colors"
+                  className="flex items-center justify-center gap-3 text-gray-300 hover:text-orange-400 transition-colors"
                 >
-                  <div className="w-10 h-10 rounded-lg border border-[#2a2a2a] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-[linear-gradient(180deg,rgba(38,26,19,0.92)_0%,rgba(18,12,8,0.72)_100%)] ring-1 ring-white/8 flex items-center justify-center">
                     <Mail className="w-4 h-4 text-orange-500" />
                   </div>
                   info@headbang-handwerk.com
                 </a>
                 <a
                   href="#"
-                  className="flex items-center gap-3 text-gray-400 hover:text-orange-400 transition-colors"
+                  className="flex items-center justify-center gap-3 text-gray-300 hover:text-orange-400 transition-colors"
                 >
-                  <div className="w-10 h-10 rounded-lg border border-[#2a2a2a] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-[linear-gradient(180deg,rgba(38,26,19,0.92)_0%,rgba(18,12,8,0.72)_100%)] ring-1 ring-white/8 flex items-center justify-center">
                     <Instagram className="w-4 h-4 text-orange-500" />
                   </div>
                   @headbanghandwerk
                 </a>
                 <a
                   href="#"
-                  className="flex items-center gap-3 text-gray-400 hover:text-orange-400 transition-colors"
+                  className="flex items-center justify-center gap-3 text-gray-300 hover:text-orange-400 transition-colors"
                 >
-                  <div className="w-10 h-10 rounded-lg border border-[#2a2a2a] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-[linear-gradient(180deg,rgba(38,26,19,0.92)_0%,rgba(18,12,8,0.72)_100%)] ring-1 ring-white/8 flex items-center justify-center">
                     <Facebook className="w-4 h-4 text-orange-500" />
                   </div>
                   Headbang Handwerk
@@ -56,10 +55,9 @@ export default function KontaktPage() {
               </div>
             </div>
 
-            {/* Right: Form */}
             <div className="lg:col-span-2">
-              <div className="rounded-xl border border-[#2a2a2a] bg-[#141414] p-8">
-                <h2 className="text-white font-bold text-xl mb-6">Nachricht senden</h2>
+              <div className="section-shell p-8">
+                <h2 className="text-white font-bold text-xl mb-6 text-center">Nachricht senden</h2>
                 <ContactForm />
               </div>
             </div>

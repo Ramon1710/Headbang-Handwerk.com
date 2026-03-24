@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --accent-orange: #f97316;
-  --accent-gold: #fbbf24;
-  --surface: #141414;
-  --surface-2: #1a1a1a;
-  --border: #2a2a2a;
-  --muted: #6b7280;
+  --background: #090604;
+  --foreground: #f4ede3;
+  --accent-orange: #ff7a00;
+  --accent-gold: #f6b94f;
+  --surface: #15110e;
+  --surface-2: #1f1814;
+  --border: #3f2a1b;
+  --muted: #b8a48e;
 }
 
 @theme inline {
@@ -33,15 +33,125 @@ html {
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(circle at 12% 5%, rgba(255, 130, 26, 0.16), transparent 32%),
+    radial-gradient(circle at 90% 20%, rgba(255, 120, 0, 0.12), transparent 38%),
+    radial-gradient(circle at 55% 100%, rgba(255, 125, 0, 0.1), transparent 45%),
+    linear-gradient(180deg, #0a0705 0%, #0a0705 28%, #0c0907 100%);
   color: var(--foreground);
-  font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  font-family: var(--font-exo), 'Segoe UI', Tahoma, sans-serif;
   min-height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 166, 93, 0.03) 0,
+      rgba(255, 166, 93, 0.03) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 130, 45, 0.02) 0,
+      rgba(255, 130, 45, 0.02) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+  mix-blend-mode: soft-light;
 }
 
 ::selection {
   background: var(--accent-orange);
   color: #000;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-cinzel), Georgia, serif;
+  letter-spacing: 0.01em;
+}
+
+.copy-center {
+  max-width: 52rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.section-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.section-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 2rem;
+  background:
+    radial-gradient(circle at top, rgba(255, 143, 42, 0.14), transparent 54%),
+    linear-gradient(180deg, rgba(28, 18, 12, 0.72) 0%, rgba(14, 10, 8, 0.3) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 215, 171, 0.08),
+    0 24px 60px rgba(0, 0, 0, 0.22);
+  z-index: -1;
+}
+
+.text-panel {
+  background: linear-gradient(180deg, rgba(18, 12, 9, 0.46) 0%, rgba(18, 12, 9, 0.18) 100%);
+  border-radius: 1.75rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 223, 188, 0.04),
+    0 18px 48px rgba(0, 0, 0, 0.14);
+}
+
+.text-panel-tight {
+  padding: 1.4rem 1.6rem;
+}
+
+.text-panel-roomy {
+  padding: 1.8rem 2rem;
+}
+
+.legal-copy {
+  max-width: 48rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.legal-copy section,
+.legal-copy p {
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.legal-copy section {
+  padding: 1.5rem 1.75rem;
+  border-radius: 1.5rem;
+  background: linear-gradient(180deg, rgba(18, 12, 9, 0.42) 0%, rgba(18, 12, 9, 0.16) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 0 rgba(255, 223, 188, 0.03);
+}
+
+.fire-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 120, 0, 0.9), transparent);
+  box-shadow: 0 0 24px rgba(255, 120, 0, 0.45);
 }
 
 /* Scrollbar */

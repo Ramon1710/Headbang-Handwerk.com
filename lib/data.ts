@@ -1,4 +1,4 @@
-import { Event, SponsorPackage, BannerSlot, MerchandiseProduct } from './types';
+import { Event, SponsorPackage, BannerSlot } from './types';
 
 export const events: Event[] = [
   {
@@ -127,7 +127,7 @@ export const sponsorPackages: SponsorPackage[] = [
       'Exklusive Hauptsponsorship',
       'Eigener Messestand-Bereich',
       'VIP-Einladungen (4x)',
-      'Co-Branding auf Merchandise',
+      'Co-Branding auf Kampagnenmaterial',
       'Pressekonferenzen',
       'Spendenquittung',
       'Persönlicher Ansprechpartner',
@@ -208,82 +208,3 @@ export const bannerSlots: BannerSlot[] = [
   },
 ];
 
-export const merchandiseProducts: MerchandiseProduct[] = [
-  {
-    id: 'tshirt-hammer-headbang',
-    name: 'T-Shirt "Hammer & Headbang"',
-    price: 29.9,
-    category: 'Kleidung',
-    images: [],
-    description:
-      'Hochwertiges Baumwoll-T-Shirt mit dem ikonischen Hammer & Headbang Design. Zeig die Verbindung von Handwerk und Metal!',
-    variants: {
-      size: ['S', 'M', 'L', 'XL', 'XXL'],
-      color: ['Schwarz', 'Anthrazit'],
-    },
-    inStock: true,
-    badge: 'Bestseller',
-  },
-  {
-    id: 'hoodie-headbang-handwerk',
-    name: 'Hoodie "Headbang Handwerk"',
-    price: 49.9,
-    category: 'Kleidung',
-    images: [],
-    description:
-      'Warmer Festival-Hoodie mit großem Backprint. Der perfekte Begleiter für Herbst-Festivals.',
-    variants: {
-      size: ['S', 'M', 'L', 'XL', 'XXL'],
-      color: ['Schwarz', 'Dunkelgrau'],
-    },
-    inStock: true,
-  },
-  {
-    id: 'cap-hh-skull',
-    name: 'Cap "HH Skull"',
-    price: 24.9,
-    category: 'Accessoires',
-    images: [],
-    description:
-      'Snapback Cap mit gesticktem HH-Skull Logo. One-size-fits-most Verschluss.',
-    variants: {
-      color: ['Schwarz', 'Camo'],
-    },
-    inStock: true,
-  },
-  {
-    id: 'sticker-set',
-    name: 'Aufkleber-Set (5 Stück)',
-    price: 8.9,
-    category: 'Accessoires',
-    images: [],
-    description:
-      '5 hochwertige Vinyl-Aufkleber mit verschiedenen Headbang Handwerk Designs. Wetterfest und UV-beständig.',
-    variants: {},
-    inStock: true,
-    badge: 'Neu',
-  },
-  {
-    id: 'festival-banner',
-    name: 'Festival-Banner',
-    price: 39.9,
-    category: 'Deko',
-    images: [],
-    description:
-      'Hochwertiger Polyester-Banner für zu Hause oder die Werkstatt. 60 × 90 cm mit Ösen.',
-    variants: {},
-    inStock: true,
-  },
-  {
-    id: 'patch-set',
-    name: 'Patch-Set "Handwerk & Metal"',
-    price: 14.9,
-    category: 'Accessoires',
-    images: [],
-    description:
-      'Set aus 3 bestickten Patches – perfekt für Jacken, Taschen oder Werkzeugkoffer.',
-    variants: {},
-    inStock: true,
-    badge: 'Limitiert',
-  },
-];

@@ -12,49 +12,45 @@ const reasons = [
 
 export function SectionWhy() {
   return (
-    <section className="py-20 bg-[#0f0f0f]">
+    <section className="py-24 bg-transparent">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left: Text block */}
-          <div>
+        <div className="copy-center mb-12">
+          <div className="text-panel text-panel-tight">
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
               Warum{' '}
               <span className="text-orange-500">Handwerk und Metal?</span>
             </h2>
-            <p className="text-gray-400 text-lg leading-relaxed mb-8">
+            <p className="text-gray-300 text-lg leading-relaxed">
               Was auf den ersten Blick ungewöhnlich klingt, ist bei genauerem Hinsehen eine
               perfekte Symbiose: Beide Welten stehen für Passion, Können und Stolz auf das
               eigene Werk.
             </p>
-            <ul className="space-y-3">
-              {reasons.map((reason) => (
-                <li key={reason} className="flex items-start gap-3">
-                  <div className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center">
-                    <Check className="w-3 h-3 text-orange-500" />
-                  </div>
-                  <span className="text-gray-300 text-sm leading-relaxed">{reason}</span>
-                </li>
-              ))}
-            </ul>
           </div>
+        </div>
 
-          {/* Right: Visual */}
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { number: '500K+', label: 'Festivalbesucher\npro Saison' },
-              { number: '25–45', label: 'Durchschnittsalter\nder Besucher' },
-              { number: '73%', label: 'Handwerklich\naffine Zielgruppe' },
-              { number: '3×', label: 'Höhere Marken-\nerinnerung' },
-            ].map(({ number, label }) => (
-              <div
-                key={number}
-                className="rounded-xl border border-[#2a2a2a] bg-[#141414] p-6 text-center hover:border-orange-500/40 transition-colors"
-              >
-                <div className="text-3xl font-black text-orange-500 mb-2">{number}</div>
-                <div className="text-gray-400 text-xs leading-tight whitespace-pre-line">{label}</div>
+        <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 max-w-6xl mx-auto mb-16">
+          {reasons.map((reason) => (
+            <li key={reason} className="section-shell px-6 py-5 text-center text-gray-200 leading-relaxed flex items-center justify-center gap-3">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500/18 flex items-center justify-center">
+                <Check className="w-3.5 h-3.5 text-orange-400" />
               </div>
-            ))}
-          </div>
+              <span>{reason}</span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto text-center">
+          {[
+            { number: '500K+', label: 'Festivalbesucher pro Saison' },
+            { number: '25–45', label: 'Durchschnittsalter der Besucher' },
+            { number: '73%', label: 'Handwerklich affine Zielgruppe' },
+            { number: '3×', label: 'Höhere Markenerinnerung' },
+          ].map(({ number, label }) => (
+            <div key={number} className="px-4 py-3">
+              <div className="text-4xl font-black text-orange-400 mb-2">{number}</div>
+              <div className="text-sm text-gray-400 max-w-[12rem] mx-auto leading-snug">{label}</div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

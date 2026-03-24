@@ -34,21 +34,6 @@ export interface BannerSlot {
   description: string;
 }
 
-export interface MerchandiseProduct {
-  id: string;
-  name: string;
-  price: number;
-  category: string;
-  images: string[];
-  description: string;
-  variants: {
-    size?: string[];
-    color?: string[];
-  };
-  inStock: boolean;
-  badge?: string;
-}
-
 export interface ContactRequest {
   name: string;
   company: string;

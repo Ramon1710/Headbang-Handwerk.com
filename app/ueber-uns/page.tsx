@@ -18,9 +18,9 @@ export default function UeberUnsPage() {
   return (
     <>
       <Navigation />
-      <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
+      <main className="min-h-screen bg-transparent pt-28 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-16">
+          <div className="copy-center mb-16">
             <h1 className="text-4xl sm:text-5xl font-black text-white mb-6">
               Über{' '}
               <span className="text-orange-500">uns</span>
@@ -40,26 +40,25 @@ export default function UeberUnsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             {values.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="rounded-xl border border-[#2a2a2a] bg-[#141414] p-6">
-                <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mb-4">
+              <div key={title} className="section-shell p-6 text-center">
+                <div className="w-12 h-12 rounded-full bg-orange-500/10 ring-1 ring-orange-500/20 flex items-center justify-center mb-4 mx-auto">
                   <Icon className="w-6 h-6 text-orange-500" />
                 </div>
                 <h3 className="text-white font-bold text-lg mb-2">{title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
+                <p className="text-gray-300 text-sm leading-relaxed max-w-xs mx-auto">{desc}</p>
               </div>
             ))}
           </div>
 
-          {/* Team placeholder */}
-          <div className="rounded-xl border border-[#2a2a2a] bg-[#141414] p-8 mb-12">
+          <div className="section-shell p-8 mb-12 text-center">
             <h2 className="text-white font-bold text-2xl mb-6">Das Team</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {['Gründer & Projektleitung', 'Marketing & Social Media', 'Technik & Aufbau'].map((role) => (
                 <div key={role} className="text-center">
-                  <div className="w-20 h-20 rounded-full bg-[#2a2a2a] mx-auto mb-3 flex items-center justify-center text-gray-600 text-2xl">
+                  <div className="w-20 h-20 rounded-full bg-[linear-gradient(180deg,rgba(42,31,24,0.95)_0%,rgba(21,15,11,0.86)_100%)] ring-1 ring-white/6 mx-auto mb-3 flex items-center justify-center text-gray-600 text-2xl">
                     👤
                   </div>
-                  <p className="text-gray-500 text-sm">{role}</p>
+                  <p className="text-gray-400 text-sm">{role}</p>
                 </div>
               ))}
             </div>

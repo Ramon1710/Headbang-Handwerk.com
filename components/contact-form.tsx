@@ -10,7 +10,6 @@ const interestOptions = [
   'Sponsoring Gold',
   'Exklusivpartner',
   'Bannerfläche',
-  'Merchandise',
   'Allgemeine Anfrage',
 ];
 

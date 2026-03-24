@@ -16,14 +16,14 @@ export default function VeranstaltungenPage() {
   return (
     <>
       <Navigation />
-      <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
+      <main className="min-h-screen bg-transparent pt-28 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-14">
+          <div className="copy-center mb-14">
             <h1 className="text-4xl sm:text-5xl font-black text-white mb-4">
               Festival{' '}
               <span className="text-orange-500">Termine 2025</span>
             </h1>
-            <p className="text-gray-400 text-lg max-w-2xl">
+            <p className="text-gray-300 text-lg max-w-2xl mx-auto">
               Wir sind auf den größten Metal-Festivals Europas vertreten. Hier findet ihr alle
               aktuellen und geplanten Veranstaltungen.
             </p>
@@ -31,7 +31,7 @@ export default function VeranstaltungenPage() {
 
           {confirmed.length > 0 && (
             <div className="mb-14">
-              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center justify-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-green-500" />
                 Bestätigt
               </h2>
@@ -45,7 +45,7 @@ export default function VeranstaltungenPage() {
 
           {planned.length > 0 && (
             <div>
-              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center justify-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-yellow-500" />
                 Geplant
               </h2>

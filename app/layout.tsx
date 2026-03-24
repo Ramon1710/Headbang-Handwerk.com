@@ -1,5 +1,18 @@
 import type { Metadata } from 'next';
+import { Cinzel, Exo_2 } from 'next/font/google';
 import './globals.css';
+
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  variable: '--font-cinzel',
+  weight: ['600', '700', '800', '900'],
+});
+
+const exo2 = Exo_2({
+  subsets: ['latin'],
+  variable: '--font-exo',
+  weight: ['400', '500', '600', '700', '800'],
+});
 
 export const metadata: Metadata = {
   title: 'Headbang Handwerk – Handwerk trifft Metal',
@@ -24,7 +37,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="de">
-      <body>{children}</body>
+      <body className={`${cinzel.variable} ${exo2.variable}`}>{children}</body>
     </html>
   );
 }
