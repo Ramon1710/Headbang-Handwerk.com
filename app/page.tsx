@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import { Hammer, Flame, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Navigation } from '@/components/navigation';
+import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
-import headbangLogo from '../Headbang Handwerk e.V. Logo.png';
 import headbangStandImage from '../Headbang Stand Bild.png';
 import wackenBackgroundImage from '../Wacken Hintergrund Bild.png';
 
@@ -34,18 +34,6 @@ export default function HomePage() {
               <div className="absolute -left-10 top-4 hidden h-40 w-40 rounded-full bg-orange-500/12 blur-3xl lg:block" />
 
               <div className="relative text-panel text-panel-roomy sm:p-10 lg:p-12">
-                <div className="mb-8 flex items-center gap-4">
-                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(34,23,17,0.92)_0%,rgba(16,11,8,0.72)_100%)] px-4 py-3 ring-1 ring-[#8b572f]/55 shadow-[0_16px_32px_rgba(0,0,0,0.22)]">
-                    <Image
-                      src={headbangLogo}
-                      alt="Headbang Handwerk e.V. Logo"
-                      priority
-                      className="h-auto w-24 sm:w-28"
-                    />
-                  </div>
-                  <div className="hidden h-px flex-1 bg-[linear-gradient(90deg,rgba(255,165,76,0.55)_0%,rgba(255,165,76,0)_100%)] sm:block" />
-                </div>
-
                 <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#7e4d2a] bg-[#1b120d]/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#f4c481] backdrop-blur-sm sm:text-sm">
                   <Flame className="h-4 w-4 text-[#ff9b39]" />
                   Festival. Handwerk. Haltung.
@@ -66,37 +54,6 @@ export default function HomePage() {
                     <p>
                       Mit Headbang Handwerk e.V. schaffen wir eine Plattform, die zeigt, wie modern, vielseitig und kraftvoll das Handwerk wirklich ist. Zwischen Bühne, Feuer und tausenden Festivalbesuchern entsteht ein Ort, an dem echtes Können erlebbar wird: live, zum Anfassen und zum Mitmachen.
                     </p>
-                  </div>
-
-                  <div className="rounded-[1.75rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(41,24,14,0.84)_0%,rgba(18,11,8,0.5)_100%)] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-7">
-                    <div className="mb-5 flex items-center gap-3 text-[#ffc97a]">
-                      <Hammer className="h-5 w-5 text-[#ff9d3c]" />
-                      <p className="text-lg font-bold tracking-[0.04em]">Unser Ziel ist klar:</p>
-                    </div>
-                    <ul className="grid gap-3 sm:grid-cols-3 sm:gap-4">
-                      {goals.map((goal) => (
-                        <li
-                          key={goal}
-                          className="group flex items-center gap-3 rounded-2xl bg-[linear-gradient(180deg,rgba(255,150,56,0.12)_0%,rgba(255,150,56,0.02)_100%)] px-4 py-4 ring-1 ring-[#8c542b]/45 transition-all duration-200 hover:-translate-y-0.5 hover:ring-[#c87835]"
-                        >
-                          <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[#ffad56]" />
-                          <span className="text-sm font-semibold text-[#f7e7d3] sm:text-base">{goal}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="grid gap-6 lg:grid-cols-1 xl:grid-cols-2">
-                    <div className="rounded-[1.5rem] bg-black/18 px-5 py-5 ring-1 ring-white/6 backdrop-blur-sm">
-                      <p>
-                        Gemeinsam mit Partnern aus der Wirtschaft, Innungen und Betrieben präsentieren wir das Handwerk nicht als Pflicht – sondern als Erlebnis.
-                      </p>
-                    </div>
-                    <div className="rounded-[1.5rem] bg-black/18 px-5 py-5 ring-1 ring-white/6 backdrop-blur-sm">
-                      <p>
-                        Ob durch interaktive Aktionen, Live-Demonstrationen oder innovative Standkonzepte: Wir zeigen, dass Handwerk genauso laut, ehrlich und leidenschaftlich ist wie die Musik, die diese Festivals prägt.
-                      </p>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -142,12 +99,61 @@ export default function HomePage() {
             </div>
           </section>
 
+          <section className="mx-auto mt-8 max-w-7xl lg:mt-10">
+            <div className="overflow-hidden rounded-[1.6rem] border border-[#714422]/50 bg-[linear-gradient(90deg,rgba(30,18,12,0.94)_0%,rgba(18,11,8,0.86)_48%,rgba(30,18,12,0.94)_100%)] shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
+              <div className="flex flex-col gap-3 px-5 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+                <div className="flex items-center gap-3 text-[#ffbe6f]">
+                  <Sparkles className="h-4 w-4 flex-shrink-0 text-[#ff9f35]" />
+                  <span className="text-sm font-bold uppercase tracking-[0.24em]">Aktuelle Informationen</span>
+                </div>
+                <p className="text-sm leading-7 text-[#ead9c3] sm:text-base">
+                  News, Festivaltermine und neue Partnerschaften werden hier in Kürze laufend veröffentlicht.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="mx-auto mt-10 max-w-7xl lg:mt-12">
+            <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+              <div className="rounded-[1.9rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(41,24,14,0.84)_0%,rgba(18,11,8,0.5)_100%)] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-7 lg:p-8">
+                <div className="mb-5 flex items-center gap-3 text-[#ffc97a]">
+                  <Hammer className="h-5 w-5 text-[#ff9d3c]" />
+                  <p className="text-2xl font-black tracking-[0.03em] sm:text-[1.9rem]">Unser Ziel ist klar:</p>
+                </div>
+                <ul className="grid gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-1">
+                  {goals.map((goal) => (
+                    <li
+                      key={goal}
+                      className="group flex items-center gap-3 rounded-2xl bg-[linear-gradient(180deg,rgba(255,150,56,0.12)_0%,rgba(255,150,56,0.02)_100%)] px-4 py-4 ring-1 ring-[#8c542b]/45 transition-all duration-200 hover:-translate-y-0.5 hover:ring-[#c87835]"
+                    >
+                      <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[#ffad56]" />
+                      <span className="text-sm font-semibold text-[#f7e7d3] sm:text-base">{goal}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="grid gap-6">
+                <div className="rounded-[1.6rem] bg-black/20 px-6 py-6 ring-1 ring-white/7 backdrop-blur-sm sm:px-7 sm:py-7">
+                  <p className="text-lg leading-8 text-[#ead9c3] sm:text-[1.08rem] sm:leading-9">
+                    Gemeinsam mit Partnern aus der Wirtschaft, Innungen und Betrieben präsentieren wir das Handwerk nicht als Pflicht – sondern als Erlebnis.
+                  </p>
+                </div>
+                <div className="rounded-[1.6rem] bg-black/20 px-6 py-6 ring-1 ring-white/7 backdrop-blur-sm sm:px-7 sm:py-7">
+                  <p className="text-lg leading-8 text-[#ead9c3] sm:text-[1.08rem] sm:leading-9">
+                    Ob durch interaktive Aktionen, Live-Demonstrationen oder innovative Standkonzepte: Wir zeigen, dass Handwerk genauso laut, ehrlich und leidenschaftlich ist wie die Musik, die diese Festivals prägt.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <section className="mx-auto mt-14 max-w-7xl lg:mt-18">
             <div className="section-shell overflow-hidden rounded-[2rem] p-6 sm:p-8 lg:p-10">
               <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,153,51,0.9),transparent)]" />
               <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-10">
                 <div>
-                  <p className="mb-4 text-xl font-bold tracking-[0.02em] text-[#f0b86a] sm:text-2xl">
+                  <p className="mb-4 text-2xl font-black tracking-[0.02em] text-[#f0b86a] sm:text-[2rem]">
                     🤘 Werde Teil der Bewegung
                   </p>
                   <p className="max-w-4xl text-lg leading-8 text-[#eadbc7] sm:text-xl sm:leading-9">
@@ -172,6 +178,7 @@ export default function HomePage() {
           </section>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

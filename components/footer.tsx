@@ -39,6 +39,8 @@ export function Footer() {
           <p>© {year} Headbang Handwerk e.V.</p>
           <a href="/impressum" className="hover:text-[#ffb85e] transition-colors">Impressum</a>
           <a href="/datenschutz" className="hover:text-[#ffb85e] transition-colors">Datenschutz</a>
+          <a href="/agb" className="hover:text-[#ffb85e] transition-colors">AGB</a>
+          <a href="/kontakt" className="hover:text-[#ffb85e] transition-colors">Kontakt</a>
         </div>
       </div>
     </footer>

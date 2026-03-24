@@ -37,18 +37,16 @@ export function Navigation() {
     >
       <div className="fire-divider" />
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
+        <div className="flex items-center justify-between py-3 min-h-24">
           <a href="/" className="flex items-center gap-3 group" aria-label="Headbang Handwerk">
             <Image
               src={headbangLogo}
               alt="Headbang Handwerk Logo"
               priority
-              className="w-40 sm:w-48 h-auto drop-shadow-[0_8px_18px_rgba(0,0,0,0.65)]"
+              className="h-auto max-h-[78px] w-40 object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.65)] sm:max-h-[92px] sm:w-48"
             />
           </a>
 
-          {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-2">
             {navLinks.map((link) => (
               <a
@@ -61,7 +59,6 @@ export function Navigation() {
             ))}
           </div>
 
-          {/* CTA + Burger */}
           <div className="flex items-center gap-3">
             <Button href="/sponsoren" size="sm" className="hidden sm:inline-flex min-w-44">
               Jetzt unterstützen
@@ -77,7 +74,6 @@ export function Navigation() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
       {menuOpen && (
         <div className="lg:hidden bg-[#0f0907]/98 border-b border-[#4a2b19] px-4 pb-5">
           <div className="flex flex-col gap-1 pt-2">
