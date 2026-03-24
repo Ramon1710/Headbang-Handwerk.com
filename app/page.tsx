@@ -104,8 +104,8 @@ export default function HomePage() {
             <div className="relative">
               <div className="absolute -left-10 top-6 hidden h-44 w-44 rounded-full bg-orange-500/14 blur-3xl lg:block" />
 
-              <div className="relative text-panel text-panel-roomy sm:p-11 lg:p-14">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#80502b] bg-[#1b120d]/82 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#f4c481] backdrop-blur-sm sm:text-xs">
+              <div className="relative rounded-[1.75rem] border border-white/8 bg-[linear-gradient(180deg,rgba(18,12,9,0.18)_0%,rgba(18,12,9,0.05)_100%)] shadow-[0_16px_40px_rgba(0,0,0,0.12)] backdrop-blur-[10px] sm:p-11 lg:p-14">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#80502b]/60 bg-[#1b120d]/32 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#f4c481] backdrop-blur-sm sm:text-xs">
                   <Sparkles className="h-4 w-4 text-[#ff9b39]" />
                   Startseite mit klarem Projektfokus
                 </div>
@@ -131,15 +131,15 @@ export default function HomePage() {
                 </div>
 
                 <div className="mt-12 grid gap-6 sm:grid-cols-3">
-                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.13)_0%,rgba(255,155,57,0.02)_100%)] px-6 py-6 ring-1 ring-[#92592f]/45">
+                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.08)_0%,rgba(255,155,57,0.015)_100%)] px-6 py-6 ring-1 ring-[#92592f]/28 backdrop-blur-[6px]">
                     <p className="text-2xl font-black text-[#ffbe6f]">Wacken 2027</p>
                     <p className="mt-1 text-sm leading-6 text-[#dbc4aa]">Nächster großer Meilenstein im Projekt</p>
                   </div>
-                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.13)_0%,rgba(255,155,57,0.02)_100%)] px-6 py-6 ring-1 ring-[#92592f]/45">
+                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.08)_0%,rgba(255,155,57,0.015)_100%)] px-6 py-6 ring-1 ring-[#92592f]/28 backdrop-blur-[6px]">
                     <p className="text-2xl font-black text-[#ffbe6f]">Live-Demos</p>
                     <p className="mt-1 text-sm leading-6 text-[#dbc4aa]">Handwerk als Erlebnis statt nur als Botschaft</p>
                   </div>
-                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.13)_0%,rgba(255,155,57,0.02)_100%)] px-6 py-6 ring-1 ring-[#92592f]/45">
+                  <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.08)_0%,rgba(255,155,57,0.015)_100%)] px-6 py-6 ring-1 ring-[#92592f]/28 backdrop-blur-[6px]">
                     <p className="text-2xl font-black text-[#ffbe6f]">Partnernetzwerk</p>
                     <p className="mt-1 text-sm leading-6 text-[#dbc4aa]">Betriebe, Innungen und Unterstützer an einem Ort</p>
                   </div>
@@ -149,8 +149,8 @@ export default function HomePage() {
 
             <div className="relative lg:pt-10">
               <div className="absolute -inset-6 rounded-[2.4rem] bg-[radial-gradient(circle,rgba(255,128,26,0.24)_0%,rgba(255,128,26,0.04)_48%,rgba(255,128,26,0)_72%)] blur-2xl" />
-              <div className="relative overflow-hidden rounded-[2.2rem] border border-[#8f562b]/55 bg-[linear-gradient(180deg,rgba(30,20,14,0.96)_0%,rgba(13,9,7,0.94)_100%)] p-3 shadow-[0_32px_90px_rgba(0,0,0,0.52)] sm:p-4">
-                <div className="absolute left-5 top-5 z-10 inline-flex items-center gap-2 rounded-full bg-black/60 px-3 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#f8c887] ring-1 ring-[#936038]/65 backdrop-blur-sm sm:text-xs">
+              <div className="relative rounded-[2.2rem] border border-[#8f562b]/32 bg-[linear-gradient(180deg,rgba(30,20,14,0.26)_0%,rgba(13,9,7,0.14)_100%)] p-3 pb-5 shadow-[0_24px_60px_rgba(0,0,0,0.18)] backdrop-blur-[10px] sm:p-4 sm:pb-6">
+                <div className="absolute left-5 top-5 z-10 inline-flex items-center gap-2 rounded-full bg-black/24 px-3 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#f8c887] ring-1 ring-[#936038]/45 backdrop-blur-sm sm:text-xs">
                   <Flame className="h-3.5 w-3.5 text-[#ffab4e]" />
                   Live am Stand
                 </div>
@@ -165,8 +165,8 @@ export default function HomePage() {
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,4,2,0.02)_0%,rgba(7,4,2,0.34)_100%)]" />
                 </div>
 
-                <div className="mt-6 grid gap-4">
-                  <div className="rounded-[1.6rem] bg-[#120d0a]/92 px-5 py-5 ring-1 ring-white/7">
+                <div className="mt-6 grid gap-4 pb-1">
+                  <div className="rounded-[1.6rem] bg-[#120d0a]/26 px-5 py-5 ring-1 ring-white/8 backdrop-blur-[8px]">
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#ffbf76]">Projektfokus</p>
@@ -180,13 +180,13 @@ export default function HomePage() {
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-2xl bg-[#120d0a]/90 px-5 py-4 ring-1 ring-white/6">
+                    <div className="rounded-2xl bg-[#120d0a]/22 px-5 py-4 ring-1 ring-white/8 backdrop-blur-[8px]">
                       <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">Ansprache</p>
-                      <p className="mt-2 text-lg font-black text-[#ffb14d]">Laut. Echt. Nahbar.</p>
+                      <p className="mt-2 pb-1 text-lg font-black leading-[1.2] text-[#ffb14d]">Laut. Echt. Nahbar.</p>
                     </div>
-                    <div className="rounded-2xl bg-[#120d0a]/90 px-5 py-4 ring-1 ring-white/6">
+                    <div className="rounded-2xl bg-[#120d0a]/22 px-5 py-4 ring-1 ring-white/8 backdrop-blur-[8px]">
                       <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">Wirkung</p>
-                      <p className="mt-2 text-lg font-black text-[#ffb14d]">Erlebnis statt Bannerdenken</p>
+                      <p className="mt-2 pb-1 text-lg font-black leading-[1.2] text-[#ffb14d]">Erlebnis statt Bannerdenken</p>
                     </div>
                   </div>
                 </div>
@@ -195,10 +195,10 @@ export default function HomePage() {
           </section>
 
           <section className="mx-auto mt-[4.5rem] max-w-7xl py-8 lg:mt-[6rem] lg:py-[3.5rem]">
-            <div className="overflow-hidden rounded-[1.7rem] border border-[#704321]/55 bg-[linear-gradient(90deg,rgba(30,18,12,0.96)_0%,rgba(16,10,8,0.86)_50%,rgba(30,18,12,0.96)_100%)] shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
+            <div className="overflow-hidden rounded-[1.7rem] border border-[#704321]/30 bg-[linear-gradient(90deg,rgba(30,18,12,0.2)_0%,rgba(16,10,8,0.08)_50%,rgba(30,18,12,0.2)_100%)] shadow-[0_14px_34px_rgba(0,0,0,0.1)] backdrop-blur-[10px]">
               <div className="grid gap-6 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-4 lg:gap-7 lg:px-8">
                 {highlightStats.map((item) => (
-                  <div key={item.label} className="rounded-2xl bg-black/15 px-5 py-5 ring-1 ring-white/6">
+                  <div key={item.label} className="rounded-2xl bg-black/8 px-5 py-5 ring-1 ring-white/8 backdrop-blur-[6px]">
                     <p className="text-3xl font-black text-[#ffd08f]">{item.value}</p>
                     <p className="mt-2 text-sm leading-6 text-[#e5d5c0]">{item.label}</p>
                   </div>
@@ -211,7 +211,7 @@ export default function HomePage() {
 
           <section className="mx-auto max-w-7xl py-12 lg:py-[6rem]">
             <div className="grid gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-[4.5rem]">
-              <div className="text-panel text-panel-roomy">
+              <div className="rounded-[1.75rem] border border-white/8 bg-[linear-gradient(180deg,rgba(18,12,9,0.16)_0%,rgba(18,12,9,0.05)_100%)] px-8 py-8 shadow-[0_16px_40px_rgba(0,0,0,0.1)] backdrop-blur-[10px] sm:px-10 sm:py-10 lg:px-12 lg:py-12">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Was wir hier eigentlich bauen</p>
                 <h2 className="mt-5 text-4xl font-black leading-tight text-[#fff0da] sm:text-[3rem]">
                   Kein Messestand wie jeder andere.
@@ -233,9 +233,9 @@ export default function HomePage() {
                 {promiseCards.map(({ title, text, icon: Icon }) => (
                   <div
                     key={title}
-                    className="rounded-[1.7rem] border border-[#714422]/45 bg-[linear-gradient(180deg,rgba(27,17,12,0.9)_0%,rgba(14,10,8,0.58)_100%)] p-7 shadow-[0_18px_44px_rgba(0,0,0,0.2)]"
+                    className="rounded-[1.7rem] border border-[#714422]/26 bg-[linear-gradient(180deg,rgba(27,17,12,0.18)_0%,rgba(14,10,8,0.06)_100%)] p-7 shadow-[0_14px_32px_rgba(0,0,0,0.08)] backdrop-blur-[10px]"
                   >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.16)_0%,rgba(255,155,57,0.04)_100%)] ring-1 ring-[#a76737]/40">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.09)_0%,rgba(255,155,57,0.02)_100%)] ring-1 ring-[#a76737]/28 backdrop-blur-[6px]">
                       <Icon className="h-5 w-5 text-[#ffab4e]" />
                     </div>
                     <h3 className="mt-5 text-xl font-black text-[#fff0da]">{title}</h3>
@@ -263,7 +263,7 @@ export default function HomePage() {
               {processSteps.map((step) => (
                 <div
                   key={step.number}
-                  className="rounded-[1.75rem] border border-[#734624]/45 bg-[linear-gradient(180deg,rgba(27,17,12,0.88)_0%,rgba(12,8,6,0.58)_100%)] px-7 py-8 shadow-[0_20px_48px_rgba(0,0,0,0.2)]"
+                  className="rounded-[1.75rem] border border-[#734624]/24 bg-[linear-gradient(180deg,rgba(27,17,12,0.14)_0%,rgba(12,8,6,0.05)_100%)] px-7 py-8 shadow-[0_14px_30px_rgba(0,0,0,0.08)] backdrop-blur-[10px]"
                 >
                   <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#ffbf76]">{step.number}</p>
                   <h3 className="mt-4 text-[1.7rem] font-black leading-tight text-[#fff0da]">{step.title}</h3>
@@ -277,7 +277,7 @@ export default function HomePage() {
 
           <section className="mx-auto max-w-7xl py-[3.5rem] lg:py-[7rem]">
             <div className="grid gap-16 lg:grid-cols-[1.03fr_0.97fr] lg:gap-20 xl:gap-24">
-              <div className="rounded-[2rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(37,23,14,0.84)_0%,rgba(15,10,8,0.52)_100%)] p-9 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-10 lg:p-12">
+              <div className="rounded-[2rem] border border-[#734624]/28 bg-[linear-gradient(180deg,rgba(37,23,14,0.18)_0%,rgba(15,10,8,0.05)_100%)] p-9 shadow-[0_14px_34px_rgba(0,0,0,0.08)] backdrop-blur-[10px] sm:p-10 lg:p-12">
                 <div className="flex items-center gap-3 text-[#ffc97a]">
                   <ShieldCheck className="h-5 w-5 text-[#ff9d3c]" />
                   <p className="text-sm font-semibold uppercase tracking-[0.24em]">Warum das funktioniert</p>
@@ -289,18 +289,18 @@ export default function HomePage() {
                   Genau darin liegt das Prinzip dieser Startseite: Sie stellt nicht zuerst Details aus, sondern das Ergebnis. Wer hier landet, versteht direkt, worum es geht, warum das Projekt relevant ist und wie man konkret Teil davon wird.
                 </p>
                 <div className="mt-[4.5rem] grid gap-8 sm:grid-cols-2 lg:gap-10">
-                  <div className="rounded-[1.6rem] bg-black/18 px-7 py-7 ring-1 ring-white/7">
+                  <div className="rounded-[1.6rem] bg-black/8 px-7 py-7 ring-1 ring-white/8 backdrop-blur-[6px]">
                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">Für Betriebe</p>
                     <p className="mt-2 text-base leading-7 text-[#f0e1cf]">Mehr Sichtbarkeit, stärkere Differenzierung und neue Gesprächsanlässe.</p>
                   </div>
-                  <div className="rounded-[1.6rem] bg-black/18 px-7 py-7 ring-1 ring-white/7">
+                  <div className="rounded-[1.6rem] bg-black/8 px-7 py-7 ring-1 ring-white/8 backdrop-blur-[6px]">
                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">Für Nachwuchs</p>
                     <p className="mt-2 text-base leading-7 text-[#f0e1cf]">Ein direkter, ungezwungener Zugang zu Berufen, Menschen und echtem Können.</p>
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-[2rem] border border-[#704321]/50 bg-[linear-gradient(180deg,rgba(24,16,11,0.92)_0%,rgba(12,8,6,0.88)_100%)] p-9 shadow-[0_20px_50px_rgba(0,0,0,0.28)] sm:p-10 lg:p-12">
+              <div className="rounded-[2rem] border border-[#704321]/26 bg-[linear-gradient(180deg,rgba(24,16,11,0.16)_0%,rgba(12,8,6,0.05)_100%)] p-9 shadow-[0_14px_34px_rgba(0,0,0,0.08)] backdrop-blur-[10px] sm:p-10 lg:p-12">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Aktuelle Information</p>
                 <h3 className="mt-4 text-3xl font-black text-[#ffd08f] sm:text-[2.3rem]">Wacken 2027 steht im Fokus.</h3>
                 <div className="mt-6 space-y-5 text-base leading-8 text-[#ead9c3]">
@@ -338,10 +338,10 @@ export default function HomePage() {
               {featuredEvents.map((event) => (
                 <div
                   key={event.id}
-                  className="rounded-[1.7rem] border border-[#6e4325]/45 bg-[linear-gradient(180deg,rgba(26,17,12,0.94)_0%,rgba(13,9,7,0.78)_100%)] p-6 shadow-[0_18px_44px_rgba(0,0,0,0.24)]"
+                  className="rounded-[1.7rem] border border-[#6e4325]/24 bg-[linear-gradient(180deg,rgba(26,17,12,0.16)_0%,rgba(13,9,7,0.05)_100%)] p-6 shadow-[0_14px_30px_rgba(0,0,0,0.08)] backdrop-blur-[10px]"
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <span className="inline-flex rounded-full border border-[#84502c] bg-[#1b120d] px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-[#ffbf76]">
+                    <span className="inline-flex rounded-full border border-[#84502c]/50 bg-[#1b120d]/28 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-[#ffbf76] backdrop-blur-[6px]">
                       {statusLabels[event.status]}
                     </span>
                     <Calendar className="h-4 w-4 flex-shrink-0 text-[#ff9d3c]" />
@@ -386,10 +386,10 @@ export default function HomePage() {
               {featuredPackages.map((pkg) => (
                 <div
                   key={pkg.id}
-                  className={`rounded-[1.8rem] border p-6 shadow-[0_18px_44px_rgba(0,0,0,0.24)] ${
+                  className={`rounded-[1.8rem] border p-6 shadow-[0_14px_30px_rgba(0,0,0,0.08)] backdrop-blur-[10px] ${
                     pkg.highlighted
-                      ? 'border-[#d07a34] bg-[linear-gradient(180deg,rgba(86,40,11,0.56)_0%,rgba(19,13,9,0.84)_100%)]'
-                      : 'border-[#6e4325]/45 bg-[linear-gradient(180deg,rgba(26,17,12,0.94)_0%,rgba(13,9,7,0.78)_100%)]'
+                      ? 'border-[#d07a34]/45 bg-[linear-gradient(180deg,rgba(86,40,11,0.2)_0%,rgba(19,13,9,0.08)_100%)]'
+                      : 'border-[#6e4325]/24 bg-[linear-gradient(180deg,rgba(26,17,12,0.16)_0%,rgba(13,9,7,0.05)_100%)]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -398,7 +398,7 @@ export default function HomePage() {
                       <p className="mt-2 text-3xl font-black text-[#ffbe6f]">{formatPrice(pkg.price)}</p>
                     </div>
                     {pkg.highlighted ? (
-                      <span className="inline-flex rounded-full bg-[#ff9d3c] px-3 py-1 text-[0.7rem] font-black uppercase tracking-[0.18em] text-black">
+                      <span className="inline-flex rounded-full bg-[#ff9d3c]/78 px-3 py-1 text-[0.7rem] font-black uppercase tracking-[0.18em] text-black backdrop-blur-[6px]">
                         Empfohlen
                       </span>
                     ) : null}
