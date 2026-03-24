@@ -120,7 +120,7 @@ export default function HomePage() {
                   Headbang Handwerk bringt Betriebe, Marken und Nachwuchs in ein Umfeld, das Aufmerksamkeit nicht erkauft, sondern erzeugt. Auf den größten Metal-Festivals Europas wird Handwerk live erlebbar, modern inszeniert und glaubwürdig vermittelt.
                 </p>
 
-                <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                <div className="mt-14 flex flex-col gap-4 sm:flex-row lg:mt-16">
                   <Button href="/sponsoren" size="lg" className="min-w-56 justify-center">
                     Jetzt Partner werden
                     <ArrowRight className="h-4 w-4" />
