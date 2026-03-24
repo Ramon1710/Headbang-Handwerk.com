@@ -207,7 +207,9 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-[7rem] max-w-7xl py-12 lg:mt-[11rem] lg:py-[6rem]">
+          <div aria-hidden="true" className="h-16 lg:h-28 xl:h-36" />
+
+          <section className="mx-auto max-w-7xl py-12 lg:py-[6rem]">
             <div className="grid gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-[4.5rem]">
               <div className="text-panel text-panel-roomy">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Was wir hier eigentlich bauen</p>
@@ -244,7 +246,9 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-[8rem] max-w-7xl py-[3.5rem] lg:mt-[12rem] lg:py-[7rem]">
+          <div aria-hidden="true" className="h-20 lg:h-32 xl:h-40" />
+
+          <section className="mx-auto max-w-7xl py-[3.5rem] lg:py-[7rem]">
             <div className="grid gap-16 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-24">
               <div className="max-w-3xl lg:pt-2">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">So funktioniert die Beteiligung</p>
@@ -269,7 +273,9 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-[8rem] max-w-7xl py-[3.5rem] lg:mt-[12rem] lg:py-[7rem]">
+          <div aria-hidden="true" className="h-20 lg:h-32 xl:h-40" />
+
+          <section className="mx-auto max-w-7xl py-[3.5rem] lg:py-[7rem]">
             <div className="grid gap-16 lg:grid-cols-[1.03fr_0.97fr] lg:gap-20 xl:gap-24">
               <div className="rounded-[2rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(37,23,14,0.84)_0%,rgba(15,10,8,0.52)_100%)] p-9 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-10 lg:p-12">
                 <div className="flex items-center gap-3 text-[#ffc97a]">
@@ -314,7 +320,9 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-[8rem] max-w-7xl py-[3.5rem] lg:mt-[12rem] lg:py-[7rem]">
+          <div aria-hidden="true" className="h-20 lg:h-32 xl:h-40" />
+
+          <section className="mx-auto max-w-7xl py-[3.5rem] lg:py-[7rem]">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Nächste Anlässe</p>
@@ -360,7 +368,9 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-[8rem] max-w-7xl py-[3.5rem] lg:mt-[12rem] lg:py-[7rem]">
+          <div aria-hidden="true" className="h-20 lg:h-32 xl:h-40" />
+
+          <section className="mx-auto max-w-7xl py-[3.5rem] lg:py-[7rem]">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Einstieg für Partner</p>
@@ -412,7 +422,9 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-[8rem] max-w-7xl py-[4rem] lg:mt-[12rem] lg:py-[8rem]">
+          <div aria-hidden="true" className="h-20 lg:h-32 xl:h-44" />
+
+          <section className="mx-auto max-w-7xl py-[4rem] lg:py-[8rem]">
             <div className="border-t border-[#9b5a2c]/70 px-2 pt-20 sm:px-4 sm:pt-20 lg:px-0 lg:pt-28">
               <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
                 <div>
