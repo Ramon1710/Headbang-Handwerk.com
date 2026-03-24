@@ -101,21 +101,40 @@ export default function HomePage() {
 
           <section className="mx-auto mt-8 max-w-7xl lg:mt-10">
             <div className="overflow-hidden rounded-[1.6rem] border border-[#714422]/50 bg-[linear-gradient(90deg,rgba(30,18,12,0.94)_0%,rgba(18,11,8,0.86)_48%,rgba(30,18,12,0.94)_100%)] shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
-              <div className="flex flex-col gap-3 px-5 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-                <div className="flex items-center gap-3 text-[#ffbe6f]">
+              <div className="grid gap-5 px-5 py-5 sm:px-6 lg:grid-cols-[auto_1fr] lg:items-start lg:gap-8 lg:px-8">
+                <div className="flex items-center gap-3 text-[#ffbe6f] lg:pt-1">
                   <Sparkles className="h-4 w-4 flex-shrink-0 text-[#ff9f35]" />
                   <span className="text-sm font-bold uppercase tracking-[0.24em]">Aktuelle Informationen</span>
                 </div>
-                <p className="text-sm leading-7 text-[#ead9c3] sm:text-base">
-                  News, Festivaltermine und neue Partnerschaften werden hier in Kürze laufend veröffentlicht.
-                </p>
+                <div className="space-y-3 text-sm leading-7 text-[#ead9c3] sm:text-base sm:leading-8">
+                  <p className="text-lg font-black text-[#ffd08f] sm:text-[1.22rem]">
+                    🔥 Wacken 2027 – wir sind dabei!
+                  </p>
+                  <p>
+                    Headbang Handwerk plant den nächsten großen Schritt:
+                    <br />
+                    👉 einen eigenen Stand auf dem Wacken Open Air 2027.
+                  </p>
+                  <p>
+                    Mit Live-Demos, Mitmach-Aktionen und starken Partnern bringen wir das Handwerk direkt ins Festival – laut, sichtbar und zum Anfassen.
+                  </p>
+                  <p>
+                    <span className="font-bold text-[#ffcf92]">Unser Ziel:</span>
+                    <br />
+                    Das Handwerk dort zeigen, wo Begeisterung entsteht.
+                  </p>
+                  <p className="font-bold text-[#ffcf92]">🤘 Jetzt Partner werden</p>
+                  <p>
+                    Für Wacken 2027 suchen wir Unternehmen, die Teil dieses Projekts werden wollen.
+                  </p>
+                </div>
               </div>
             </div>
           </section>
 
-          <section className="mx-auto mt-10 max-w-7xl lg:mt-12">
+          <section className="mt-10 w-full lg:mt-12">
             <div className="grid gap-6">
-              <div className="mx-auto w-full max-w-4xl rounded-[1.9rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(41,24,14,0.84)_0%,rgba(18,11,8,0.5)_100%)] p-6 text-center shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-7 lg:p-8">
+              <div className="mx-auto w-full max-w-5xl rounded-[1.9rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(41,24,14,0.84)_0%,rgba(18,11,8,0.5)_100%)] p-6 text-center shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-7 lg:p-8">
                 <div className="mb-5 flex items-center justify-center gap-3 text-[#ffc97a]">
                   <Hammer className="h-5 w-5 text-[#ff9d3c]" />
                   <p className="text-2xl font-black tracking-[0.03em] sm:text-[1.9rem]">Unser Ziel ist klar:</p>
@@ -133,7 +152,7 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              <div className="grid gap-6 xl:grid-cols-2">
+              <div className="mx-auto grid w-full max-w-6xl gap-6 xl:grid-cols-2">
                 <div className="rounded-[1.6rem] bg-black/20 px-6 py-6 ring-1 ring-white/7 backdrop-blur-sm sm:px-7 sm:py-7">
                   <p className="text-lg leading-8 text-[#ead9c3] sm:text-[1.08rem] sm:leading-9">
                     Gemeinsam mit Partnern aus der Wirtschaft, Innungen und Betrieben präsentieren wir das Handwerk nicht als Pflicht – sondern als Erlebnis.
