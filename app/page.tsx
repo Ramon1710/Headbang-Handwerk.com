@@ -194,7 +194,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-14 max-w-7xl lg:mt-20">
+          <section className="mx-auto mt-14 max-w-7xl py-4 lg:mt-20 lg:py-8">
             <div className="overflow-hidden rounded-[1.7rem] border border-[#704321]/55 bg-[linear-gradient(90deg,rgba(30,18,12,0.96)_0%,rgba(16,10,8,0.86)_50%,rgba(30,18,12,0.96)_100%)] shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
               <div className="grid gap-6 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-4 lg:gap-7 lg:px-8">
                 {highlightStats.map((item) => (
@@ -207,8 +207,8 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-24 max-w-7xl lg:mt-36">
-            <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
+          <section className="mx-auto mt-24 max-w-7xl py-6 lg:mt-36 lg:py-12">
+            <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
               <div className="text-panel text-panel-roomy">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Was wir hier eigentlich bauen</p>
                 <h2 className="mt-5 text-4xl font-black leading-tight text-[#fff0da] sm:text-[3rem]">
@@ -227,7 +227,7 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              <div className="grid gap-6 md:grid-cols-3 lg:gap-7">
+              <div className="grid gap-6 pt-2 md:grid-cols-3 lg:gap-8 lg:pt-6">
                 {promiseCards.map(({ title, text, icon: Icon }) => (
                   <div
                     key={title}
@@ -244,8 +244,8 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-28 max-w-7xl lg:mt-40">
-            <div className="grid gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-20">
+          <section className="mx-auto mt-28 max-w-7xl py-8 lg:mt-40 lg:py-14">
+            <div className="grid gap-14 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-20">
               <div className="max-w-3xl lg:pt-2">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">So funktioniert die Beteiligung</p>
                 <h2 className="mt-5 text-4xl font-black leading-[0.96] text-[#fff0da] sm:text-[3rem] lg:text-[3.4rem]">Vom Interesse bis zur Festivalpräsenz.</h2>
@@ -255,7 +255,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="mt-16 grid gap-8 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-12 xl:gap-x-10">
+            <div className="mt-20 grid gap-8 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-14 xl:gap-x-10">
               {processSteps.map((step) => (
                 <div
                   key={step.number}
@@ -269,8 +269,8 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-28 max-w-7xl lg:mt-40">
-            <div className="grid gap-12 lg:grid-cols-[1.03fr_0.97fr] lg:gap-18 xl:gap-20">
+          <section className="mx-auto mt-28 max-w-7xl py-8 lg:mt-40 lg:py-14">
+            <div className="grid gap-14 lg:grid-cols-[1.03fr_0.97fr] lg:gap-18 xl:gap-20">
               <div className="rounded-[2rem] border border-[#734624]/55 bg-[linear-gradient(180deg,rgba(37,23,14,0.84)_0%,rgba(15,10,8,0.52)_100%)] p-9 shadow-[0_20px_50px_rgba(0,0,0,0.22)] sm:p-10 lg:p-12">
                 <div className="flex items-center gap-3 text-[#ffc97a]">
                   <ShieldCheck className="h-5 w-5 text-[#ff9d3c]" />
@@ -314,8 +314,8 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-28 max-w-7xl lg:mt-40">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <section className="mx-auto mt-28 max-w-7xl py-8 lg:mt-40 lg:py-14">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Nächste Anlässe</p>
                 <h2 className="mt-4 text-4xl font-black text-[#fff0da] sm:text-[3rem]">Veranstaltungen mit echter Bühne für das Handwerk.</h2>
@@ -326,7 +326,7 @@ export default function HomePage() {
               </Button>
             </div>
 
-            <div className="mt-18 grid gap-8 lg:grid-cols-3 lg:gap-y-12 xl:gap-x-10">
+            <div className="mt-20 grid gap-8 lg:grid-cols-3 lg:gap-y-14 xl:gap-x-10">
               {featuredEvents.map((event) => (
                 <div
                   key={event.id}
@@ -360,8 +360,8 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-28 max-w-7xl lg:mt-40">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <section className="mx-auto mt-28 max-w-7xl py-8 lg:mt-40 lg:py-14">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Einstieg für Partner</p>
                 <h2 className="mt-4 text-4xl font-black text-[#fff0da] sm:text-[3rem]">Sponsoring-Pakete mit klarer Staffelung.</h2>
@@ -372,7 +372,7 @@ export default function HomePage() {
               </Button>
             </div>
 
-            <div className="mt-18 grid gap-8 lg:grid-cols-3 lg:gap-y-12 xl:gap-x-10">
+            <div className="mt-20 grid gap-8 lg:grid-cols-3 lg:gap-y-14 xl:gap-x-10">
               {featuredPackages.map((pkg) => (
                 <div
                   key={pkg.id}
@@ -412,8 +412,8 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mx-auto mt-28 max-w-7xl lg:mt-40">
-            <div className="border-t border-[#9b5a2c]/70 px-2 pt-12 sm:px-4 sm:pt-14 lg:px-0 lg:pt-20">
+          <section className="mx-auto mt-28 max-w-7xl py-10 lg:mt-40 lg:py-16">
+            <div className="border-t border-[#9b5a2c]/70 px-2 pt-16 sm:px-4 sm:pt-18 lg:px-0 lg:pt-24">
               <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">Letzter Abschnitt, klare Handlung</p>
