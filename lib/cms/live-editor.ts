@@ -67,7 +67,7 @@ function sanitizeCssValue(value?: string) {
   }
 
   const trimmed = value.trim();
-  return /^\d+(\.\d+)?(px|%|rem|vw|vh)$/.test(trimmed) ? trimmed : undefined;
+  return /^-?\d+(\.\d+)?(px|%|rem|vw|vh)$/.test(trimmed) ? trimmed : undefined;
 }
 
 export function sanitizeLiveEditorBoxStyle(style: Partial<LiveEditorBoxStyle>) {
