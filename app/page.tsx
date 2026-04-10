@@ -17,6 +17,7 @@ import { LiveEditableText } from '@/components/live-editable-text';
 import { LiveLayoutSaveProvider } from '@/components/live-layout-save-context';
 import { LiveResizableBox } from '@/components/live-resizable-box';
 import { Button } from '@/components/ui/button';
+import { logoutAction } from '@/app/admin/actions';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { resolveLiveBoxStyle, resolveLiveHtml, resolveLiveRichHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
@@ -77,9 +78,19 @@ export default async function HomePage() {
           }}
         >
         {isAdmin ? (
-          <div className="fixed bottom-4 right-4 z-[60] max-w-sm rounded-2xl border border-[#ff9d3c]/50 bg-[#130d09]/92 px-4 py-3 text-sm text-[#f4e5d2] shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-sm">
-            Klick auf Text zum Bearbeiten. Ziehe unten rechts an Kästchen, um ihre Größe zu ändern.
-          </div>
+          <>
+            <form action={logoutAction} className="fixed left-4 top-4 z-[61]">
+              <button
+                type="submit"
+                className="rounded-2xl border border-[#ff9d3c]/50 bg-[#130d09]/94 px-4 py-3 text-sm font-black text-[#f4e5d2] shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-sm transition hover:border-[#ffb14d] hover:text-white"
+              >
+                Admin-Ansicht verlassen
+              </button>
+            </form>
+            <div className="fixed bottom-4 right-4 z-[60] max-w-sm rounded-2xl border border-[#ff9d3c]/50 bg-[#130d09]/92 px-4 py-3 text-sm text-[#f4e5d2] shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-sm">
+              Klick auf Text zum Bearbeiten. Ziehe unten rechts an Kästchen, um ihre Größe zu ändern.
+            </div>
+          </>
         ) : null}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgba(255,143,42,0.22)_0%,transparent_32%),radial-gradient(circle_at_88%_14%,rgba(255,168,76,0.15)_0%,transparent_26%),linear-gradient(180deg,rgba(8,5,3,0.18)_0%,rgba(8,5,3,0.82)_100%)]" />
         <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:120px_120px]" />
