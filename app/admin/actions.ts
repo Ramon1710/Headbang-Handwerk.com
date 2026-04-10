@@ -2,7 +2,13 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { isFirebaseStorageUploadError, uploadCmsAsset, uploadStandAsset } from '@/lib/cms/file-storage';
+import {
+  isFirebaseStorageBucketNotFoundError,
+  isFirebaseStoragePermissionError,
+  isFirebaseStorageUploadError,
+  uploadCmsAsset,
+  uploadStandAsset,
+} from '@/lib/cms/file-storage';
 import { isFirebaseAuthError } from '@/lib/cms/firebase';
 import {
   isFirebaseAuthSaveError,
@@ -42,12 +48,28 @@ export async function updateCmsAction(formData: FormData) {
   let next = mergeCmsContentFromForm(formData, current);
   const removeLogoAsset = String(formData.get('logoAssetRemove') || '') === 'on';
   const logoAssetFile = formData.get('logoAssetFile');
-  const removeHeroImageAsset = String(formData.get('heroImageAssetRemove') || '') === 'on';
-  const heroImageAssetFile = formData.get('heroImageAssetFile');
-  const removeBackgroundImageAsset = String(formData.get('backgroundImageAssetRemove') || '') === 'on';
-  const backgroundImageAssetFile = formData.get('backgroundImageAssetFile');
   const removeStandAsset = String(formData.get('standAssetRemove') || '') === 'on';
   const standAssetFile = formData.get('standAssetFile');
+
+  function redirectForUploadError(baseCode: string, error: unknown): never {
+    if (isFirebaseStorageBucketNotFoundError(error)) {
+      redirect(`/admin?saveError=${baseCode}-bucket`);
+    }
+
+    if (isFirebaseStoragePermissionError(error)) {
+      redirect(`/admin?saveError=${baseCode}-permission`);
+    }
+
+    if (isFirebaseStorageUploadError(error)) {
+      redirect(`/admin?saveError=${baseCode}`);
+    }
+
+    if (isFirebaseAuthError(error)) {
+      redirect('/admin?saveError=firebase-auth');
+    }
+
+    throw error;
+  }
 
   if (removeLogoAsset) {
     next = {
@@ -58,40 +80,6 @@ export async function updateCmsAction(formData: FormData) {
           assetUrl: '',
           assetName: '',
           assetContentType: '',
-        },
-      },
-    };
-  }
-
-  if (removeHeroImageAsset) {
-    next = {
-      ...next,
-      site: {
-        ...next.site,
-        home: {
-          ...next.site.home,
-          heroImage: {
-            assetUrl: '',
-            assetName: '',
-            assetContentType: '',
-          },
-        },
-      },
-    };
-  }
-
-  if (removeBackgroundImageAsset) {
-    next = {
-      ...next,
-      site: {
-        ...next.site,
-        home: {
-          ...next.site.home,
-          backgroundImage: {
-            assetUrl: '',
-            assetName: '',
-            assetContentType: '',
-          },
         },
       },
     };
@@ -129,15 +117,7 @@ export async function updateCmsAction(formData: FormData) {
         },
       };
     } catch (error) {
-      if (isFirebaseStorageUploadError(error)) {
-        redirect('/admin?saveError=stand-upload');
-      }
-
-      if (isFirebaseAuthError(error)) {
-        redirect('/admin?saveError=firebase-auth');
-      }
-
-      throw error;
+      redirectForUploadError('stand-upload', error);
     }
   }
 
@@ -161,50 +141,6 @@ export async function updateCmsAction(formData: FormData) {
         };
       },
     },
-    {
-      file: heroImageAssetFile,
-      folder: 'home-hero',
-      fallbackName: 'hero-bild',
-      errorCode: 'hero-image-upload',
-      assign: (uploadedAsset: Awaited<ReturnType<typeof uploadCmsAsset>>) => {
-        next = {
-          ...next,
-          site: {
-            ...next.site,
-            home: {
-              ...next.site.home,
-              heroImage: {
-                assetUrl: uploadedAsset.url,
-                assetName: uploadedAsset.name,
-                assetContentType: uploadedAsset.contentType,
-              },
-            },
-          },
-        };
-      },
-    },
-    {
-      file: backgroundImageAssetFile,
-      folder: 'home-background',
-      fallbackName: 'hintergrund-bild',
-      errorCode: 'background-image-upload',
-      assign: (uploadedAsset: Awaited<ReturnType<typeof uploadCmsAsset>>) => {
-        next = {
-          ...next,
-          site: {
-            ...next.site,
-            home: {
-              ...next.site.home,
-              backgroundImage: {
-                assetUrl: uploadedAsset.url,
-                assetName: uploadedAsset.name,
-                assetContentType: uploadedAsset.contentType,
-              },
-            },
-          },
-        };
-      },
-    },
   ]) {
     if (!(assetUpload.file instanceof File) || assetUpload.file.size <= 0) {
       continue;
@@ -214,15 +150,7 @@ export async function updateCmsAction(formData: FormData) {
       const uploadedAsset = await uploadCmsAsset(assetUpload.file, assetUpload.folder, assetUpload.fallbackName);
       assetUpload.assign(uploadedAsset);
     } catch (error) {
-      if (isFirebaseStorageUploadError(error)) {
-        redirect(`/admin?saveError=${assetUpload.errorCode}`);
-      }
-
-      if (isFirebaseAuthError(error)) {
-        redirect('/admin?saveError=firebase-auth');
-      }
-
-      throw error;
+      redirectForUploadError(assetUpload.errorCode, error);
     }
   }
 

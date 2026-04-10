@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { getCmsContent } from '@/lib/cms/storage';
 import { events, sponsorPackages } from '@/lib/data';
 import { formatPrice } from '@/lib/utils';
-import headbangStandImage from '../Headbang Stand Bild.png';
+import standBeispielKiImage from '../Stand Beispiel KI.png';
 import wackenBackgroundImage from '../Wacken Hintergrund Bild.png';
 
 const featuredEvents = events.slice(0, 3);
@@ -36,7 +36,7 @@ const statusLabels: Record<(typeof featuredEvents)[number]['status'], string> = 
 export default async function HomePage() {
   const cms = await getCmsContent();
   const home = cms.site.home;
-  const heroImageSrc = home.heroImage.assetUrl || headbangStandImage.src;
+  const heroImageSrc = standBeispielKiImage.src;
   const backgroundImageSrc = home.backgroundImage.assetUrl || wackenBackgroundImage.src;
 
   return (

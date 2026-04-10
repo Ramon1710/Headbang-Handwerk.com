@@ -76,7 +76,17 @@ export default async function AdminPage({
 }: {
   searchParams: Promise<{
     saved?: string;
-    saveError?: 'missing-config' | 'invalid-firebase' | 'firebase-auth' | 'stand-upload' | 'logo-upload' | 'hero-image-upload' | 'background-image-upload' | string;
+    saveError?:
+      | 'missing-config'
+      | 'invalid-firebase'
+      | 'firebase-auth'
+      | 'stand-upload'
+      | 'stand-upload-bucket'
+      | 'stand-upload-permission'
+      | 'logo-upload'
+      | 'logo-upload-bucket'
+      | 'logo-upload-permission'
+      | string;
   }>;
 }) {
   if (!(await isAdminAuthenticated())) {
@@ -134,14 +144,18 @@ export default async function AdminPage({
             <div className="rounded-2xl border border-red-500/40 bg-red-950/30 px-5 py-4 text-sm text-red-200">
               {params.saveError === 'firebase-auth'
                 ? 'Speichern fehlgeschlagen. Firebase antwortet mit UNAUTHENTICATED. Prüfe FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY und ob der Service Account im richtigen Projekt erstellt wurde.'
+                : params.saveError === 'stand-upload-bucket'
+                ? 'Die 3D-Stand-Datei konnte nicht hochgeladen werden, weil der Firebase-Storage-Bucket nicht gefunden wurde. Prüfe FIREBASE_STORAGE_BUCKET in Vercel und ob Firebase Storage im richtigen Projekt aktiviert ist.'
+                : params.saveError === 'stand-upload-permission'
+                ? 'Die 3D-Stand-Datei konnte nicht hochgeladen werden, weil dem Service Account Rechte auf Firebase Storage fehlen. Vergib in Google Cloud mindestens Schreibrechte auf den Bucket.'
                 : params.saveError === 'stand-upload'
                 ? 'Die 3D-Stand-Datei konnte nicht hochgeladen werden. Prüfe FIREBASE_STORAGE_BUCKET in Vercel oder den Zugriff des Service Accounts auf Firebase Storage.'
+                : params.saveError === 'logo-upload-bucket'
+                ? 'Das Logo konnte nicht hochgeladen werden, weil der Firebase-Storage-Bucket nicht gefunden wurde. Prüfe FIREBASE_STORAGE_BUCKET in Vercel und ob Firebase Storage im richtigen Projekt aktiviert ist.'
+                : params.saveError === 'logo-upload-permission'
+                ? 'Das Logo konnte nicht hochgeladen werden, weil dem Service Account Rechte auf Firebase Storage fehlen. Vergib in Google Cloud mindestens Schreibrechte auf den Bucket.'
                 : params.saveError === 'logo-upload'
                 ? 'Das Logo konnte nicht hochgeladen werden. Prüfe FIREBASE_STORAGE_BUCKET in Vercel oder den Zugriff des Service Accounts auf Firebase Storage.'
-                : params.saveError === 'hero-image-upload'
-                ? 'Das Startseiten-Hauptbild konnte nicht hochgeladen werden. Prüfe FIREBASE_STORAGE_BUCKET in Vercel oder den Zugriff des Service Accounts auf Firebase Storage.'
-                : params.saveError === 'background-image-upload'
-                ? 'Das Startseiten-Hintergrundbild konnte nicht hochgeladen werden. Prüfe FIREBASE_STORAGE_BUCKET in Vercel oder den Zugriff des Service Accounts auf Firebase Storage.'
                 : params.saveError === 'invalid-firebase'
                 ? 'Speichern fehlgeschlagen. Firebase ist gesetzt, aber der Service-Account-Key ist noch ungültig oder falsch formatiert.'
                 : 'Speichern fehlgeschlagen. Für Vercel musst du zuerst FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL und FIREBASE_PRIVATE_KEY setzen.'}
@@ -192,50 +206,6 @@ export default async function AdminPage({
             <InputField label="Hero Titel" name="heroTitle" defaultValue={formValues.heroTitle} />
             <TextareaField label="Hero Einleitung" name="heroLead" defaultValue={formValues.heroLead} rows={4} />
             <TextareaField label="Hero Fließtext" name="heroBody" defaultValue={formValues.heroBody} rows={6} />
-            <label className="block lg:col-span-2">
-              <span className="mb-2 block text-sm font-semibold text-[color:var(--color-foreground)]">Startseiten-Hauptbild hochladen</span>
-              <input
-                type="file"
-                name="heroImageAssetFile"
-                accept=".png,.jpg,.jpeg,.webp,.svg"
-                className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-[color:var(--color-foreground)] outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-white focus:border-[color:var(--color-accent)]"
-              />
-            </label>
-            <div className="rounded-2xl border border-[color:var(--color-border)]/70 bg-black/15 px-4 py-4 text-sm text-[color:var(--color-muted)] lg:col-span-2">
-              {formValues.heroImageAssetUrl ? (
-                <>
-                  Aktuelles Hauptbild: <a href={formValues.heroImageAssetUrl} target="_blank" rel="noreferrer" className="font-semibold text-[color:var(--color-accent-soft)] underline underline-offset-4">{formValues.heroImageAssetName || 'Datei öffnen'}</a>
-                </>
-              ) : (
-                'Aktuell wird noch das lokale Standard-Hauptbild verwendet.'
-              )}
-            </div>
-            <label className="flex items-center gap-3 rounded-xl border border-[color:var(--color-border)]/70 bg-black/10 px-4 py-3 text-sm text-[color:var(--color-foreground)] lg:col-span-2">
-              <input type="checkbox" name="heroImageAssetRemove" className="h-4 w-4 rounded border-[color:var(--color-border)] bg-black/20" />
-              Hochgeladenes Hauptbild beim Speichern entfernen und auf Standard zurücksetzen
-            </label>
-            <label className="block lg:col-span-2">
-              <span className="mb-2 block text-sm font-semibold text-[color:var(--color-foreground)]">Startseiten-Hintergrundbild hochladen</span>
-              <input
-                type="file"
-                name="backgroundImageAssetFile"
-                accept=".png,.jpg,.jpeg,.webp,.svg"
-                className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-[color:var(--color-foreground)] outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-white focus:border-[color:var(--color-accent)]"
-              />
-            </label>
-            <div className="rounded-2xl border border-[color:var(--color-border)]/70 bg-black/15 px-4 py-4 text-sm text-[color:var(--color-muted)] lg:col-span-2">
-              {formValues.backgroundImageAssetUrl ? (
-                <>
-                  Aktuelles Hintergrundbild: <a href={formValues.backgroundImageAssetUrl} target="_blank" rel="noreferrer" className="font-semibold text-[color:var(--color-accent-soft)] underline underline-offset-4">{formValues.backgroundImageAssetName || 'Datei öffnen'}</a>
-                </>
-              ) : (
-                'Aktuell wird noch das lokale Standard-Hintergrundbild verwendet.'
-              )}
-            </div>
-            <label className="flex items-center gap-3 rounded-xl border border-[color:var(--color-border)]/70 bg-black/10 px-4 py-3 text-sm text-[color:var(--color-foreground)] lg:col-span-2">
-              <input type="checkbox" name="backgroundImageAssetRemove" className="h-4 w-4 rounded border-[color:var(--color-border)] bg-black/20" />
-              Hochgeladenes Hintergrundbild beim Speichern entfernen und auf Standard zurücksetzen
-            </label>
             <InputField label="Primärer Button Text" name="heroPrimaryCtaLabel" defaultValue={formValues.heroPrimaryCtaLabel} />
             <InputField label="Primärer Button Link" name="heroPrimaryCtaHref" defaultValue={formValues.heroPrimaryCtaHref} />
             <InputField label="Sekundärer Button Text" name="heroSecondaryCtaLabel" defaultValue={formValues.heroSecondaryCtaLabel} />

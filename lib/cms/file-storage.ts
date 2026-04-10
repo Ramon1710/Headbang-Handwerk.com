@@ -10,9 +10,56 @@ import {
 } from './firebase';
 
 const FIREBASE_STORAGE_UPLOAD_ERROR = 'CMS_FIREBASE_STORAGE_UPLOAD';
+const FIREBASE_STORAGE_BUCKET_NOT_FOUND_ERROR = 'CMS_FIREBASE_STORAGE_BUCKET_NOT_FOUND';
+const FIREBASE_STORAGE_PERMISSION_ERROR = 'CMS_FIREBASE_STORAGE_PERMISSION';
 
 function createFirebaseDownloadUrl(bucketName: string, objectName: string, token: string) {
   return `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(objectName)}?alt=media&token=${token}`;
+}
+
+function isFirebaseStorageBucketNotFoundError(error: unknown) {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+
+  const maybeCode = 'code' in error ? error.code : undefined;
+  const maybeMessage = 'message' in error ? error.message : undefined;
+
+  return (
+    maybeCode === 404 ||
+    maybeCode === '404' ||
+    (typeof maybeMessage === 'string' && /bucket|not found|does not exist/i.test(maybeMessage))
+  );
+}
+
+function isFirebaseStoragePermissionError(error: unknown) {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+
+  const maybeCode = 'code' in error ? error.code : undefined;
+  const maybeMessage = 'message' in error ? error.message : undefined;
+
+  return (
+    maybeCode === 403 ||
+    maybeCode === '403' ||
+    maybeCode === 7 ||
+    maybeCode === '7' ||
+    maybeCode === 'PERMISSION_DENIED' ||
+    (typeof maybeMessage === 'string' && /permission|access denied|insufficient/i.test(maybeMessage))
+  );
+}
+
+function toFirebaseStorageUploadError(error: unknown) {
+  if (isFirebaseStorageBucketNotFoundError(error)) {
+    return new Error(FIREBASE_STORAGE_BUCKET_NOT_FOUND_ERROR);
+  }
+
+  if (isFirebaseStoragePermissionError(error)) {
+    return new Error(FIREBASE_STORAGE_PERMISSION_ERROR);
+  }
+
+  return new Error(FIREBASE_STORAGE_UPLOAD_ERROR);
 }
 
 function sanitizeFilename(filename: string) {
@@ -74,7 +121,7 @@ export async function uploadCmsAsset(file: File, folder: string, fallbackName: s
     }
   }
 
-  throw lastError instanceof Error ? new Error(FIREBASE_STORAGE_UPLOAD_ERROR) : new Error(FIREBASE_STORAGE_UPLOAD_ERROR);
+  throw toFirebaseStorageUploadError(lastError);
 }
 
 export async function uploadStandAsset(file: File) {
@@ -83,4 +130,12 @@ export async function uploadStandAsset(file: File) {
 
 export function isFirebaseStorageUploadError(error: unknown) {
   return error instanceof Error && error.message === FIREBASE_STORAGE_UPLOAD_ERROR;
+}
+
+export function isFirebaseStorageBucketNotFoundError(error: unknown) {
+  return error instanceof Error && error.message === FIREBASE_STORAGE_BUCKET_NOT_FOUND_ERROR;
+}
+
+export function isFirebaseStoragePermissionError(error: unknown) {
+  return error instanceof Error && error.message === FIREBASE_STORAGE_PERMISSION_ERROR;
 }

@@ -35,7 +35,7 @@ Dann die Werte in `.env.local` eintragen:
 - `FIREBASE_PROJECT_ID` – Firebase Projekt-ID
 - `FIREBASE_CLIENT_EMAIL` – Service-Account E-Mail aus Firebase
 - `FIREBASE_PRIVATE_KEY` – Private Key des Service-Accounts
-- `FIREBASE_STORAGE_BUCKET` – optional empfohlen für Datei-Uploads im CMS, z.B. für den 3D-Stand
+- `FIREBASE_STORAGE_BUCKET` – empfohlen für Datei-Uploads im CMS, nur der reine Bucket-Name, z.B. `mein-projekt.firebasestorage.app` oder `mein-projekt.appspot.com`
 
 ### 3. Development Server starten
 
@@ -71,7 +71,9 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 2. Einen Service Account erzeugen.
 3. In Vercel diese Variablen setzen: `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`.
 4. `FIREBASE_PRIVATE_KEY` muss in Vercel als kompletter Key gespeichert werden; Zeilenumbrüche werden serverseitig automatisch korrekt verarbeitet.
-5. Nach dem Setzen neu deployen.
+5. Für Datei-Uploads zusätzlich `FIREBASE_STORAGE_BUCKET` als reinen Bucket-Namen setzen, nicht als `gs://...` oder komplette URL.
+6. In Google Cloud dem verwendeten Service Account mindestens `Storage Object Admin` auf dem Bucket oder `Storage Admin` im Projekt geben.
+7. Nach dem Setzen neu deployen.
 
 ## Seiten
 
