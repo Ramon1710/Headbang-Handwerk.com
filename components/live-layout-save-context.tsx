@@ -70,8 +70,8 @@ export function LiveLayoutSaveProvider({
         });
 
         if (!response.ok) {
-          const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-          throw new Error(payload?.error || `save-failed:${key}`);
+          const payload = (await response.json().catch(() => null)) as { error?: string; detail?: string } | null;
+          throw new Error(payload?.detail ? `${payload?.error || 'save-failed'}:${payload.detail}` : payload?.error || `save-failed:${key}`);
         }
       }
 
@@ -80,14 +80,17 @@ export function LiveLayoutSaveProvider({
       router.refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'save-failed';
+      const [code, detail] = message.split(':', 2);
 
       setSaveError(
-        message === 'missing-config'
+        code === 'missing-config'
           ? 'Speichern nicht moeglich. Auf Vercel fehlt noch die Firebase-Konfiguration fuer dauerhafte CMS-Aenderungen.'
-          : message === 'invalid-firebase'
+          : code === 'invalid-firebase'
           ? 'Speichern fehlgeschlagen. Firebase ist gesetzt, aber der Service-Account-Key ist ungueltig oder falsch formatiert.'
-          : message === 'firebase-auth'
+          : code === 'firebase-auth'
           ? 'Speichern fehlgeschlagen. Der Service Account darf aktuell nicht nach Firebase schreiben.'
+          : code === 'route-failure' || code === 'unknown-save-error'
+          ? `Speichern fehlgeschlagen. Technischer Fehler: ${detail || 'unbekannt'}`
           : 'Speichern fehlgeschlagen. Bitte erneut versuchen.'
       );
     } finally {
