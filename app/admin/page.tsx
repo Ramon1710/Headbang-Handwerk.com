@@ -40,7 +40,7 @@ function TextareaField({ label, name, defaultValue, rows = 4 }: { label: string;
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; saveError?: string }>;
 }) {
   if (!(await isAdminAuthenticated())) {
     redirect('/admin/login');
@@ -64,7 +64,7 @@ export default async function AdminPage({
           </div>
           <div className="flex items-center gap-4">
             <div className="rounded-full border border-[color:var(--color-border)] bg-black/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-accent-soft)]">
-              Speicher: {storageMode === 'mysql' ? 'MySQL' : 'Lokale Datei'}
+              Speicher: {storageMode === 'mysql' ? 'MySQL' : storageMode === 'local-file' ? 'Lokale Datei' : 'Nur Anzeige'}
             </div>
             <form action={logoutAction}>
               <button type="submit" className="rounded-xl border border-[color:var(--color-border)] px-4 py-2 text-sm font-semibold text-[color:var(--color-foreground)] transition hover:border-[color:var(--color-accent)] hover:text-[color:var(--color-accent-soft)]">
@@ -75,9 +75,21 @@ export default async function AdminPage({
         </div>
 
         <form action={updateCmsAction} className="mt-8 space-y-8 pb-12">
+          {storageMode === 'readonly-fallback' ? (
+            <div className="rounded-2xl border border-amber-500/40 bg-amber-950/30 px-5 py-4 text-sm text-amber-100">
+              Auf Vercel ist aktuell keine CMS-Datenbank gesetzt. Die Admin-Seite lädt, aber Änderungen können noch nicht dauerhaft gespeichert werden.
+            </div>
+          ) : null}
+
           {params.saved ? (
             <div className="rounded-2xl border border-green-500/40 bg-green-950/30 px-5 py-4 text-sm text-green-200">
               Änderungen gespeichert. Die Website rendert ab jetzt mit den neuen Werten.
+            </div>
+          ) : null}
+
+          {params.saveError ? (
+            <div className="rounded-2xl border border-red-500/40 bg-red-950/30 px-5 py-4 text-sm text-red-200">
+              Speichern fehlgeschlagen. Für Vercel musst du zuerst CMS_DATABASE_URL setzen.
             </div>
           ) : null}
 

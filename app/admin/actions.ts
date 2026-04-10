@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { getCmsContent, saveCmsContent } from '@/lib/cms/storage';
+import { getCmsContent, isReadonlyFallbackError, saveCmsContent } from '@/lib/cms/storage';
 import { isAdminAuthenticated, loginAdmin, logoutAdmin } from '@/lib/cms/auth';
 import { mergeCmsContentFromForm } from '@/lib/cms/form-data';
 
@@ -31,7 +31,15 @@ export async function updateCmsAction(formData: FormData) {
   const current = await getCmsContent();
   const next = mergeCmsContentFromForm(formData, current);
 
-  await saveCmsContent(next);
+  try {
+    await saveCmsContent(next);
+  } catch (error) {
+    if (isReadonlyFallbackError(error)) {
+      redirect('/admin?saveError=1');
+    }
+
+    throw error;
+  }
 
   revalidatePath('/', 'layout');
   revalidatePath('/');

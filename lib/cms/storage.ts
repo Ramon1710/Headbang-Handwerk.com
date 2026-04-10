@@ -7,6 +7,7 @@ import type { CmsContent } from './schema';
 
 const LOCAL_DATA_DIR = path.join(process.cwd(), '.cms');
 const LOCAL_DATA_FILE = path.join(LOCAL_DATA_DIR, 'content.json');
+const READONLY_FALLBACK_ERROR = 'CMS_READONLY_FALLBACK';
 
 let pool: mysql.Pool | null = null;
 
@@ -16,6 +17,15 @@ function getDatabaseUrl() {
 
 function hasDatabase() {
   return Boolean(getDatabaseUrl());
+}
+
+function isReadonlyFilesystemError(error: unknown) {
+  if (!error || typeof error !== 'object' || !('code' in error)) {
+    return false;
+  }
+
+  const code = String(error.code);
+  return code === 'EROFS' || code === 'EACCES' || code === 'EPERM';
 }
 
 function getPool() {
@@ -78,12 +88,20 @@ async function writeToDatabase(content: CmsContent) {
 }
 
 async function ensureLocalFile() {
-  await fs.mkdir(LOCAL_DATA_DIR, { recursive: true });
-
   try {
-    await fs.access(LOCAL_DATA_FILE);
-  } catch {
-    await fs.writeFile(LOCAL_DATA_FILE, JSON.stringify(defaultCmsContent, null, 2), 'utf8');
+    await fs.mkdir(LOCAL_DATA_DIR, { recursive: true });
+
+    try {
+      await fs.access(LOCAL_DATA_FILE);
+    } catch {
+      await fs.writeFile(LOCAL_DATA_FILE, JSON.stringify(defaultCmsContent, null, 2), 'utf8');
+    }
+  } catch (error) {
+    if (isReadonlyFilesystemError(error)) {
+      throw new Error(READONLY_FALLBACK_ERROR);
+    }
+
+    throw error;
   }
 }
 
@@ -112,7 +130,17 @@ function normalizeContent(content: CmsContent): CmsContent {
 }
 
 export const getCmsContent = cache(async (): Promise<CmsContent> => {
-  const content = hasDatabase() ? await readFromDatabase() : await readFromFile();
+  let content: CmsContent | null;
+
+  try {
+    content = hasDatabase() ? await readFromDatabase() : await readFromFile();
+  } catch (error) {
+    if (!hasDatabase() && error instanceof Error && error.message === READONLY_FALLBACK_ERROR) {
+      return defaultCmsContent;
+    }
+
+    throw error;
+  }
 
   if (!content) {
     if (hasDatabase()) {
@@ -133,9 +161,25 @@ export async function saveCmsContent(content: CmsContent) {
     return;
   }
 
-  await writeToFile(normalized);
+  try {
+    await writeToFile(normalized);
+  } catch (error) {
+    if (error instanceof Error && error.message === READONLY_FALLBACK_ERROR) {
+      throw error;
+    }
+
+    throw error;
+  }
 }
 
 export function cmsStorageMode() {
-  return hasDatabase() ? 'mysql' : 'local-file';
+  if (hasDatabase()) {
+    return 'mysql';
+  }
+
+  return process.env.VERCEL ? 'readonly-fallback' : 'local-file';
+}
+
+export function isReadonlyFallbackError(error: unknown) {
+  return error instanceof Error && error.message === READONLY_FALLBACK_ERROR;
 }

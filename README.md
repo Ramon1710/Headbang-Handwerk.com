@@ -60,7 +60,7 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 - Login unter `/admin/login`
 - Ohne konfigurierte Datenbank werden Inhalte lokal in `.cms/content.json` gespeichert. Das ist nur für lokale Entwicklung sinnvoll.
 - Auf Vercel müssen CMS-Änderungen über eine externe Datenbank gespeichert werden, da das Dateisystem dort nicht dauerhaft beschreibbar ist.
-- Die aktuelle Implementierung nutzt MySQL und passt damit auch zu externen Datenbanken bei klassischen Hostern oder Managed-Datenbanken.
+- Die aktuelle Implementierung nutzt MySQL als persistente CMS-Datenbank für den Vercel-Betrieb.
 
 ## Seiten
 
