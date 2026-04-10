@@ -130,22 +130,22 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     <div className="relative">
       <div
         ref={ref}
-        className={className}
+        className={`relative ${className}`}
         style={isAdmin ? { ...boxStyle, resize: 'both', overflow: 'auto' } : boxStyle}
         title={isAdmin ? 'Klick zum Bearbeiten, unten rechts Größe ändern, oben links verschieben' : undefined}
       >
+        {isAdmin ? (
+          <button
+            type="button"
+            onMouseDown={handleMoveStart}
+            className="absolute left-2 top-2 z-10 cursor-grab rounded-full border border-[#ff9d3c]/70 bg-[#1a110b] px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#ffcf98] shadow-[0_12px_30px_rgba(0,0,0,0.28)] active:cursor-grabbing"
+          >
+            Bewegen
+          </button>
+        ) : null}
         {children}
+        {isAdmin ? <div aria-hidden="true" className="pointer-events-none absolute bottom-3 right-3 h-4 w-4 border-b-2 border-r-2 border-[#ff9d3c]/80" /> : null}
       </div>
-      {isAdmin ? (
-        <button
-          type="button"
-          onMouseDown={handleMoveStart}
-          className="absolute -left-2 -top-2 z-10 cursor-grab rounded-full border border-[#ff9d3c]/70 bg-[#1a110b] px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#ffcf98] shadow-[0_12px_30px_rgba(0,0,0,0.28)] active:cursor-grabbing"
-        >
-          Bewegen
-        </button>
-      ) : null}
-      {isAdmin ? <div aria-hidden="true" className="pointer-events-none absolute bottom-3 right-3 h-4 w-4 border-b-2 border-r-2 border-[#ff9d3c]/80" /> : null}
     </div>
   );
 }

@@ -98,6 +98,32 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
     editorRef.current.focus();
   }, [html, isOpen]);
 
+  useEffect(() => {
+    if (!isOpen || !editorRef.current) {
+      return;
+    }
+
+    function handleSelectionChange() {
+      if (!editorRef.current) {
+        return;
+      }
+
+      const selection = window.getSelection();
+
+      if (!selection || selection.rangeCount === 0 || !isSelectionInsideEditor(selection, editorRef.current)) {
+        return;
+      }
+
+      selectionRef.current = selection.getRangeAt(0).cloneRange();
+    }
+
+    document.addEventListener('selectionchange', handleSelectionChange);
+
+    return () => {
+      document.removeEventListener('selectionchange', handleSelectionChange);
+    };
+  }, [isOpen]);
+
   function captureSelection() {
     if (!editorRef.current) {
       return;
@@ -113,13 +139,18 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
   }
 
   function restoreSelection() {
+    const selection = window.getSelection();
+
+    if (editorRef.current && selection && selection.rangeCount > 0 && isSelectionInsideEditor(selection, editorRef.current)) {
+      selectionRef.current = selection.getRangeAt(0).cloneRange();
+      return true;
+    }
+
     if (!editorRef.current || !selectionRef.current) {
       return false;
     }
 
     editorRef.current.focus();
-
-    const selection = window.getSelection();
 
     if (!selection) {
       return false;
@@ -204,9 +235,9 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2 rounded-2xl border border-white/8 bg-black/20 p-3">
-              <button type="button" onMouseDown={(event) => { event.preventDefault(); handleFormat('strong'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Fett</button>
-              <button type="button" onMouseDown={(event) => { event.preventDefault(); handleFormat('em'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Kursiv</button>
-              <button type="button" onMouseDown={(event) => { event.preventDefault(); handleFormat('u'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Unterstreichen</button>
+              <button type="button" onMouseDown={(event) => { event.preventDefault(); captureSelection(); handleFormat('strong'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Fett</button>
+              <button type="button" onMouseDown={(event) => { event.preventDefault(); captureSelection(); handleFormat('em'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Kursiv</button>
+              <button type="button" onMouseDown={(event) => { event.preventDefault(); captureSelection(); handleFormat('u'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Unterstreichen</button>
               <select
                 onFocus={captureSelection}
                 onChange={(event) => {
