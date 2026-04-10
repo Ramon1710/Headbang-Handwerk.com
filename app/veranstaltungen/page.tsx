@@ -48,7 +48,7 @@ export default async function VeranstaltungenPage({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {confirmed.map((e, index) => (
                   <LiveResizableBox key={e.id} boxKey={`events.confirmed.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `events.confirmed.${index}.box`)} isAdmin={isAdmin} className="h-full">
-                    <EventCard event={e} />
+                    <EventCard event={e} isAdmin={isAdmin} liveEditor={liveEditor} editorKeyPrefix={`events.confirmed.${index}.content`} />
                   </LiveResizableBox>
                 ))}
               </div>
@@ -66,7 +66,7 @@ export default async function VeranstaltungenPage({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {planned.map((e, index) => (
                   <LiveResizableBox key={e.id} boxKey={`events.planned.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `events.planned.${index}.box`)} isAdmin={isAdmin} className="h-full">
-                    <EventCard event={e} />
+                    <EventCard event={e} isAdmin={isAdmin} liveEditor={liveEditor} editorKeyPrefix={`events.planned.${index}.content`} />
                   </LiveResizableBox>
                 ))}
               </div>
