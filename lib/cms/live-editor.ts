@@ -22,7 +22,7 @@ function textToHtml(value: string) {
 function stripDangerousMarkup(html: string) {
   return html
     .replace(/<\/?(script|style)[^>]*>/gi, '')
-    .replace(/<!--.*?-->/gs, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/\son[a-z]+="[^"]*"/gi, '')
     .replace(/\son[a-z]+='[^']*'/gi, '')
     .replace(/\son[a-z]+=[^\s>]+/gi, '');
