@@ -10,6 +10,12 @@
   --surface-2: #1f1814;
   --border: #3f2a1b;
   --muted: #b8a48e;
+  --cms-box-label-font: var(--font-exo), 'Segoe UI', Tahoma, sans-serif;
+  --cms-box-title-font: var(--font-cinzel), Georgia, serif;
+  --cms-box-body-font: var(--font-exo), 'Segoe UI', Tahoma, sans-serif;
+  --cms-box-label-size: 0.8rem;
+  --cms-box-title-size: 1.5rem;
+  --cms-box-body-size: 1rem;
 }
 
 @theme inline {
@@ -181,6 +187,21 @@ h6 {
   height: 2px;
   background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent-orange) 90%, transparent), transparent);
   box-shadow: 0 0 24px color-mix(in srgb, var(--accent-orange) 45%, transparent);
+}
+
+.cms-box-label {
+  font-family: var(--cms-box-label-font);
+  font-size: var(--cms-box-label-size);
+}
+
+.cms-box-title {
+  font-family: var(--cms-box-title-font);
+  font-size: var(--cms-box-title-size);
+}
+
+.cms-box-body {
+  font-family: var(--cms-box-body-font);
+  font-size: var(--cms-box-body-size);
 }
 
 /* Scrollbar */

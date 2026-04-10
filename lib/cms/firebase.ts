@@ -45,6 +45,22 @@ export function hasFirebaseConfig() {
   return Boolean(getFirebaseConfig());
 }
 
+export function getFirebaseStorageBucketCandidates() {
+  const explicitBucket = normalizeValue(process.env.FIREBASE_STORAGE_BUCKET);
+
+  if (explicitBucket) {
+    return [explicitBucket];
+  }
+
+  const projectId = normalizeValue(process.env.FIREBASE_PROJECT_ID);
+
+  if (!projectId) {
+    return [];
+  }
+
+  return [`${projectId}.appspot.com`, `${projectId}.firebasestorage.app`];
+}
+
 export function getFirebaseDb() {
   const config = getFirebaseConfig();
 

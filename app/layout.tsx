@@ -53,6 +53,12 @@ export default async function RootLayout({
             '--surface-2': cms.theme.surfaceAlt,
             '--border': cms.theme.border,
             '--muted': cms.theme.muted,
+            '--cms-box-label-font': cms.theme.boxLabelFont === 'cinzel' ? 'var(--font-cinzel), Georgia, serif' : 'var(--font-exo), Segoe UI, Tahoma, sans-serif',
+            '--cms-box-title-font': cms.theme.boxTitleFont === 'cinzel' ? 'var(--font-cinzel), Georgia, serif' : 'var(--font-exo), Segoe UI, Tahoma, sans-serif',
+            '--cms-box-body-font': cms.theme.boxBodyFont === 'cinzel' ? 'var(--font-cinzel), Georgia, serif' : 'var(--font-exo), Segoe UI, Tahoma, sans-serif',
+            '--cms-box-label-size': cms.theme.boxLabelSize,
+            '--cms-box-title-size': cms.theme.boxTitleSize,
+            '--cms-box-body-size': cms.theme.boxBodySize,
           } as React.CSSProperties
         }
       >

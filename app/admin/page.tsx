@@ -37,10 +37,39 @@ function TextareaField({ label, name, defaultValue, rows = 4 }: { label: string;
   );
 }
 
+function SelectField({
+  label,
+  name,
+  defaultValue,
+  options,
+}: {
+  label: string;
+  name: string;
+  defaultValue: string;
+  options: Array<{ label: string; value: string }>;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-sm font-semibold text-[color:var(--color-foreground)]">{label}</span>
+      <select
+        name={name}
+        defaultValue={defaultValue}
+        className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-[color:var(--color-foreground)] outline-none transition focus:border-[color:var(--color-accent)]"
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; saveError?: 'missing-config' | 'invalid-firebase' | 'firebase-auth' | string }>;
+  searchParams: Promise<{ saved?: string; saveError?: 'missing-config' | 'invalid-firebase' | 'firebase-auth' | 'stand-upload' | string }>;
 }) {
   if (!(await isAdminAuthenticated())) {
     redirect('/admin/login');
@@ -74,7 +103,7 @@ export default async function AdminPage({
           </div>
         </div>
 
-        <form action={updateCmsAction} className="mt-8 space-y-8 pb-12">
+        <form action={updateCmsAction} encType="multipart/form-data" className="mt-8 space-y-8 pb-12">
           {storageMode === 'readonly-fallback' ? (
             <div className="rounded-2xl border border-amber-500/40 bg-amber-950/30 px-5 py-4 text-sm text-amber-100">
               Auf Vercel ist aktuell Firebase noch nicht vollständig gesetzt. Die Admin-Seite lädt, aber Änderungen können noch nicht dauerhaft gespeichert werden.
@@ -91,6 +120,8 @@ export default async function AdminPage({
             <div className="rounded-2xl border border-red-500/40 bg-red-950/30 px-5 py-4 text-sm text-red-200">
               {params.saveError === 'firebase-auth'
                 ? 'Speichern fehlgeschlagen. Firebase antwortet mit UNAUTHENTICATED. Prüfe FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY und ob der Service Account im richtigen Projekt erstellt wurde.'
+                : params.saveError === 'stand-upload'
+                ? 'Die 3D-Stand-Datei konnte nicht hochgeladen werden. Prüfe FIREBASE_STORAGE_BUCKET in Vercel oder den Zugriff des Service Accounts auf Firebase Storage.'
                 : params.saveError === 'invalid-firebase'
                 ? 'Speichern fehlgeschlagen. Firebase ist gesetzt, aber der Service-Account-Key ist noch ungültig oder falsch formatiert.'
                 : 'Speichern fehlgeschlagen. Für Vercel musst du zuerst FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL und FIREBASE_PRIVATE_KEY setzen.'}
@@ -214,6 +245,31 @@ export default async function AdminPage({
             </div>
             <InputField label="Platzhalter Titel" name="standOverviewPlaceholderTitle" defaultValue={formValues.standOverviewPlaceholderTitle} />
             <InputField label="Platzhalter Zusatz" name="standOverviewPlaceholderText" defaultValue={formValues.standOverviewPlaceholderText} />
+            <label className="block lg:col-span-2">
+              <span className="mb-2 block text-sm font-semibold text-[color:var(--color-foreground)]">3D-Stand-Datei hochladen</span>
+              <input
+                type="file"
+                name="standAssetFile"
+                accept=".pdf,.png,.jpg,.jpeg,.webp,.svg,.mp4,.mov,.glb,.gltf,.usdz"
+                className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-[color:var(--color-foreground)] outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-white focus:border-[color:var(--color-accent)]"
+              />
+              <span className="mt-2 block text-xs text-[color:var(--color-muted)]">
+                Unterstützt z.B. PDF, PNG, JPG, SVG, MP4 oder 3D-Dateien wie GLB/GLTF.
+              </span>
+            </label>
+            <div className="rounded-2xl border border-[color:var(--color-border)]/70 bg-black/15 px-4 py-4 text-sm text-[color:var(--color-muted)] lg:col-span-2">
+              {formValues.standAssetUrl ? (
+                <>
+                  Aktuelle Datei: <a href={formValues.standAssetUrl} target="_blank" rel="noreferrer" className="font-semibold text-[color:var(--color-accent-soft)] underline underline-offset-4">{formValues.standAssetName || 'Datei öffnen'}</a>
+                </>
+              ) : (
+                'Aktuell ist noch keine 3D-Stand-Datei hinterlegt.'
+              )}
+            </div>
+            <label className="flex items-center gap-3 rounded-xl border border-[color:var(--color-border)]/70 bg-black/10 px-4 py-3 text-sm text-[color:var(--color-foreground)] lg:col-span-2">
+              <input type="checkbox" name="standAssetRemove" className="h-4 w-4 rounded border-[color:var(--color-border)] bg-black/20" />
+              Vorhandene 3D-Stand-Datei beim Speichern entfernen
+            </label>
             <InputField label="Frontbanner Label" name="standFrontBannerLabel" defaultValue={formValues.standFrontBannerLabel} />
             <InputField label="Rückbanner Label" name="standBackBannerLabel" defaultValue={formValues.standBackBannerLabel} />
             <InputField label="Linke Seitenmarke" name="standLeftLabel" defaultValue={formValues.standLeftLabel} />
@@ -246,6 +302,33 @@ export default async function AdminPage({
             <InputField label="Surface alt" name="themeSurfaceAlt" defaultValue={formValues.themeSurfaceAlt} type="color" />
             <InputField label="Border" name="themeBorder" defaultValue={formValues.themeBorder} type="color" />
             <InputField label="Muted" name="themeMuted" defaultValue={formValues.themeMuted} type="color" />
+          </section>
+
+          <section className="grid gap-6 rounded-[1.8rem] border border-[color:var(--color-border)]/70 bg-[color:var(--color-surface)]/70 p-7 lg:grid-cols-3">
+            <div className="lg:col-span-3">
+              <h2 className="text-2xl font-black text-[color:var(--color-foreground)]">Kästen Typografie</h2>
+            </div>
+            <SelectField
+              label="Label Schrift"
+              name="boxLabelFont"
+              defaultValue={formValues.boxLabelFont}
+              options={[{ label: 'Exo 2', value: 'exo' }, { label: 'Cinzel', value: 'cinzel' }]}
+            />
+            <SelectField
+              label="Titel Schrift"
+              name="boxTitleFont"
+              defaultValue={formValues.boxTitleFont}
+              options={[{ label: 'Cinzel', value: 'cinzel' }, { label: 'Exo 2', value: 'exo' }]}
+            />
+            <SelectField
+              label="Text Schrift"
+              name="boxBodyFont"
+              defaultValue={formValues.boxBodyFont}
+              options={[{ label: 'Exo 2', value: 'exo' }, { label: 'Cinzel', value: 'cinzel' }]}
+            />
+            <InputField label="Label Größe" name="boxLabelSize" defaultValue={formValues.boxLabelSize} />
+            <InputField label="Titel Größe" name="boxTitleSize" defaultValue={formValues.boxTitleSize} />
+            <InputField label="Text Größe" name="boxBodySize" defaultValue={formValues.boxBodySize} />
           </section>
 
           <div className="flex justify-end">

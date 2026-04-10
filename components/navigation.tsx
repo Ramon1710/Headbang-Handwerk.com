@@ -8,6 +8,12 @@ import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 import headbangLogo from '../Headbang Handwerk e.V. Logo.png';
 
+const logoSources = [
+  '/Headbang Handwerk e.V. Logo Final.svg',
+  '/Headbang Handwerk e.V. Logo Final PNG.png',
+  headbangLogo,
+];
+
 interface NavigationProps {
   links: NavigationLink[];
   ctaLabel: string;
@@ -17,6 +23,9 @@ interface NavigationProps {
 export function Navigation({ links, ctaLabel, ctaHref }: NavigationProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoIndex, setLogoIndex] = useState(0);
+
+  const currentLogo = logoSources[Math.min(logoIndex, logoSources.length - 1)];
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -38,9 +47,11 @@ export function Navigation({ links, ctaLabel, ctaHref }: NavigationProps) {
         <div className="flex items-center justify-between py-3 min-h-24">
           <a href="/" className="flex items-center gap-3 group" aria-label="Headbang Handwerk">
             <Image
-              src={headbangLogo}
+              src={currentLogo}
               alt="Headbang Handwerk Logo"
               priority
+              unoptimized={typeof currentLogo === 'string' && currentLogo.endsWith('.svg')}
+              onError={() => setLogoIndex((current) => Math.min(current + 1, logoSources.length - 1))}
               className="h-auto max-h-[78px] w-40 object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.65)] sm:max-h-[92px] sm:w-48"
             />
           </a>

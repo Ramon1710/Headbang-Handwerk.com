@@ -35,6 +35,7 @@ Dann die Werte in `.env.local` eintragen:
 - `FIREBASE_PROJECT_ID` – Firebase Projekt-ID
 - `FIREBASE_CLIENT_EMAIL` – Service-Account E-Mail aus Firebase
 - `FIREBASE_PRIVATE_KEY` – Private Key des Service-Accounts
+- `FIREBASE_STORAGE_BUCKET` – optional empfohlen für Datei-Uploads im CMS, z.B. für den 3D-Stand
 
 ### 3. Development Server starten
 
@@ -62,6 +63,7 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 - Ohne konfigurierte Datenbank werden Inhalte lokal in `.cms/content.json` gespeichert. Das ist nur für lokale Entwicklung sinnvoll.
 - Auf Vercel müssen CMS-Änderungen über Firebase Firestore gespeichert werden, da das Dateisystem dort nicht dauerhaft beschreibbar ist.
 - Für Firestore werden die drei Firebase-Umgebungsvariablen aus dem Service Account benötigt.
+- Für Datei-Uploads im Admin, z.B. auf der 3D-Stand-Seite, sollte zusätzlich `FIREBASE_STORAGE_BUCKET` gesetzt werden.
 
 ## Firebase Setup
 

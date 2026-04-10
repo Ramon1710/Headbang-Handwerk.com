@@ -96,8 +96,8 @@ export default async function HomePage() {
                 <div className="mt-0 grid gap-6 sm:grid-cols-3">
                   {home.heroMetrics.map((metric) => (
                     <div key={metric.label} className="rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.08)_0%,rgba(255,155,57,0.015)_100%)] px-6 py-6 ring-1 ring-[#92592f]/28 backdrop-blur-[6px]">
-                      <p className="text-2xl font-black text-[#ffbe6f]">{metric.value}</p>
-                      <p className="mt-1 text-sm leading-6 text-[#dbc4aa]">{metric.label}</p>
+                      <p className="cms-box-title font-black text-[#ffbe6f]">{metric.value}</p>
+                      <p className="cms-box-body mt-1 leading-6 text-[#dbc4aa]">{metric.label}</p>
                     </div>
                   ))}
                 </div>
@@ -126,24 +126,24 @@ export default async function HomePage() {
                   <div className="rounded-[1.6rem] bg-[#120d0a]/26 px-5 py-5 ring-1 ring-white/8 backdrop-blur-[8px]">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#ffbf76]">{home.projectFocusEyebrow}</p>
-                        <p className="mt-2 text-2xl font-black text-[#fff0da]">{home.projectFocusTitle}</p>
+                        <p className="cms-box-label font-semibold uppercase tracking-[0.24em] text-[#ffbf76]">{home.projectFocusEyebrow}</p>
+                        <p className="cms-box-title mt-2 font-black text-[#fff0da]">{home.projectFocusTitle}</p>
                       </div>
                       <Target className="mt-1 h-5 w-5 flex-shrink-0 text-[#ff9d3c]" />
                     </div>
-                    <p className="mt-4 text-sm leading-7 text-[#dcc8b0] sm:text-[0.98rem]">
+                    <p className="cms-box-body mt-4 leading-7 text-[#dcc8b0] sm:text-[0.98rem]">
                       {home.projectFocusText}
                     </p>
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="rounded-2xl bg-[#120d0a]/22 px-5 py-4 ring-1 ring-white/8 backdrop-blur-[8px]">
-                      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">{home.projectFocusToneLabel}</p>
-                      <p className="mt-2 pb-1 text-lg font-black leading-[1.2] text-[#ffb14d]">{home.projectFocusToneValue}</p>
+                      <p className="cms-box-label font-semibold uppercase tracking-[0.2em] text-[#caa985]">{home.projectFocusToneLabel}</p>
+                      <p className="cms-box-title mt-2 pb-1 font-black leading-[1.2] text-[#ffb14d]">{home.projectFocusToneValue}</p>
                     </div>
                     <div className="rounded-2xl bg-[#120d0a]/22 px-5 py-4 ring-1 ring-white/8 backdrop-blur-[8px]">
-                      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]">{home.projectFocusImpactLabel}</p>
-                      <p className="mt-2 pb-1 text-lg font-black leading-[1.2] text-[#ffb14d]">{home.projectFocusImpactValue}</p>
+                      <p className="cms-box-label font-semibold uppercase tracking-[0.2em] text-[#caa985]">{home.projectFocusImpactLabel}</p>
+                      <p className="cms-box-title mt-2 pb-1 font-black leading-[1.2] text-[#ffb14d]">{home.projectFocusImpactValue}</p>
                     </div>
                   </div>
 

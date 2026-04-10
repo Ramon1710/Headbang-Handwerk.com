@@ -11,6 +11,12 @@ export const defaultCmsContent: CmsContent = {
     surfaceAlt: '#1f1814',
     border: '#3f2a1b',
     muted: '#b8a48e',
+    boxLabelFont: 'exo',
+    boxTitleFont: 'cinzel',
+    boxBodyFont: 'exo',
+    boxLabelSize: '0.8rem',
+    boxTitleSize: '1.5rem',
+    boxBodySize: '1rem',
   },
   site: {
     seo: {
@@ -205,6 +211,9 @@ export const defaultCmsContent: CmsContent = {
       overviewTitle: 'Stand-Übersicht (Schematisch)',
       overviewPlaceholderTitle: 'Interaktive 3D-Ansicht',
       overviewPlaceholderText: 'folgt in Kürze',
+      assetUrl: '',
+      assetName: '',
+      assetContentType: '',
       frontBannerLabel: 'Frontbanner (3×2m) – €800',
       backBannerLabel: 'Rückbanner (4×1m) – €350',
       leftLabel: 'Links',

@@ -26,16 +26,16 @@ export function SponsorPackageCard({ pkg }: SponsorPackageCardProps) {
       )}
 
       <div className="mb-6">
-        <h3 className="text-white font-black text-2xl mb-1">{pkg.name}</h3>
-        <div className="mb-1 text-3xl font-black text-[color:var(--color-accent)]">
+        <h3 className="cms-box-title mb-1 font-black text-white">{pkg.name}</h3>
+        <div className="cms-box-title mb-1 font-black text-[color:var(--color-accent)]">
           {formatPrice(pkg.price)}
         </div>
-        <p className="text-gray-400 text-sm max-w-xs mx-auto">{pkg.visibility}</p>
+        <p className="cms-box-body max-w-xs mx-auto text-gray-400">{pkg.visibility}</p>
       </div>
 
       <ul className="space-y-2.5 mb-8 flex-1">
         {pkg.features.map((feature) => (
-          <li key={feature} className="flex items-start justify-center gap-2.5 text-sm text-gray-200 text-center">
+          <li key={feature} className="cms-box-body flex items-start justify-center gap-2.5 text-center text-gray-200">
             <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-[color:var(--color-accent)]" />
             {feature}
           </li>

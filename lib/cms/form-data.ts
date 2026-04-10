@@ -78,6 +78,8 @@ export interface CmsFormValues {
   standOverviewTitle: string;
   standOverviewPlaceholderTitle: string;
   standOverviewPlaceholderText: string;
+  standAssetUrl: string;
+  standAssetName: string;
   standFrontBannerLabel: string;
   standBackBannerLabel: string;
   standLeftLabel: string;
@@ -98,6 +100,12 @@ export interface CmsFormValues {
   themeSurfaceAlt: string;
   themeBorder: string;
   themeMuted: string;
+  boxLabelFont: string;
+  boxTitleFont: string;
+  boxBodyFont: string;
+  boxLabelSize: string;
+  boxTitleSize: string;
+  boxBodySize: string;
 }
 
 export function cmsContentToFormValues(content: CmsContent): CmsFormValues {
@@ -166,6 +174,8 @@ export function cmsContentToFormValues(content: CmsContent): CmsFormValues {
     standOverviewTitle: content.site.stand.overviewTitle,
     standOverviewPlaceholderTitle: content.site.stand.overviewPlaceholderTitle,
     standOverviewPlaceholderText: content.site.stand.overviewPlaceholderText,
+    standAssetUrl: content.site.stand.assetUrl,
+    standAssetName: content.site.stand.assetName,
     standFrontBannerLabel: content.site.stand.frontBannerLabel,
     standBackBannerLabel: content.site.stand.backBannerLabel,
     standLeftLabel: content.site.stand.leftLabel,
@@ -186,6 +196,12 @@ export function cmsContentToFormValues(content: CmsContent): CmsFormValues {
     themeSurfaceAlt: content.theme.surfaceAlt,
     themeBorder: content.theme.border,
     themeMuted: content.theme.muted,
+    boxLabelFont: content.theme.boxLabelFont,
+    boxTitleFont: content.theme.boxTitleFont,
+    boxBodyFont: content.theme.boxBodyFont,
+    boxLabelSize: content.theme.boxLabelSize,
+    boxTitleSize: content.theme.boxTitleSize,
+    boxBodySize: content.theme.boxBodySize,
   };
 }
 
@@ -202,6 +218,12 @@ export function mergeCmsContentFromForm(formData: FormData, current: CmsContent)
       surfaceAlt: getString(formData, 'themeSurfaceAlt', current.theme.surfaceAlt),
       border: getString(formData, 'themeBorder', current.theme.border),
       muted: getString(formData, 'themeMuted', current.theme.muted),
+      boxLabelFont: getString(formData, 'boxLabelFont', current.theme.boxLabelFont) as CmsContent['theme']['boxLabelFont'],
+      boxTitleFont: getString(formData, 'boxTitleFont', current.theme.boxTitleFont) as CmsContent['theme']['boxTitleFont'],
+      boxBodyFont: getString(formData, 'boxBodyFont', current.theme.boxBodyFont) as CmsContent['theme']['boxBodyFont'],
+      boxLabelSize: getString(formData, 'boxLabelSize', current.theme.boxLabelSize),
+      boxTitleSize: getString(formData, 'boxTitleSize', current.theme.boxTitleSize),
+      boxBodySize: getString(formData, 'boxBodySize', current.theme.boxBodySize),
     },
     site: {
       ...current.site,
@@ -298,6 +320,9 @@ export function mergeCmsContentFromForm(formData: FormData, current: CmsContent)
         overviewTitle: getString(formData, 'standOverviewTitle', current.site.stand.overviewTitle),
         overviewPlaceholderTitle: getString(formData, 'standOverviewPlaceholderTitle', current.site.stand.overviewPlaceholderTitle),
         overviewPlaceholderText: getString(formData, 'standOverviewPlaceholderText', current.site.stand.overviewPlaceholderText),
+        assetUrl: current.site.stand.assetUrl,
+        assetName: current.site.stand.assetName,
+        assetContentType: current.site.stand.assetContentType,
         frontBannerLabel: getString(formData, 'standFrontBannerLabel', current.site.stand.frontBannerLabel),
         backBannerLabel: getString(formData, 'standBackBannerLabel', current.site.stand.backBannerLabel),
         leftLabel: getString(formData, 'standLeftLabel', current.site.stand.leftLabel),

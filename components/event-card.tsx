@@ -21,19 +21,19 @@ export function EventCard({ event }: EventCardProps) {
       <div className="flex items-start justify-center mb-4">
         <Badge variant={variant}>{label}</Badge>
       </div>
-      <h3 className="text-white font-bold text-xl mb-1">{event.title}</h3>
-      <p className="mb-4 text-sm font-medium text-[color:var(--color-accent)]">{event.festivalName}</p>
+      <h3 className="cms-box-title mb-1 font-bold text-white">{event.title}</h3>
+      <p className="cms-box-label mb-4 font-medium text-[color:var(--color-accent)]">{event.festivalName}</p>
       <div className="space-y-2 mb-4 max-w-xs mx-auto">
-        <div className="flex items-center justify-center gap-2 text-gray-300 text-sm">
+        <div className="cms-box-body flex items-center justify-center gap-2 text-gray-300">
           <Calendar className="w-4 h-4 flex-shrink-0 text-[color:var(--color-accent)]" />
           {event.date}
         </div>
-        <div className="flex items-center justify-center gap-2 text-gray-300 text-sm">
+        <div className="cms-box-body flex items-center justify-center gap-2 text-gray-300">
           <MapPin className="w-4 h-4 flex-shrink-0 text-[color:var(--color-accent)]" />
           {event.location}
         </div>
       </div>
-      <p className="text-gray-400 text-sm leading-relaxed mb-6 max-w-sm mx-auto">{event.description}</p>
+      <p className="cms-box-body mb-6 max-w-sm mx-auto leading-relaxed text-gray-400">{event.description}</p>
       <Button href={event.ctaUrl || '/kontakt'} size="sm" variant="secondary" className="w-full">
         {event.ctaText}
       </Button>

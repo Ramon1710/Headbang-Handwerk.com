@@ -8,6 +8,12 @@ export interface ThemeSettings {
   surfaceAlt: string;
   border: string;
   muted: string;
+  boxLabelFont: 'cinzel' | 'exo';
+  boxTitleFont: 'cinzel' | 'exo';
+  boxBodyFont: 'cinzel' | 'exo';
+  boxLabelSize: string;
+  boxTitleSize: string;
+  boxBodySize: string;
 }
 
 export interface NavigationLink {
@@ -153,6 +159,9 @@ export interface StandPageContent {
   overviewTitle: string;
   overviewPlaceholderTitle: string;
   overviewPlaceholderText: string;
+  assetUrl: string;
+  assetName: string;
+  assetContentType: string;
   frontBannerLabel: string;
   backBannerLabel: string;
   leftLabel: string;
