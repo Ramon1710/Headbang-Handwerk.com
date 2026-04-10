@@ -391,14 +391,26 @@ export default async function HomePage({
 
           <section className="mx-auto max-w-7xl py-[3.5rem] lg:py-[7rem]">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-              <div className="max-w-3xl">
+              <LiveResizableBox
+                boxKey="home.eventsHeader.box"
+                initialStyle={resolveLiveBoxStyle(liveEditor, 'home.eventsHeader.box')}
+                isAdmin={isAdmin}
+                className="max-w-3xl"
+              >
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">{home.eventsEyebrow}</p>
                 <h2 className="mt-4 text-4xl font-black text-[#fff0da] sm:text-[3rem]">{home.eventsTitle}</h2>
-              </div>
-              <Button href={home.eventsCtaHref} variant="secondary" size="lg">
-                {home.eventsCtaLabel}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+              </LiveResizableBox>
+              <LiveResizableBox
+                boxKey="home.eventsCta.box"
+                initialStyle={resolveLiveBoxStyle(liveEditor, 'home.eventsCta.box')}
+                isAdmin={isAdmin}
+                className="self-start lg:self-auto"
+              >
+                <Button href={home.eventsCtaHref} variant="secondary" size="lg">
+                  {home.eventsCtaLabel}
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </LiveResizableBox>
             </div>
 
             <div className="mt-24 grid gap-10 lg:grid-cols-3 lg:gap-y-16 xl:gap-x-12">
@@ -442,14 +454,26 @@ export default async function HomePage({
 
           <section className="mx-auto max-w-7xl py-[3.5rem] lg:py-[7rem]">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-              <div className="max-w-3xl">
+              <LiveResizableBox
+                boxKey="home.packagesHeader.box"
+                initialStyle={resolveLiveBoxStyle(liveEditor, 'home.packagesHeader.box')}
+                isAdmin={isAdmin}
+                className="max-w-3xl"
+              >
                 <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]">{home.packagesEyebrow}</p>
                 <h2 className="mt-4 text-4xl font-black text-[#fff0da] sm:text-[3rem]">{home.packagesTitle}</h2>
-              </div>
-              <Button href={home.packagesCtaHref} variant="ghost" size="lg">
-                {home.packagesCtaLabel}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+              </LiveResizableBox>
+              <LiveResizableBox
+                boxKey="home.packagesCta.box"
+                initialStyle={resolveLiveBoxStyle(liveEditor, 'home.packagesCta.box')}
+                isAdmin={isAdmin}
+                className="self-start lg:self-auto"
+              >
+                <Button href={home.packagesCtaHref} variant="ghost" size="lg">
+                  {home.packagesCtaLabel}
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </LiveResizableBox>
             </div>
 
             <div className="mt-24 grid gap-10 lg:grid-cols-3 lg:gap-y-16 xl:gap-x-12">
