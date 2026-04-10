@@ -59,6 +59,8 @@ export interface LiveEditorBoxStyle {
   width?: string;
   height?: string;
   minHeight?: string;
+  x?: string;
+  y?: string;
 }
 
 export interface LiveEditorContent {

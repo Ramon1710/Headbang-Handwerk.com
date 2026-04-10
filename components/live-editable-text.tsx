@@ -48,10 +48,19 @@ function wrapSelectionWithStyle(style: Partial<CSSStyleDeclaration>) {
   selection.addRange(nextRange);
 }
 
+function isSelectionInsideEditor(selection: Selection, editor: HTMLDivElement) {
+  if (!selection.anchorNode) {
+    return false;
+  }
+
+  return editor.contains(selection.anchorNode);
+}
+
 export function LiveEditableText({ as = 'div', className, editorKey, initialHtml, isAdmin, title }: LiveEditableTextProps) {
   const Component = as;
   const router = useRouter();
   const editorRef = useRef<HTMLDivElement | null>(null);
+  const selectionRef = useRef<Range | null>(null);
   const [html, setHtml] = useState(initialHtml);
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -68,6 +77,56 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
     editorRef.current.innerHTML = html;
     editorRef.current.focus();
   }, [html, isOpen]);
+
+  function captureSelection() {
+    if (!editorRef.current) {
+      return;
+    }
+
+    const selection = window.getSelection();
+
+    if (!selection || selection.rangeCount === 0 || !isSelectionInsideEditor(selection, editorRef.current)) {
+      return;
+    }
+
+    selectionRef.current = selection.getRangeAt(0).cloneRange();
+  }
+
+  function restoreSelection() {
+    if (!editorRef.current || !selectionRef.current) {
+      return false;
+    }
+
+    editorRef.current.focus();
+
+    const selection = window.getSelection();
+
+    if (!selection) {
+      return false;
+    }
+
+    selection.removeAllRanges();
+    selection.addRange(selectionRef.current);
+    return true;
+  }
+
+  function handleExecCommand(command: string) {
+    if (!restoreSelection()) {
+      return;
+    }
+
+    applyExecCommand(command);
+    captureSelection();
+  }
+
+  function handleStyleWrap(style: Partial<CSSStyleDeclaration>) {
+    if (!restoreSelection()) {
+      return;
+    }
+
+    wrapSelectionWithStyle(style);
+    captureSelection();
+  }
 
   async function save() {
     if (!editorRef.current) {
@@ -125,12 +184,15 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2 rounded-2xl border border-white/8 bg-black/20 p-3">
-              <button type="button" onMouseDown={(event) => { event.preventDefault(); applyExecCommand('bold'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Fett</button>
-              <button type="button" onMouseDown={(event) => { event.preventDefault(); applyExecCommand('italic'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Kursiv</button>
-              <button type="button" onMouseDown={(event) => { event.preventDefault(); applyExecCommand('underline'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Unterstreichen</button>
+              <button type="button" onMouseDown={(event) => { event.preventDefault(); handleExecCommand('bold'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Fett</button>
+              <button type="button" onMouseDown={(event) => { event.preventDefault(); handleExecCommand('italic'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Kursiv</button>
+              <button type="button" onMouseDown={(event) => { event.preventDefault(); handleExecCommand('underline'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Unterstreichen</button>
               <select
-                onMouseDown={(event) => event.preventDefault()}
-                onChange={(event) => wrapSelectionWithStyle({ fontFamily: event.target.value })}
+                onFocus={captureSelection}
+                onChange={(event) => {
+                  handleStyleWrap({ fontFamily: event.target.value });
+                  event.target.selectedIndex = 0;
+                }}
                 defaultValue=""
                 className="rounded-lg border border-[#704321] bg-[#1a130f] px-3 py-2 text-sm text-[#f3dfc4]"
               >
@@ -140,8 +202,11 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
                 ))}
               </select>
               <select
-                onMouseDown={(event) => event.preventDefault()}
-                onChange={(event) => wrapSelectionWithStyle({ fontSize: event.target.value })}
+                onFocus={captureSelection}
+                onChange={(event) => {
+                  handleStyleWrap({ fontSize: event.target.value });
+                  event.target.selectedIndex = 0;
+                }}
                 defaultValue=""
                 className="rounded-lg border border-[#704321] bg-[#1a130f] px-3 py-2 text-sm text-[#f3dfc4]"
               >
@@ -156,6 +221,10 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
               ref={editorRef}
               contentEditable
               suppressContentEditableWarning
+              onMouseUp={captureSelection}
+              onKeyUp={captureSelection}
+              onInput={captureSelection}
+              onFocus={captureSelection}
               className="mt-5 min-h-72 rounded-[1.3rem] border border-white/10 bg-[#0f0b08] px-5 py-4 text-base leading-8 text-[#f5e7d5] outline-none"
             />
 

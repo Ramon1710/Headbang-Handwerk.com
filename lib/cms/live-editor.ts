@@ -75,12 +75,19 @@ export function sanitizeLiveEditorBoxStyle(style: Partial<LiveEditorBoxStyle>) {
     width: sanitizeCssValue(style.width),
     height: sanitizeCssValue(style.height),
     minHeight: sanitizeCssValue(style.minHeight),
+    x: sanitizeCssValue(style.x),
+    y: sanitizeCssValue(style.y),
   } satisfies LiveEditorBoxStyle;
 }
 
 export function resolveLiveHtml(liveEditor: LiveEditorContent | undefined, key: string, fallbackText: string) {
   const html = liveEditor?.richText[key];
   return html && html.trim() ? html : textToHtml(fallbackText);
+}
+
+export function resolveLiveRichHtml(liveEditor: LiveEditorContent | undefined, key: string, fallbackHtml: string) {
+  const html = liveEditor?.richText[key];
+  return html && html.trim() ? html : fallbackHtml;
 }
 
 export function resolveLiveBoxStyle(liveEditor: LiveEditorContent | undefined, key: string): CSSProperties | undefined {
@@ -94,5 +101,6 @@ export function resolveLiveBoxStyle(liveEditor: LiveEditorContent | undefined, k
     width: boxStyle.width,
     height: boxStyle.height,
     minHeight: boxStyle.minHeight,
+    transform: boxStyle.x || boxStyle.y ? `translate(${boxStyle.x || '0px'}, ${boxStyle.y || '0px'})` : undefined,
   };
 }
