@@ -43,6 +43,47 @@ export interface CmsFormValues {
   closingTitle: string;
   closingLead: string;
   closingStatement: string;
+  sponsorsTitle: string;
+  sponsorsAccentWord: string;
+  sponsorsLead: string;
+  sponsorsBenefitsTitle: string;
+  sponsorsBenefits: string;
+  sponsorsCustomPackageTitle: string;
+  sponsorsCustomPackageText: string;
+  sponsorsCustomPackageCtaLabel: string;
+  sponsorsCustomPackageCtaHref: string;
+  aboutTitle: string;
+  aboutAccentWord: string;
+  aboutIntroParagraphs: string;
+  aboutValueOneTitle: string;
+  aboutValueOneDescription: string;
+  aboutValueTwoTitle: string;
+  aboutValueTwoDescription: string;
+  aboutValueThreeTitle: string;
+  aboutValueThreeDescription: string;
+  aboutTeamTitle: string;
+  aboutTeamRoles: string;
+  aboutCtaLabel: string;
+  aboutCtaHref: string;
+  contactTitle: string;
+  contactLead: string;
+  contactEmail: string;
+  contactInstagramLabel: string;
+  contactFacebookLabel: string;
+  contactFormTitle: string;
+  standBadge: string;
+  standTitle: string;
+  standAccentWord: string;
+  standLead: string;
+  standOverviewTitle: string;
+  standOverviewPlaceholderTitle: string;
+  standOverviewPlaceholderText: string;
+  standFrontBannerLabel: string;
+  standBackBannerLabel: string;
+  standLeftLabel: string;
+  standRightLabel: string;
+  standAvailableTitle: string;
+  standReservedTitle: string;
   footerHeadline: string;
   footerHighlight: string;
   facebookUrl: string;
@@ -90,6 +131,47 @@ export function cmsContentToFormValues(content: CmsContent): CmsFormValues {
     closingTitle: content.site.home.closingTitle,
     closingLead: content.site.home.closingLead,
     closingStatement: content.site.home.closingStatement,
+    sponsorsTitle: content.site.sponsors.title,
+    sponsorsAccentWord: content.site.sponsors.accentWord,
+    sponsorsLead: content.site.sponsors.lead,
+    sponsorsBenefitsTitle: content.site.sponsors.benefitsTitle,
+    sponsorsBenefits: toLines(content.site.sponsors.benefits),
+    sponsorsCustomPackageTitle: content.site.sponsors.customPackageTitle,
+    sponsorsCustomPackageText: content.site.sponsors.customPackageText,
+    sponsorsCustomPackageCtaLabel: content.site.sponsors.customPackageCtaLabel,
+    sponsorsCustomPackageCtaHref: content.site.sponsors.customPackageCtaHref,
+    aboutTitle: content.site.about.title,
+    aboutAccentWord: content.site.about.accentWord,
+    aboutIntroParagraphs: toLines(content.site.about.introParagraphs),
+    aboutValueOneTitle: content.site.about.values[0]?.title || '',
+    aboutValueOneDescription: content.site.about.values[0]?.description || '',
+    aboutValueTwoTitle: content.site.about.values[1]?.title || '',
+    aboutValueTwoDescription: content.site.about.values[1]?.description || '',
+    aboutValueThreeTitle: content.site.about.values[2]?.title || '',
+    aboutValueThreeDescription: content.site.about.values[2]?.description || '',
+    aboutTeamTitle: content.site.about.teamTitle,
+    aboutTeamRoles: toLines(content.site.about.teamRoles),
+    aboutCtaLabel: content.site.about.ctaLabel,
+    aboutCtaHref: content.site.about.ctaHref,
+    contactTitle: content.site.contact.title,
+    contactLead: content.site.contact.lead,
+    contactEmail: content.site.contact.email,
+    contactInstagramLabel: content.site.contact.instagramLabel,
+    contactFacebookLabel: content.site.contact.facebookLabel,
+    contactFormTitle: content.site.contact.formTitle,
+    standBadge: content.site.stand.badge,
+    standTitle: content.site.stand.title,
+    standAccentWord: content.site.stand.accentWord,
+    standLead: content.site.stand.lead,
+    standOverviewTitle: content.site.stand.overviewTitle,
+    standOverviewPlaceholderTitle: content.site.stand.overviewPlaceholderTitle,
+    standOverviewPlaceholderText: content.site.stand.overviewPlaceholderText,
+    standFrontBannerLabel: content.site.stand.frontBannerLabel,
+    standBackBannerLabel: content.site.stand.backBannerLabel,
+    standLeftLabel: content.site.stand.leftLabel,
+    standRightLabel: content.site.stand.rightLabel,
+    standAvailableTitle: content.site.stand.availableTitle,
+    standReservedTitle: content.site.stand.reservedTitle,
     footerHeadline: content.site.footer.brandHeadline,
     footerHighlight: content.site.footer.brandHighlight,
     facebookUrl: socialMap.facebook || defaults.find((item) => item.platform === 'facebook')?.href || '#',
@@ -161,6 +243,67 @@ export function mergeCmsContentFromForm(formData: FormData, current: CmsContent)
         closingTitle: getString(formData, 'closingTitle', current.site.home.closingTitle),
         closingLead: getString(formData, 'closingLead', current.site.home.closingLead),
         closingStatement: getString(formData, 'closingStatement', current.site.home.closingStatement),
+      },
+      sponsors: {
+        ...current.site.sponsors,
+        title: getString(formData, 'sponsorsTitle', current.site.sponsors.title),
+        accentWord: getString(formData, 'sponsorsAccentWord', current.site.sponsors.accentWord),
+        lead: getString(formData, 'sponsorsLead', current.site.sponsors.lead),
+        benefitsTitle: getString(formData, 'sponsorsBenefitsTitle', current.site.sponsors.benefitsTitle),
+        benefits: fromLines(formData.get('sponsorsBenefits')),
+        customPackageTitle: getString(formData, 'sponsorsCustomPackageTitle', current.site.sponsors.customPackageTitle),
+        customPackageText: getString(formData, 'sponsorsCustomPackageText', current.site.sponsors.customPackageText),
+        customPackageCtaLabel: getString(formData, 'sponsorsCustomPackageCtaLabel', current.site.sponsors.customPackageCtaLabel),
+        customPackageCtaHref: getString(formData, 'sponsorsCustomPackageCtaHref', current.site.sponsors.customPackageCtaHref),
+      },
+      about: {
+        ...current.site.about,
+        title: getString(formData, 'aboutTitle', current.site.about.title),
+        accentWord: getString(formData, 'aboutAccentWord', current.site.about.accentWord),
+        introParagraphs: fromLines(formData.get('aboutIntroParagraphs')),
+        values: [
+          {
+            title: getString(formData, 'aboutValueOneTitle', current.site.about.values[0]?.title),
+            description: getString(formData, 'aboutValueOneDescription', current.site.about.values[0]?.description),
+          },
+          {
+            title: getString(formData, 'aboutValueTwoTitle', current.site.about.values[1]?.title),
+            description: getString(formData, 'aboutValueTwoDescription', current.site.about.values[1]?.description),
+          },
+          {
+            title: getString(formData, 'aboutValueThreeTitle', current.site.about.values[2]?.title),
+            description: getString(formData, 'aboutValueThreeDescription', current.site.about.values[2]?.description),
+          },
+        ],
+        teamTitle: getString(formData, 'aboutTeamTitle', current.site.about.teamTitle),
+        teamRoles: fromLines(formData.get('aboutTeamRoles')),
+        ctaLabel: getString(formData, 'aboutCtaLabel', current.site.about.ctaLabel),
+        ctaHref: getString(formData, 'aboutCtaHref', current.site.about.ctaHref),
+      },
+      contact: {
+        ...current.site.contact,
+        title: getString(formData, 'contactTitle', current.site.contact.title),
+        lead: getString(formData, 'contactLead', current.site.contact.lead),
+        email: getString(formData, 'contactEmail', current.site.contact.email),
+        instagramLabel: getString(formData, 'contactInstagramLabel', current.site.contact.instagramLabel),
+        facebookLabel: getString(formData, 'contactFacebookLabel', current.site.contact.facebookLabel),
+        formTitle: getString(formData, 'contactFormTitle', current.site.contact.formTitle),
+      },
+      stand: {
+        ...current.site.stand,
+        badge: getString(formData, 'standBadge', current.site.stand.badge),
+        title: getString(formData, 'standTitle', current.site.stand.title),
+        accentWord: getString(formData, 'standAccentWord', current.site.stand.accentWord),
+        lead: getString(formData, 'standLead', current.site.stand.lead),
+        overviewTitle: getString(formData, 'standOverviewTitle', current.site.stand.overviewTitle),
+        overviewPlaceholderTitle: getString(formData, 'standOverviewPlaceholderTitle', current.site.stand.overviewPlaceholderTitle),
+        overviewPlaceholderText: getString(formData, 'standOverviewPlaceholderText', current.site.stand.overviewPlaceholderText),
+        frontBannerLabel: getString(formData, 'standFrontBannerLabel', current.site.stand.frontBannerLabel),
+        backBannerLabel: getString(formData, 'standBackBannerLabel', current.site.stand.backBannerLabel),
+        leftLabel: getString(formData, 'standLeftLabel', current.site.stand.leftLabel),
+        rightLabel: getString(formData, 'standRightLabel', current.site.stand.rightLabel),
+        availableTitle: getString(formData, 'standAvailableTitle', current.site.stand.availableTitle),
+        reservedTitle: getString(formData, 'standReservedTitle', current.site.stand.reservedTitle),
       },
       footer: {
         ...current.site.footer,

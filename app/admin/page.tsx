@@ -59,12 +59,12 @@ export default async function AdminPage({
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Admin Bereich</p>
             <h1 className="mt-3 text-4xl font-black text-[color:var(--color-foreground)]">Texte und Farben direkt bearbeiten</h1>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-[color:var(--color-muted)]">
-              Diese Inhalte werden serverseitig geladen. In Produktion auf Vercel sollten die Änderungen in einer externen MySQL-Datenbank gespeichert werden.
+              Diese Inhalte werden serverseitig geladen. In Produktion auf Vercel sollten die Änderungen in Firebase Firestore gespeichert werden.
             </p>
           </div>
           <div className="flex items-center gap-4">
             <div className="rounded-full border border-[color:var(--color-border)] bg-black/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-accent-soft)]">
-              Speicher: {storageMode === 'mysql' ? 'MySQL' : storageMode === 'local-file' ? 'Lokale Datei' : 'Nur Anzeige'}
+              Speicher: {storageMode === 'firebase' ? 'Firebase' : storageMode === 'local-file' ? 'Lokale Datei' : 'Nur Anzeige'}
             </div>
             <form action={logoutAction}>
               <button type="submit" className="rounded-xl border border-[color:var(--color-border)] px-4 py-2 text-sm font-semibold text-[color:var(--color-foreground)] transition hover:border-[color:var(--color-accent)] hover:text-[color:var(--color-accent-soft)]">
@@ -77,7 +77,7 @@ export default async function AdminPage({
         <form action={updateCmsAction} className="mt-8 space-y-8 pb-12">
           {storageMode === 'readonly-fallback' ? (
             <div className="rounded-2xl border border-amber-500/40 bg-amber-950/30 px-5 py-4 text-sm text-amber-100">
-              Auf Vercel ist aktuell keine CMS-Datenbank gesetzt. Die Admin-Seite lädt, aber Änderungen können noch nicht dauerhaft gespeichert werden.
+              Auf Vercel ist aktuell Firebase noch nicht vollständig gesetzt. Die Admin-Seite lädt, aber Änderungen können noch nicht dauerhaft gespeichert werden.
             </div>
           ) : null}
 
@@ -89,7 +89,7 @@ export default async function AdminPage({
 
           {params.saveError ? (
             <div className="rounded-2xl border border-red-500/40 bg-red-950/30 px-5 py-4 text-sm text-red-200">
-              Speichern fehlgeschlagen. Für Vercel musst du zuerst CMS_DATABASE_URL setzen.
+              Speichern fehlgeschlagen. Für Vercel musst du zuerst FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL und FIREBASE_PRIVATE_KEY setzen.
             </div>
           ) : null}
 
@@ -137,6 +137,85 @@ export default async function AdminPage({
             <div className="lg:col-span-2">
               <TextareaField label="Abschluss Statement" name="closingStatement" defaultValue={formValues.closingStatement} rows={4} />
             </div>
+          </section>
+
+          <section className="grid gap-6 rounded-[1.8rem] border border-[color:var(--color-border)]/70 bg-[color:var(--color-surface)]/70 p-7 lg:grid-cols-2">
+            <div className="lg:col-span-2">
+              <h2 className="text-2xl font-black text-[color:var(--color-foreground)]">Sponsoren-Seite</h2>
+            </div>
+            <InputField label="Titel links" name="sponsorsTitle" defaultValue={formValues.sponsorsTitle} />
+            <InputField label="Akzentwort" name="sponsorsAccentWord" defaultValue={formValues.sponsorsAccentWord} />
+            <div className="lg:col-span-2">
+              <TextareaField label="Einleitung" name="sponsorsLead" defaultValue={formValues.sponsorsLead} rows={4} />
+            </div>
+            <InputField label="Benefits Überschrift" name="sponsorsBenefitsTitle" defaultValue={formValues.sponsorsBenefitsTitle} />
+            <InputField label="Individuelles CTA Link" name="sponsorsCustomPackageCtaHref" defaultValue={formValues.sponsorsCustomPackageCtaHref} />
+            <div className="lg:col-span-2">
+              <TextareaField label="Benefits, eine Zeile pro Eintrag" name="sponsorsBenefits" defaultValue={formValues.sponsorsBenefits} rows={6} />
+            </div>
+            <InputField label="Individuelles Modul Titel" name="sponsorsCustomPackageTitle" defaultValue={formValues.sponsorsCustomPackageTitle} />
+            <InputField label="Individuelles CTA Text" name="sponsorsCustomPackageCtaLabel" defaultValue={formValues.sponsorsCustomPackageCtaLabel} />
+            <div className="lg:col-span-2">
+              <TextareaField label="Individueller Hinweistext" name="sponsorsCustomPackageText" defaultValue={formValues.sponsorsCustomPackageText} rows={4} />
+            </div>
+          </section>
+
+          <section className="grid gap-6 rounded-[1.8rem] border border-[color:var(--color-border)]/70 bg-[color:var(--color-surface)]/70 p-7 lg:grid-cols-2">
+            <div className="lg:col-span-2">
+              <h2 className="text-2xl font-black text-[color:var(--color-foreground)]">Über uns</h2>
+            </div>
+            <InputField label="Titel links" name="aboutTitle" defaultValue={formValues.aboutTitle} />
+            <InputField label="Akzentwort" name="aboutAccentWord" defaultValue={formValues.aboutAccentWord} />
+            <div className="lg:col-span-2">
+              <TextareaField label="Einleitung, eine Zeile pro Absatz" name="aboutIntroParagraphs" defaultValue={formValues.aboutIntroParagraphs} rows={5} />
+            </div>
+            <InputField label="Wert 1 Titel" name="aboutValueOneTitle" defaultValue={formValues.aboutValueOneTitle} />
+            <TextareaField label="Wert 1 Text" name="aboutValueOneDescription" defaultValue={formValues.aboutValueOneDescription} rows={3} />
+            <InputField label="Wert 2 Titel" name="aboutValueTwoTitle" defaultValue={formValues.aboutValueTwoTitle} />
+            <TextareaField label="Wert 2 Text" name="aboutValueTwoDescription" defaultValue={formValues.aboutValueTwoDescription} rows={3} />
+            <InputField label="Wert 3 Titel" name="aboutValueThreeTitle" defaultValue={formValues.aboutValueThreeTitle} />
+            <TextareaField label="Wert 3 Text" name="aboutValueThreeDescription" defaultValue={formValues.aboutValueThreeDescription} rows={3} />
+            <InputField label="Team Überschrift" name="aboutTeamTitle" defaultValue={formValues.aboutTeamTitle} />
+            <InputField label="CTA Link" name="aboutCtaHref" defaultValue={formValues.aboutCtaHref} />
+            <div className="lg:col-span-2">
+              <TextareaField label="Team Rollen, eine Zeile pro Rolle" name="aboutTeamRoles" defaultValue={formValues.aboutTeamRoles} rows={4} />
+            </div>
+            <InputField label="CTA Text" name="aboutCtaLabel" defaultValue={formValues.aboutCtaLabel} />
+          </section>
+
+          <section className="grid gap-6 rounded-[1.8rem] border border-[color:var(--color-border)]/70 bg-[color:var(--color-surface)]/70 p-7 lg:grid-cols-2">
+            <div className="lg:col-span-2">
+              <h2 className="text-2xl font-black text-[color:var(--color-foreground)]">Kontakt</h2>
+            </div>
+            <InputField label="Seitentitel" name="contactTitle" defaultValue={formValues.contactTitle} />
+            <InputField label="E-Mail" name="contactEmail" defaultValue={formValues.contactEmail} />
+            <div className="lg:col-span-2">
+              <TextareaField label="Einleitung" name="contactLead" defaultValue={formValues.contactLead} rows={4} />
+            </div>
+            <InputField label="Instagram Anzeige-Text" name="contactInstagramLabel" defaultValue={formValues.contactInstagramLabel} />
+            <InputField label="Facebook Anzeige-Text" name="contactFacebookLabel" defaultValue={formValues.contactFacebookLabel} />
+            <InputField label="Formular Überschrift" name="contactFormTitle" defaultValue={formValues.contactFormTitle} />
+          </section>
+
+          <section className="grid gap-6 rounded-[1.8rem] border border-[color:var(--color-border)]/70 bg-[color:var(--color-surface)]/70 p-7 lg:grid-cols-2">
+            <div className="lg:col-span-2">
+              <h2 className="text-2xl font-black text-[color:var(--color-foreground)]">3D-Stand</h2>
+            </div>
+            <InputField label="Badge" name="standBadge" defaultValue={formValues.standBadge} />
+            <InputField label="Titel links" name="standTitle" defaultValue={formValues.standTitle} />
+            <InputField label="Akzentwort" name="standAccentWord" defaultValue={formValues.standAccentWord} />
+            <InputField label="Übersichtstitel" name="standOverviewTitle" defaultValue={formValues.standOverviewTitle} />
+            <div className="lg:col-span-2">
+              <TextareaField label="Einleitung" name="standLead" defaultValue={formValues.standLead} rows={4} />
+            </div>
+            <InputField label="Platzhalter Titel" name="standOverviewPlaceholderTitle" defaultValue={formValues.standOverviewPlaceholderTitle} />
+            <InputField label="Platzhalter Zusatz" name="standOverviewPlaceholderText" defaultValue={formValues.standOverviewPlaceholderText} />
+            <InputField label="Frontbanner Label" name="standFrontBannerLabel" defaultValue={formValues.standFrontBannerLabel} />
+            <InputField label="Rückbanner Label" name="standBackBannerLabel" defaultValue={formValues.standBackBannerLabel} />
+            <InputField label="Linke Seitenmarke" name="standLeftLabel" defaultValue={formValues.standLeftLabel} />
+            <InputField label="Rechte Seitenmarke" name="standRightLabel" defaultValue={formValues.standRightLabel} />
+            <InputField label="Überschrift verfügbare Flächen" name="standAvailableTitle" defaultValue={formValues.standAvailableTitle} />
+            <InputField label="Überschrift reserviert" name="standReservedTitle" defaultValue={formValues.standReservedTitle} />
           </section>
 
           <section className="grid gap-6 rounded-[1.8rem] border border-[color:var(--color-border)]/70 bg-[color:var(--color-surface)]/70 p-7 lg:grid-cols-2">

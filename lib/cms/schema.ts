@@ -108,6 +108,59 @@ export interface FooterContent {
   socialLinks: FooterSocialLink[];
 }
 
+export interface SponsorsPageContent {
+  title: string;
+  accentWord: string;
+  lead: string;
+  benefitsTitle: string;
+  benefits: string[];
+  customPackageTitle: string;
+  customPackageText: string;
+  customPackageCtaLabel: string;
+  customPackageCtaHref: string;
+}
+
+export interface AboutValueItem {
+  title: string;
+  description: string;
+}
+
+export interface AboutPageContent {
+  title: string;
+  accentWord: string;
+  introParagraphs: string[];
+  values: AboutValueItem[];
+  teamTitle: string;
+  teamRoles: string[];
+  ctaLabel: string;
+  ctaHref: string;
+}
+
+export interface ContactPageContent {
+  title: string;
+  lead: string;
+  email: string;
+  instagramLabel: string;
+  facebookLabel: string;
+  formTitle: string;
+}
+
+export interface StandPageContent {
+  badge: string;
+  title: string;
+  accentWord: string;
+  lead: string;
+  overviewTitle: string;
+  overviewPlaceholderTitle: string;
+  overviewPlaceholderText: string;
+  frontBannerLabel: string;
+  backBannerLabel: string;
+  leftLabel: string;
+  rightLabel: string;
+  availableTitle: string;
+  reservedTitle: string;
+}
+
 export interface SeoContent {
   title: string;
   description: string;
@@ -120,6 +173,10 @@ export interface SiteContent {
   navigationCtaLabel: string;
   navigationCtaHref: string;
   home: HomePageContent;
+  sponsors: SponsorsPageContent;
+  about: AboutPageContent;
+  contact: ContactPageContent;
+  stand: StandPageContent;
   footer: FooterContent;
 }
 

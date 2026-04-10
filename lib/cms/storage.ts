@@ -1,20 +1,9 @@
 import { cache } from 'react';
 import { defaultCmsContent } from './default-content';
+import { getFirebaseDb, hasFirebaseConfig } from './firebase';
 import type { CmsContent } from './schema';
 
 const READONLY_FALLBACK_ERROR = 'CMS_READONLY_FALLBACK';
-
-type DatabasePool = Awaited<ReturnType<typeof createPool>>;
-
-let pool: DatabasePool | null = null;
-
-function getDatabaseUrl() {
-  return process.env.CMS_DATABASE_URL || process.env.DATABASE_URL;
-}
-
-function hasDatabase() {
-  return Boolean(getDatabaseUrl());
-}
 
 function isVercelRuntime() {
   return Boolean(process.env.VERCEL);
@@ -39,69 +28,20 @@ function isReadonlyFilesystemError(error: unknown) {
   return code === 'EROFS' || code === 'EACCES' || code === 'EPERM';
 }
 
-async function createPool() {
-  const databaseUrl = getDatabaseUrl();
+async function readFromFirebase(): Promise<CmsContent | null> {
+  const db = getFirebaseDb();
+  const snapshot = await db.collection('cms').doc('site').get();
 
-  if (!databaseUrl) {
-    throw new Error('Keine CMS-Datenbank konfiguriert.');
-  }
-
-  const mysql = await import('mysql2/promise');
-
-  return mysql.createPool({
-    uri: databaseUrl,
-    connectionLimit: 4,
-    ssl: process.env.CMS_DATABASE_SSL === 'false' ? undefined : { rejectUnauthorized: false },
-  });
-}
-
-async function getPool() {
-  if (!pool) {
-    pool = await createPool();
-  }
-
-  return pool;
-}
-
-async function ensureDatabaseTable() {
-  const db = await getPool();
-
-  await db.execute(`
-    CREATE TABLE IF NOT EXISTS cms_content (
-      id VARCHAR(32) PRIMARY KEY,
-      payload JSON NOT NULL,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    )
-  `);
-}
-
-async function readFromDatabase(): Promise<CmsContent | null> {
-  await ensureDatabaseTable();
-  const db = await getPool();
-  const [rows] = await db.execute(
-    'SELECT payload FROM cms_content WHERE id = ? LIMIT 1',
-    ['site']
-  );
-
-  if (!Array.isArray(rows) || !rows.length) {
+  if (!snapshot.exists) {
     return null;
   }
 
-  const payload = (rows[0] as { payload: string | CmsContent }).payload;
-  return typeof payload === 'string' ? (JSON.parse(payload) as CmsContent) : (payload as CmsContent);
+  return snapshot.data() as CmsContent;
 }
 
-async function writeToDatabase(content: CmsContent) {
-  await ensureDatabaseTable();
-  const db = await getPool();
-  await db.execute(
-    `
-      INSERT INTO cms_content (id, payload)
-      VALUES (?, ?)
-      ON DUPLICATE KEY UPDATE payload = VALUES(payload)
-    `,
-    ['site', JSON.stringify(content)]
-  );
+async function writeToFirebase(content: CmsContent) {
+  const db = getFirebaseDb();
+  await db.collection('cms').doc('site').set(content, { merge: true });
 }
 
 async function ensureLocalFile() {
@@ -148,22 +88,26 @@ function normalizeContent(content: CmsContent): CmsContent {
       ...content.site,
       seo: { ...defaultCmsContent.site.seo, ...content.site.seo },
       home: { ...defaultCmsContent.site.home, ...content.site.home },
+      sponsors: { ...defaultCmsContent.site.sponsors, ...content.site.sponsors },
+      about: { ...defaultCmsContent.site.about, ...content.site.about },
+      contact: { ...defaultCmsContent.site.contact, ...content.site.contact },
+      stand: { ...defaultCmsContent.site.stand, ...content.site.stand },
       footer: { ...defaultCmsContent.site.footer, ...content.site.footer },
     },
   };
 }
 
 export const getCmsContent = cache(async (): Promise<CmsContent> => {
-  if (!hasDatabase() && isVercelRuntime()) {
+  if (!hasFirebaseConfig() && isVercelRuntime()) {
     return defaultCmsContent;
   }
 
   let content: CmsContent | null;
 
   try {
-    content = hasDatabase() ? await readFromDatabase() : await readFromFile();
+    content = hasFirebaseConfig() ? await readFromFirebase() : await readFromFile();
   } catch (error) {
-    if (!hasDatabase() && error instanceof Error && error.message === READONLY_FALLBACK_ERROR) {
+    if (!hasFirebaseConfig() && error instanceof Error && error.message === READONLY_FALLBACK_ERROR) {
       return defaultCmsContent;
     }
 
@@ -171,8 +115,8 @@ export const getCmsContent = cache(async (): Promise<CmsContent> => {
   }
 
   if (!content) {
-    if (hasDatabase()) {
-      await writeToDatabase(defaultCmsContent);
+    if (hasFirebaseConfig()) {
+      await writeToFirebase(defaultCmsContent);
     }
 
     return defaultCmsContent;
@@ -184,8 +128,8 @@ export const getCmsContent = cache(async (): Promise<CmsContent> => {
 export async function saveCmsContent(content: CmsContent) {
   const normalized = normalizeContent(content);
 
-  if (hasDatabase()) {
-    await writeToDatabase(normalized);
+  if (hasFirebaseConfig()) {
+    await writeToFirebase(normalized);
     return;
   }
 
@@ -205,8 +149,8 @@ export async function saveCmsContent(content: CmsContent) {
 }
 
 export function cmsStorageMode() {
-  if (hasDatabase()) {
-    return 'mysql';
+  if (hasFirebaseConfig()) {
+    return 'firebase';
   }
 
   return isVercelRuntime() ? 'readonly-fallback' : 'local-file';

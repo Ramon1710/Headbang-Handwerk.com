@@ -32,8 +32,9 @@ Dann die Werte in `.env.local` eintragen:
 - `CMS_ADMIN_USERNAME` – Loginname für den Admin-Bereich
 - `CMS_ADMIN_PASSWORD` – Passwort für den Admin-Bereich
 - `CMS_SESSION_SECRET` – Secret zum Signieren der Admin-Session
-- `CMS_DATABASE_URL` – Externe MySQL-Verbindung für CMS-Inhalte auf Vercel
-- `CMS_DATABASE_SSL` – optional `false`, falls der MySQL-Host kein SSL nutzt
+- `FIREBASE_PROJECT_ID` – Firebase Projekt-ID
+- `FIREBASE_CLIENT_EMAIL` – Service-Account E-Mail aus Firebase
+- `FIREBASE_PRIVATE_KEY` – Private Key des Service-Accounts
 
 ### 3. Development Server starten
 
@@ -59,8 +60,16 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 - Login unter `/admin/login`
 - Ohne konfigurierte Datenbank werden Inhalte lokal in `.cms/content.json` gespeichert. Das ist nur für lokale Entwicklung sinnvoll.
-- Auf Vercel müssen CMS-Änderungen über eine externe Datenbank gespeichert werden, da das Dateisystem dort nicht dauerhaft beschreibbar ist.
-- Die aktuelle Implementierung nutzt MySQL als persistente CMS-Datenbank für den Vercel-Betrieb.
+- Auf Vercel müssen CMS-Änderungen über Firebase Firestore gespeichert werden, da das Dateisystem dort nicht dauerhaft beschreibbar ist.
+- Für Firestore werden die drei Firebase-Umgebungsvariablen aus dem Service Account benötigt.
+
+## Firebase Setup
+
+1. In Firebase Firestore im Produktionsmodus aktivieren.
+2. Einen Service Account erzeugen.
+3. In Vercel diese Variablen setzen: `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`.
+4. `FIREBASE_PRIVATE_KEY` muss in Vercel als kompletter Key gespeichert werden; Zeilenumbrüche werden serverseitig automatisch korrekt verarbeitet.
+5. Nach dem Setzen neu deployen.
 
 ## Seiten
 

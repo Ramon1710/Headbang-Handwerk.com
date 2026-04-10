@@ -141,6 +141,77 @@ export const defaultCmsContent: CmsContent = {
       closingSecondaryCtaLabel: 'Ansprechpartner kontaktieren',
       closingSecondaryCtaHref: '/kontakt',
     },
+    sponsors: {
+      title: 'Sponsoring',
+      accentWord: 'Pakete',
+      lead:
+        'Bringt eure Marke auf die Hauptbühne des deutschen Handwerks – inmitten der lautesten Festivals Europas.',
+      benefitsTitle: 'Was ihr bekommt',
+      benefits: [
+        'Direkte Ansprache der Zielgruppe auf Festivals',
+        'Logo auf Website, Banner und Social Media',
+        'Auf Wunsch Spendenquittung (kein Verein, steuerlich klären)',
+        'Persönliche Betreuung durch unser Team',
+        'Flexibel buchbar – einzelne Festivals oder Gesamtsaison',
+        'Hohes Medien- und Social-Media-Potenzial',
+      ],
+      customPackageTitle: 'Individuelles Paket gewünscht?',
+      customPackageText:
+        'Ihr habt besondere Anforderungen oder wollt etwas ganz Eigenes? Wir erstellen euch gerne ein maßgeschneidertes Angebot.',
+      customPackageCtaLabel: 'Jetzt anfragen',
+      customPackageCtaHref: '/kontakt',
+    },
+    about: {
+      title: 'Über',
+      accentWord: 'uns',
+      introParagraphs: [
+        'Headbang Handwerk wurde mit einer einfachen Idee gegründet: Das Handwerk braucht neue Wege, um junge Menschen zu begeistern. Und Festivals sind genau der richtige Ort dafür.',
+        'Wir sind ein Team aus Handwerksbegeisterten und Metal-Fans, das glaubt: Wer einmal live gesehen hat, wie eine Klinge geschmiedet wird oder wie ein Zimmermann arbeitet, der vergisst das nicht mehr. Genau das wollen wir zeigen – laut, lebendig, unvergesslich.',
+      ],
+      values: [
+        {
+          title: 'Leidenschaft',
+          description: 'Wir lieben Metal und Handwerk gleichermaßen – und das spürt man bei allem, was wir tun.',
+        },
+        {
+          title: 'Mission',
+          description: 'Nachwuchs fürs Handwerk gewinnen, dort wo die Jugend wirklich ist: auf Festivals.',
+        },
+        {
+          title: 'Vision',
+          description: 'Headbang Handwerk europaweit auf allen großen Metal-Festivals etablieren.',
+        },
+      ],
+      teamTitle: 'Das Team',
+      teamRoles: ['Gründer & Projektleitung', 'Marketing & Social Media', 'Technik & Aufbau'],
+      ctaLabel: 'Kontakt aufnehmen',
+      ctaHref: '/kontakt',
+    },
+    contact: {
+      title: 'Kontakt',
+      lead:
+        'Habt ihr Fragen, wollt ihr Sponsor werden oder sucht ihr eine Bannerfläche? Schreibt uns – wir antworten innerhalb von 1–2 Werktagen.',
+      email: 'info@headbang-handwerk.com',
+      instagramLabel: '@headbanghandwerk',
+      facebookLabel: 'Headbang Handwerk',
+      formTitle: 'Nachricht senden',
+    },
+    stand: {
+      badge: 'Messestand-Konfiguration',
+      title: '3D-Stand &',
+      accentWord: 'Bannerflächen',
+      lead:
+        'Wählt eure Wunschposition am Stand und sichert euch maximale Sichtbarkeit auf unseren Festivals. Klickt auf eine Fläche für Details.',
+      overviewTitle: 'Stand-Übersicht (Schematisch)',
+      overviewPlaceholderTitle: 'Interaktive 3D-Ansicht',
+      overviewPlaceholderText: 'folgt in Kürze',
+      frontBannerLabel: 'Frontbanner (3×2m) – €800',
+      backBannerLabel: 'Rückbanner (4×1m) – €350',
+      leftLabel: 'Links',
+      rightLabel: 'Rechts ⚡',
+      availableTitle: 'Verfügbare Flächen',
+      reservedTitle: 'Reserviert / Vergeben',
+    },
     footer: {
       brandHeadline: 'Headbang Handwerk',
       brandHighlight: ' - wir bringen das Handwerk auf die Bühne.',
