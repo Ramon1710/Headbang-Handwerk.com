@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { createPortal } from 'react-dom';
 
 type SupportedTag = 'div' | 'p' | 'span' | 'h1' | 'h2' | 'h3';
 
@@ -23,11 +24,6 @@ const FONT_FAMILIES = [
 
 const FONT_SIZES = ['14px', '16px', '18px', '20px', '24px', '28px', '32px', '40px'];
 
-function applyExecCommand(command: string, value?: string) {
-  document.execCommand('styleWithCSS', false, 'true');
-  document.execCommand(command, false, value);
-}
-
 function wrapSelectionWithStyle(style: Partial<CSSStyleDeclaration>) {
   const selection = window.getSelection();
 
@@ -39,6 +35,25 @@ function wrapSelectionWithStyle(style: Partial<CSSStyleDeclaration>) {
   const wrapper = document.createElement('span');
 
   Object.assign(wrapper.style, style);
+  wrapper.appendChild(range.extractContents());
+  range.insertNode(wrapper);
+  selection.removeAllRanges();
+
+  const nextRange = document.createRange();
+  nextRange.selectNodeContents(wrapper);
+  selection.addRange(nextRange);
+}
+
+function wrapSelectionWithTag(tagName: 'strong' | 'em' | 'u') {
+  const selection = window.getSelection();
+
+  if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+    return;
+  }
+
+  const range = selection.getRangeAt(0);
+  const wrapper = document.createElement(tagName);
+
   wrapper.appendChild(range.extractContents());
   range.insertNode(wrapper);
   selection.removeAllRanges();
@@ -64,10 +79,15 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
   const [html, setHtml] = useState(initialHtml);
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setHtml(initialHtml);
   }, [initialHtml]);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!isOpen || !editorRef.current) {
@@ -110,12 +130,12 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
     return true;
   }
 
-  function handleExecCommand(command: string) {
+  function handleFormat(tagName: 'strong' | 'em' | 'u') {
     if (!restoreSelection()) {
       return;
     }
 
-    applyExecCommand(command);
+    wrapSelectionWithTag(tagName);
     captureSelection();
   }
 
@@ -170,7 +190,7 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
         title={isAdmin ? title || 'Zum Bearbeiten anklicken' : undefined}
       />
 
-      {isOpen ? (
+      {isOpen && isMounted ? createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm">
           <div className="w-full max-w-3xl rounded-[1.6rem] border border-[#704321] bg-[#120d0a] p-5 shadow-[0_30px_70px_rgba(0,0,0,0.45)] sm:p-6">
             <div className="flex items-center justify-between gap-4">
@@ -184,9 +204,9 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2 rounded-2xl border border-white/8 bg-black/20 p-3">
-              <button type="button" onMouseDown={(event) => { event.preventDefault(); handleExecCommand('bold'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Fett</button>
-              <button type="button" onMouseDown={(event) => { event.preventDefault(); handleExecCommand('italic'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Kursiv</button>
-              <button type="button" onMouseDown={(event) => { event.preventDefault(); handleExecCommand('underline'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Unterstreichen</button>
+              <button type="button" onMouseDown={(event) => { event.preventDefault(); handleFormat('strong'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Fett</button>
+              <button type="button" onMouseDown={(event) => { event.preventDefault(); handleFormat('em'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Kursiv</button>
+              <button type="button" onMouseDown={(event) => { event.preventDefault(); handleFormat('u'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Unterstreichen</button>
               <select
                 onFocus={captureSelection}
                 onChange={(event) => {
@@ -237,7 +257,8 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       ) : null}
     </>
   );

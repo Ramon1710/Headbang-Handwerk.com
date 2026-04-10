@@ -66,8 +66,8 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       queueSave({
         width,
         minHeight: height,
-        x: typeof nextStyle.transform === 'string' ? nextStyle.transform.match(/translate\(([^,]+),\s*([^\)]+)\)/)?.[1]?.trim() : undefined,
-        y: typeof nextStyle.transform === 'string' ? nextStyle.transform.match(/translate\(([^,]+),\s*([^\)]+)\)/)?.[2]?.trim() : undefined,
+        x: typeof nextStyle.left === 'string' ? nextStyle.left : undefined,
+        y: typeof nextStyle.top === 'string' ? nextStyle.top : undefined,
       });
     });
 
@@ -82,7 +82,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     };
   }, [boxKey, boxStyle, isAdmin, router]);
 
-  function handleMoveStart(event: React.PointerEvent<HTMLButtonElement>) {
+  function handleMoveStart(event: React.MouseEvent<HTMLButtonElement>) {
     if (!isAdmin || !ref.current) {
       return;
     }
@@ -92,22 +92,22 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
 
     const startX = event.clientX;
     const startY = event.clientY;
-    const transform = typeof boxStyle?.transform === 'string' ? boxStyle.transform : '';
-    const currentMatch = transform.match(/translate\(([^,]+),\s*([^\)]+)\)/);
-    const initialX = currentMatch ? Number.parseFloat(currentMatch[1]) : 0;
-    const initialY = currentMatch ? Number.parseFloat(currentMatch[2]) : 0;
+    const initialX = typeof boxStyle?.left === 'string' ? Number.parseFloat(boxStyle.left) || 0 : 0;
+    const initialY = typeof boxStyle?.top === 'string' ? Number.parseFloat(boxStyle.top) || 0 : 0;
 
-    function handlePointerMove(moveEvent: PointerEvent) {
+    function handleMouseMove(moveEvent: MouseEvent) {
       const nextX = initialX + (moveEvent.clientX - startX);
       const nextY = initialY + (moveEvent.clientY - startY);
 
       setBoxStyle((current) => ({
         ...current,
-        transform: `translate(${Math.round(nextX)}px, ${Math.round(nextY)}px)`,
+        position: 'relative',
+        left: `${Math.round(nextX)}px`,
+        top: `${Math.round(nextY)}px`,
       }));
     }
 
-    function handlePointerUp(upEvent: PointerEvent) {
+    function handleMouseUp(upEvent: MouseEvent) {
       const nextX = initialX + (upEvent.clientX - startX);
       const nextY = initialY + (upEvent.clientY - startY);
 
@@ -118,12 +118,12 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
         y: `${Math.round(nextY)}px`,
       });
 
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
     }
 
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
   }
 
   return (
@@ -139,8 +139,8 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       {isAdmin ? (
         <button
           type="button"
-          onPointerDown={handleMoveStart}
-          className="absolute -left-2 -top-2 z-10 rounded-full border border-[#ff9d3c]/70 bg-[#1a110b] px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#ffcf98] shadow-[0_12px_30px_rgba(0,0,0,0.28)]"
+          onMouseDown={handleMoveStart}
+          className="absolute -left-2 -top-2 z-10 cursor-grab rounded-full border border-[#ff9d3c]/70 bg-[#1a110b] px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#ffcf98] shadow-[0_12px_30px_rgba(0,0,0,0.28)] active:cursor-grabbing"
         >
           Bewegen
         </button>
