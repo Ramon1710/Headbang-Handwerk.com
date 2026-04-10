@@ -20,6 +20,7 @@ export async function SiteNavigation({ links, ctaLabel, ctaHref }: SiteNavigatio
       ctaLabel={ctaLabel}
       ctaHref={ctaHref}
       logoSrc={cms.site.logo.assetUrl}
+      showViewToggle={isAdmin}
       showLogout={isAdmin}
       logoutAction={logoutAction}
     />

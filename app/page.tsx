@@ -52,9 +52,15 @@ function textParagraphHtml(text: string, className: string) {
   return `<p class="${className}">${escapeEditorHtml(text).replace(/\n/g, '<br />')}</p>`;
 }
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ view?: string }>;
+}) {
+  const params = searchParams ? await searchParams : undefined;
   const cms = await getCmsContent();
-  const isAdmin = await isAdminAuthenticated();
+  const isAuthenticatedAdmin = await isAdminAuthenticated();
+  const isAdmin = isAuthenticatedAdmin && params?.view !== 'user';
   const home = cms.site.home;
   const liveEditor = cms.site.liveEditor;
   const heroImageSrc = standBeispielKiImage.src;

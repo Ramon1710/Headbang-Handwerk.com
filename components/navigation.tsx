@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import type { ComponentProps } from 'react';
 import { Menu, X } from 'lucide-react';
 import type { NavigationLink } from '@/lib/cms/schema';
@@ -15,6 +16,7 @@ interface NavigationProps {
   logoSrc?: string;
   showAdminLink?: boolean;
   adminHref?: string;
+  showViewToggle?: boolean;
   showLogout?: boolean;
   logoutAction?: ComponentProps<'form'>['action'];
 }
@@ -26,12 +28,27 @@ export function Navigation({
   logoSrc,
   showAdminLink = false,
   adminHref = '/admin',
+  showViewToggle = false,
   showLogout = false,
   logoutAction,
 }: NavigationProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const resolvedLogoSrc = logoSrc || headbangLogo.src;
+
+  const isUserView = searchParams.get('view') === 'user';
+  const nextParams = new URLSearchParams(searchParams.toString());
+
+  if (isUserView) {
+    nextParams.delete('view');
+  } else {
+    nextParams.set('view', 'user');
+  }
+
+  const viewToggleHref = nextParams.toString() ? `${pathname}?${nextParams.toString()}` : pathname;
+  const viewToggleLabel = isUserView ? 'Adminansicht' : 'Nutzeransicht';
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -77,6 +94,11 @@ export function Navigation({
                 Admin
               </Button>
             ) : null}
+            {showViewToggle ? (
+              <Button href={viewToggleHref} size="sm" variant="secondary" className="hidden sm:inline-flex min-w-36">
+                {viewToggleLabel}
+              </Button>
+            ) : null}
             {showLogout && logoutAction ? (
               <form action={logoutAction} className="hidden sm:block">
                 <Button type="submit" size="sm" variant="secondary" className="min-w-32">
@@ -114,6 +136,11 @@ export function Navigation({
             {showAdminLink ? (
               <Button href={adminHref} size="sm" variant="secondary" className="mt-3 w-full">
                 Admin
+              </Button>
+            ) : null}
+            {showViewToggle ? (
+              <Button href={viewToggleHref} size="sm" variant="secondary" className="mt-3 w-full">
+                {viewToggleLabel}
               </Button>
             ) : null}
             {showLogout && logoutAction ? (
