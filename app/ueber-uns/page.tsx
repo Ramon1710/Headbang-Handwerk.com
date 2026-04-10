@@ -43,15 +43,16 @@ export default async function UeberUnsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             {values.map(({ icon: Icon }, index) => {
               const value = about.values[index];
+              const valueKey = value?.title || `value-${index}`;
 
               return (
-              <div key={title} className="section-shell p-6 text-center">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--color-accent)]/10 ring-1 ring-[color:var(--color-accent)]/20">
-                  <Icon className="h-6 w-6 text-[color:var(--color-accent)]" />
+                <div key={valueKey} className="section-shell p-6 text-center">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--color-accent)]/10 ring-1 ring-[color:var(--color-accent)]/20">
+                    <Icon className="h-6 w-6 text-[color:var(--color-accent)]" />
+                  </div>
+                  <h3 className="text-white font-bold text-lg mb-2">{value?.title}</h3>
+                  <p className="text-gray-300 text-sm leading-relaxed max-w-xs mx-auto">{value?.description}</p>
                 </div>
-                <h3 className="text-white font-bold text-lg mb-2">{value?.title}</h3>
-                <p className="text-gray-300 text-sm leading-relaxed max-w-xs mx-auto">{value?.description}</p>
-              </div>
               );
             })}
           </div>
