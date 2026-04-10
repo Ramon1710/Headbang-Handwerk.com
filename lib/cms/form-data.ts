@@ -1,6 +1,8 @@
 import { defaultCmsContent } from './default-content';
 import type { CmsContent } from './schema';
 
+const WORD_POINT_SIZES = [8, 9, 10, 10.5, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
+
 function toLines(value: string[]) {
   return value.join('\n');
 }
@@ -14,6 +16,52 @@ function fromLines(value: FormDataEntryValue | null) {
 
 function getString(formData: FormData, key: string, fallback = '') {
   return String(formData.get(key) || fallback).trim();
+}
+
+function toNearestWordPointSize(value: number) {
+  return WORD_POINT_SIZES.reduce((closest, current) => {
+    return Math.abs(current - value) < Math.abs(closest - value) ? current : closest;
+  }, WORD_POINT_SIZES[0]);
+}
+
+function toWordPointSize(value: string) {
+  const normalized = value.trim().toLowerCase().replace(',', '.').replace(/\s+/g, '');
+
+  if (!normalized) {
+    return '12pt';
+  }
+
+  if (normalized.endsWith('rem')) {
+    const numeric = Number.parseFloat(normalized.slice(0, -3));
+
+    if (Number.isFinite(numeric)) {
+      return `${toNearestWordPointSize(numeric * 12)}pt`;
+    }
+  }
+
+  if (normalized.endsWith('px')) {
+    const numeric = Number.parseFloat(normalized.slice(0, -2));
+
+    if (Number.isFinite(numeric)) {
+      return `${toNearestWordPointSize(numeric * 0.75)}pt`;
+    }
+  }
+
+  if (normalized.endsWith('pt')) {
+    const numeric = Number.parseFloat(normalized.slice(0, -2));
+
+    if (Number.isFinite(numeric)) {
+      return `${toNearestWordPointSize(numeric)}pt`;
+    }
+  }
+
+  const numeric = Number.parseFloat(normalized);
+
+  if (Number.isFinite(numeric)) {
+    return `${toNearestWordPointSize(numeric)}pt`;
+  }
+
+  return value;
 }
 
 export interface CmsFormValues {
@@ -211,9 +259,9 @@ export function cmsContentToFormValues(content: CmsContent): CmsFormValues {
     boxLabelFont: content.theme.boxLabelFont,
     boxTitleFont: content.theme.boxTitleFont,
     boxBodyFont: content.theme.boxBodyFont,
-    boxLabelSize: content.theme.boxLabelSize,
-    boxTitleSize: content.theme.boxTitleSize,
-    boxBodySize: content.theme.boxBodySize,
+    boxLabelSize: toWordPointSize(content.theme.boxLabelSize),
+    boxTitleSize: toWordPointSize(content.theme.boxTitleSize),
+    boxBodySize: toWordPointSize(content.theme.boxBodySize),
   };
 }
 
@@ -233,9 +281,9 @@ export function mergeCmsContentFromForm(formData: FormData, current: CmsContent)
       boxLabelFont: getString(formData, 'boxLabelFont', current.theme.boxLabelFont) as CmsContent['theme']['boxLabelFont'],
       boxTitleFont: getString(formData, 'boxTitleFont', current.theme.boxTitleFont) as CmsContent['theme']['boxTitleFont'],
       boxBodyFont: getString(formData, 'boxBodyFont', current.theme.boxBodyFont) as CmsContent['theme']['boxBodyFont'],
-      boxLabelSize: getString(formData, 'boxLabelSize', current.theme.boxLabelSize),
-      boxTitleSize: getString(formData, 'boxTitleSize', current.theme.boxTitleSize),
-      boxBodySize: getString(formData, 'boxBodySize', current.theme.boxBodySize),
+      boxLabelSize: toWordPointSize(getString(formData, 'boxLabelSize', current.theme.boxLabelSize)),
+      boxTitleSize: toWordPointSize(getString(formData, 'boxTitleSize', current.theme.boxTitleSize)),
+      boxBodySize: toWordPointSize(getString(formData, 'boxBodySize', current.theme.boxBodySize)),
     },
     site: {
       ...current.site,

@@ -14,9 +14,9 @@ export const defaultCmsContent: CmsContent = {
     boxLabelFont: 'exo',
     boxTitleFont: 'cinzel',
     boxBodyFont: 'exo',
-    boxLabelSize: '0.8rem',
-    boxTitleSize: '1.5rem',
-    boxBodySize: '1rem',
+    boxLabelSize: '10pt',
+    boxTitleSize: '18pt',
+    boxBodySize: '12pt',
   },
   site: {
     seo: {

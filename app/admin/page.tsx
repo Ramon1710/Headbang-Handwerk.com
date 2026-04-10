@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   title: 'Admin – Headbang Handwerk',
 };
 
+const wordPointSizeOptions = [8, 9, 10, 10.5, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72].map((size) => ({
+  label: `${String(size).replace('.', ',')} pt`,
+  value: `${size}pt`,
+}));
+
 function InputField({ label, name, defaultValue, type = 'text' }: { label: string; name: string; defaultValue: string; type?: string }) {
   return (
     <label className="block">
@@ -399,9 +404,9 @@ export default async function AdminPage({
               defaultValue={formValues.boxBodyFont}
               options={[{ label: 'Exo 2', value: 'exo' }, { label: 'Cinzel', value: 'cinzel' }]}
             />
-            <InputField label="Label Größe" name="boxLabelSize" defaultValue={formValues.boxLabelSize} />
-            <InputField label="Titel Größe" name="boxTitleSize" defaultValue={formValues.boxTitleSize} />
-            <InputField label="Text Größe" name="boxBodySize" defaultValue={formValues.boxBodySize} />
+            <SelectField label="Label Größe" name="boxLabelSize" defaultValue={formValues.boxLabelSize} options={wordPointSizeOptions} />
+            <SelectField label="Titel Größe" name="boxTitleSize" defaultValue={formValues.boxTitleSize} options={wordPointSizeOptions} />
+            <SelectField label="Text Größe" name="boxBodySize" defaultValue={formValues.boxBodySize} options={wordPointSizeOptions} />
           </section>
 
           <div className="flex justify-end">
