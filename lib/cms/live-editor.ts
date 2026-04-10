@@ -6,7 +6,7 @@ export const emptyLiveEditorContent: LiveEditorContent = {
   boxStyles: {},
 };
 
-function escapeHtml(value: string) {
+export function escapeEditorHtml(value: string) {
   return value
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -16,7 +16,11 @@ function escapeHtml(value: string) {
 }
 
 function textToHtml(value: string) {
-  return escapeHtml(value).replace(/\n/g, '<br />');
+  return escapeEditorHtml(value).replace(/\n/g, '<br />');
+}
+
+export function textParagraphHtml(text: string, className: string) {
+  return `<p class="${className}">${textToHtml(text)}</p>`;
 }
 
 function stripDangerousMarkup(html: string) {

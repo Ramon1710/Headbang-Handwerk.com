@@ -1,5 +1,8 @@
 import { Instagram, Facebook, Youtube } from 'lucide-react';
-import type { FooterContent } from '@/lib/cms/schema';
+import type { FooterContent, LiveEditorContent } from '@/lib/cms/schema';
+import { resolveLiveHtml, resolveLiveBoxStyle } from '@/lib/cms/live-editor';
+import { LiveEditableText } from './live-editable-text';
+import { LiveResizableBox } from './live-resizable-box';
 
 const icons = {
   facebook: Facebook,
@@ -7,7 +10,15 @@ const icons = {
   youtube: Youtube,
 };
 
-export function Footer({ content }: { content: FooterContent }) {
+export function Footer({
+  content,
+  isAdmin = false,
+  liveEditor,
+}: {
+  content: FooterContent;
+  isAdmin?: boolean;
+  liveEditor?: LiveEditorContent;
+}) {
   const year = new Date().getFullYear();
 
   return (
@@ -15,12 +26,39 @@ export function Footer({ content }: { content: FooterContent }) {
       <div className="fire-divider" />
       <div className="w-full px-4 py-14 text-center sm:px-6">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center">
-          <p className="mb-5 text-[1.9rem] font-semibold text-[color:var(--color-accent-soft)] sm:text-[2.2rem]">
-          {content.brandHeadline}
-          <span className="text-[color:var(--color-foreground)]">{content.brandHighlight}</span>
-          </p>
+          <LiveResizableBox
+            boxKey="footer.brand.box"
+            initialStyle={resolveLiveBoxStyle(liveEditor, 'footer.brand.box')}
+            isAdmin={isAdmin}
+            className="mb-5"
+          >
+            <p className="text-[1.9rem] font-semibold text-[color:var(--color-accent-soft)] sm:text-[2.2rem]">
+              <LiveEditableText
+                as="span"
+                className="inline"
+                editorKey="footer.brandHeadline"
+                initialHtml={resolveLiveHtml(liveEditor, 'footer.brandHeadline', content.brandHeadline)}
+                isAdmin={isAdmin}
+                title="Footer Überschrift"
+              />{' '}
+              <LiveEditableText
+                as="span"
+                className="inline text-[color:var(--color-foreground)]"
+                editorKey="footer.brandHighlight"
+                initialHtml={resolveLiveHtml(liveEditor, 'footer.brandHighlight', content.brandHighlight)}
+                isAdmin={isAdmin}
+                title="Footer Hervorhebung"
+              />
+            </p>
+          </LiveResizableBox>
 
-          <div className="mb-10 flex items-center justify-center gap-4">
+          <LiveResizableBox
+            boxKey="footer.social.box"
+            initialStyle={resolveLiveBoxStyle(liveEditor, 'footer.social.box')}
+            isAdmin={isAdmin}
+            className="mb-10"
+          >
+            <div className="flex items-center justify-center gap-4">
             {content.socialLinks.map(({ platform, label, href }) => {
               const Icon = icons[platform];
 
@@ -35,16 +73,34 @@ export function Footer({ content }: { content: FooterContent }) {
               </a>
               );
             })}
-          </div>
+            </div>
+          </LiveResizableBox>
 
           <div className="flex w-full justify-center">
-            <div className="flex w-full max-w-4xl flex-wrap items-center justify-center gap-x-5 gap-y-3 border-t border-[color:var(--color-border)] pt-5 text-center text-sm text-[color:var(--color-muted)]">
-              <p>© {year} {content.copyrightName}</p>
-              <a href="/impressum" className="transition-colors hover:text-[color:var(--color-accent-soft)]">Impressum</a>
-              <a href="/datenschutz" className="transition-colors hover:text-[color:var(--color-accent-soft)]">Datenschutz</a>
-              <a href="/agb" className="transition-colors hover:text-[color:var(--color-accent-soft)]">AGB</a>
-              <a href="/kontakt" className="transition-colors hover:text-[color:var(--color-accent-soft)]">Kontakt</a>
-            </div>
+            <LiveResizableBox
+              boxKey="footer.legal.box"
+              initialStyle={resolveLiveBoxStyle(liveEditor, 'footer.legal.box')}
+              isAdmin={isAdmin}
+              className="w-full max-w-4xl"
+            >
+              <div className="flex w-full flex-wrap items-center justify-center gap-x-5 gap-y-3 border-t border-[color:var(--color-border)] pt-5 text-center text-sm text-[color:var(--color-muted)]">
+                <p>
+                  © {year}{' '}
+                  <LiveEditableText
+                    as="span"
+                    className="inline"
+                    editorKey="footer.copyrightName"
+                    initialHtml={resolveLiveHtml(liveEditor, 'footer.copyrightName', content.copyrightName)}
+                    isAdmin={isAdmin}
+                    title="Footer Copyright"
+                  />
+                </p>
+                <a href="/impressum" className="transition-colors hover:text-[color:var(--color-accent-soft)]">Impressum</a>
+                <a href="/datenschutz" className="transition-colors hover:text-[color:var(--color-accent-soft)]">Datenschutz</a>
+                <a href="/agb" className="transition-colors hover:text-[color:var(--color-accent-soft)]">AGB</a>
+                <a href="/kontakt" className="transition-colors hover:text-[color:var(--color-accent-soft)]">Kontakt</a>
+              </div>
+            </LiveResizableBox>
           </div>
         </div>
       </div>
