@@ -524,21 +524,40 @@ export default async function HomePage({
           <section className="mx-auto max-w-7xl py-[4rem] lg:py-[8rem]">
             <div className="border-t border-[#9b5a2c]/70 px-2 pt-20 sm:px-4 sm:pt-20 lg:px-0 lg:pt-28">
               <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
-                <div>
-                    <LiveEditableText as="p" className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]" editorKey="home.closingEyebrow" initialHtml={resolveLiveHtml(liveEditor, 'home.closingEyebrow', home.closingEyebrow)} isAdmin={isAdmin} title="Abschluss Eyebrow" />
+                <LiveResizableBox
+                  boxKey="home.closingText.box"
+                  initialStyle={resolveLiveBoxStyle(liveEditor, 'home.closingText.box')}
+                  isAdmin={isAdmin}
+                  className="max-w-4xl"
+                >
+                  <LiveEditableText as="p" className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]" editorKey="home.closingEyebrow" initialHtml={resolveLiveHtml(liveEditor, 'home.closingEyebrow', home.closingEyebrow)} isAdmin={isAdmin} title="Abschluss Eyebrow" />
                   <LiveEditableText as="h2" className="mt-5 max-w-4xl text-4xl font-black leading-tight text-[#fff2de] sm:text-[3rem]" editorKey="home.closingTitle" initialHtml={resolveLiveHtml(liveEditor, 'home.closingTitle', home.closingTitle)} isAdmin={isAdmin} title="Abschluss Titel" />
                   <LiveEditableText as="p" className="mt-6 max-w-4xl text-lg leading-8 text-[#eadbc7] sm:text-xl sm:leading-9" editorKey="home.closingLead" initialHtml={resolveLiveHtml(liveEditor, 'home.closingLead', home.closingLead)} isAdmin={isAdmin} title="Abschluss Lead" />
                   <LiveEditableText as="p" className="mt-8 max-w-4xl text-2xl font-black leading-tight text-[#fff2de] sm:text-3xl" editorKey="home.closingStatement" initialHtml={resolveLiveHtml(liveEditor, 'home.closingStatement', home.closingStatement)} isAdmin={isAdmin} title="Abschluss Statement" />
-                </div>
+                </LiveResizableBox>
 
                 <div className="flex flex-col gap-4 sm:flex-row lg:flex-col xl:flex-row">
+                  <LiveResizableBox
+                    boxKey="home.closingPrimaryCta.box"
+                    initialStyle={resolveLiveBoxStyle(liveEditor, 'home.closingPrimaryCta.box')}
+                    isAdmin={isAdmin}
+                    className="self-start"
+                  >
                     <Button href={home.closingPrimaryCtaHref} size="lg">
                       {home.closingPrimaryCtaLabel}
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </LiveResizableBox>
+                  <LiveResizableBox
+                    boxKey="home.closingSecondaryCta.box"
+                    initialStyle={resolveLiveBoxStyle(liveEditor, 'home.closingSecondaryCta.box')}
+                    isAdmin={isAdmin}
+                    className="self-start"
+                  >
                     <Button href={home.closingSecondaryCtaHref} size="lg" variant="secondary">
                       {home.closingSecondaryCtaLabel}
-                  </Button>
+                    </Button>
+                  </LiveResizableBox>
                 </div>
               </div>
             </div>
