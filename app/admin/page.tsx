@@ -95,6 +95,12 @@ export default async function AdminPage({
             <div className="rounded-full border border-[color:var(--color-border)] bg-black/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-accent-soft)]">
               Speicher: {storageMode === 'firebase' ? 'Firebase' : storageMode === 'local-file' ? 'Lokale Datei' : 'Nur Anzeige'}
             </div>
+            <a
+              href="/"
+              className="rounded-xl border border-[color:var(--color-border)] px-4 py-2 text-sm font-semibold text-[color:var(--color-foreground)] transition hover:border-[color:var(--color-accent)] hover:text-[color:var(--color-accent-soft)]"
+            >
+              Zur Website
+            </a>
             <form action={logoutAction}>
               <button type="submit" className="rounded-xl border border-[color:var(--color-border)] px-4 py-2 text-sm font-semibold text-[color:var(--color-foreground)] transition hover:border-[color:var(--color-accent)] hover:text-[color:var(--color-accent-soft)]">
                 Logout

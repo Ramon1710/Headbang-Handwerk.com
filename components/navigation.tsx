@@ -13,11 +13,21 @@ interface NavigationProps {
   links: NavigationLink[];
   ctaLabel: string;
   ctaHref: string;
+  showAdminLink?: boolean;
+  adminHref?: string;
   showLogout?: boolean;
   logoutAction?: ComponentProps<'form'>['action'];
 }
 
-export function Navigation({ links, ctaLabel, ctaHref, showLogout = false, logoutAction }: NavigationProps) {
+export function Navigation({
+  links,
+  ctaLabel,
+  ctaHref,
+  showAdminLink = false,
+  adminHref = '/admin',
+  showLogout = false,
+  logoutAction,
+}: NavigationProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -61,6 +71,11 @@ export function Navigation({ links, ctaLabel, ctaHref, showLogout = false, logou
           </div>
 
           <div className="flex items-center gap-3">
+            {showAdminLink ? (
+              <Button href={adminHref} size="sm" variant="secondary" className="hidden sm:inline-flex min-w-32">
+                Admin
+              </Button>
+            ) : null}
             {showLogout && logoutAction ? (
               <form action={logoutAction} className="hidden sm:block">
                 <Button type="submit" size="sm" variant="secondary" className="min-w-32">
@@ -95,6 +110,11 @@ export function Navigation({ links, ctaLabel, ctaHref, showLogout = false, logou
                 {link.label}
               </a>
             ))}
+            {showAdminLink ? (
+              <Button href={adminHref} size="sm" variant="secondary" className="mt-3 w-full">
+                Admin
+              </Button>
+            ) : null}
             {showLogout && logoutAction ? (
               <form action={logoutAction} className="mt-3 w-full">
                 <Button type="submit" size="sm" variant="secondary" className="w-full">

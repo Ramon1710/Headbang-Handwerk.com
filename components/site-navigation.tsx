@@ -10,14 +10,15 @@ interface SiteNavigationProps {
 }
 
 export async function SiteNavigation({ links, ctaLabel, ctaHref }: SiteNavigationProps) {
-  const showLogout = await isAdminAuthenticated();
+  const isAdmin = await isAdminAuthenticated();
 
   return (
     <Navigation
       links={links}
       ctaLabel={ctaLabel}
       ctaHref={ctaHref}
-      showLogout={showLogout}
+      showAdminLink={isAdmin}
+      showLogout={isAdmin}
       logoutAction={logoutAction}
     />
   );
