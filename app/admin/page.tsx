@@ -74,7 +74,10 @@ function SelectField({
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; saveError?: 'missing-config' | 'invalid-firebase' | 'firebase-auth' | 'stand-upload' | string }>;
+  searchParams: Promise<{
+    saved?: string;
+    saveError?: 'missing-config' | 'invalid-firebase' | 'firebase-auth' | 'stand-upload' | 'logo-upload' | 'hero-image-upload' | 'background-image-upload' | string;
+  }>;
 }) {
   if (!(await isAdminAuthenticated())) {
     redirect('/admin/login');
@@ -133,6 +136,12 @@ export default async function AdminPage({
                 ? 'Speichern fehlgeschlagen. Firebase antwortet mit UNAUTHENTICATED. Prüfe FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY und ob der Service Account im richtigen Projekt erstellt wurde.'
                 : params.saveError === 'stand-upload'
                 ? 'Die 3D-Stand-Datei konnte nicht hochgeladen werden. Prüfe FIREBASE_STORAGE_BUCKET in Vercel oder den Zugriff des Service Accounts auf Firebase Storage.'
+                : params.saveError === 'logo-upload'
+                ? 'Das Logo konnte nicht hochgeladen werden. Prüfe FIREBASE_STORAGE_BUCKET in Vercel oder den Zugriff des Service Accounts auf Firebase Storage.'
+                : params.saveError === 'hero-image-upload'
+                ? 'Das Startseiten-Hauptbild konnte nicht hochgeladen werden. Prüfe FIREBASE_STORAGE_BUCKET in Vercel oder den Zugriff des Service Accounts auf Firebase Storage.'
+                : params.saveError === 'background-image-upload'
+                ? 'Das Startseiten-Hintergrundbild konnte nicht hochgeladen werden. Prüfe FIREBASE_STORAGE_BUCKET in Vercel oder den Zugriff des Service Accounts auf Firebase Storage.'
                 : params.saveError === 'invalid-firebase'
                 ? 'Speichern fehlgeschlagen. Firebase ist gesetzt, aber der Service-Account-Key ist noch ungültig oder falsch formatiert.'
                 : 'Speichern fehlgeschlagen. Für Vercel musst du zuerst FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL und FIREBASE_PRIVATE_KEY setzen.'}

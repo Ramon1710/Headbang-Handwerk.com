@@ -146,6 +146,7 @@ export async function updateCmsAction(formData: FormData) {
       file: logoAssetFile,
       folder: 'logo',
       fallbackName: 'logo',
+      errorCode: 'logo-upload',
       assign: (uploadedAsset: Awaited<ReturnType<typeof uploadCmsAsset>>) => {
         next = {
           ...next,
@@ -164,6 +165,7 @@ export async function updateCmsAction(formData: FormData) {
       file: heroImageAssetFile,
       folder: 'home-hero',
       fallbackName: 'hero-bild',
+      errorCode: 'hero-image-upload',
       assign: (uploadedAsset: Awaited<ReturnType<typeof uploadCmsAsset>>) => {
         next = {
           ...next,
@@ -185,6 +187,7 @@ export async function updateCmsAction(formData: FormData) {
       file: backgroundImageAssetFile,
       folder: 'home-background',
       fallbackName: 'hintergrund-bild',
+      errorCode: 'background-image-upload',
       assign: (uploadedAsset: Awaited<ReturnType<typeof uploadCmsAsset>>) => {
         next = {
           ...next,
@@ -212,7 +215,7 @@ export async function updateCmsAction(formData: FormData) {
       assetUpload.assign(uploadedAsset);
     } catch (error) {
       if (isFirebaseStorageUploadError(error)) {
-        redirect('/admin?saveError=stand-upload');
+        redirect(`/admin?saveError=${assetUpload.errorCode}`);
       }
 
       if (isFirebaseAuthError(error)) {
