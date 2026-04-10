@@ -32,11 +32,23 @@ export async function POST(request: Request) {
   };
 
   if (body.kind === 'richText') {
-    next.site.liveEditor.richText[body.key] = sanitizeLiveEditorHtml(String(body.html || ''));
+    const key = body.key;
+
+    if (!key) {
+      return NextResponse.json({ error: 'missing-key' }, { status: 400 });
+    }
+
+    next.site.liveEditor.richText[key] = sanitizeLiveEditorHtml(String(body.html || ''));
   }
 
   if (body.kind === 'boxStyle') {
-    next.site.liveEditor.boxStyles[body.key] = sanitizeLiveEditorBoxStyle(body.style || {});
+    const key = body.key;
+
+    if (!key) {
+      return NextResponse.json({ error: 'missing-key' }, { status: 400 });
+    }
+
+    next.site.liveEditor.boxStyles[key] = sanitizeLiveEditorBoxStyle(body.style || {});
   }
 
   if (body.kind === 'boxStyles') {
