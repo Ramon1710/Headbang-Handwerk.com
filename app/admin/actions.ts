@@ -23,15 +23,15 @@ import { mergeCmsContentFromForm } from '@/lib/cms/form-data';
 export async function loginAction(formData: FormData) {
   const username = String(formData.get('username') || '');
   const password = String(formData.get('password') || '');
-  const redirectTo = String(formData.get('redirectTo') || '/admin');
+  const redirectTo = String(formData.get('redirectTo') || '/');
   const success = await loginAdmin(username, password);
 
   if (!success) {
-    const target = redirectTo.startsWith('/') ? redirectTo : '/admin';
+    const target = redirectTo.startsWith('/') ? redirectTo : '/';
     redirect(`/admin/login?error=1&next=${encodeURIComponent(target)}`);
   }
 
-  redirect(redirectTo.startsWith('/') ? redirectTo : '/admin');
+  redirect(redirectTo.startsWith('/') ? redirectTo : '/');
 }
 
 export async function logoutAction() {

@@ -40,6 +40,10 @@ export const defaultCmsContent: CmsContent = {
     ],
     navigationCtaLabel: 'Jetzt unterstützen',
     navigationCtaHref: '/sponsoren',
+    liveEditor: {
+      richText: {},
+      boxStyles: {},
+    },
     home: {
       heroBadge: 'Startseite mit klarem Projektfokus',
       heroTitle: 'Handwerk trifft Metal. Leidenschaft trifft Zukunft.',

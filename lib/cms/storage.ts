@@ -7,6 +7,7 @@ import {
   isInvalidFirebaseConfigError,
   toFirebaseAuthError,
 } from './firebase';
+import { emptyLiveEditorContent } from './live-editor';
 import type { CmsContent } from './schema';
 
 const READONLY_FALLBACK_ERROR = 'CMS_READONLY_FALLBACK';
@@ -111,6 +112,21 @@ function normalizeContent(content: CmsContent): CmsContent {
       ...defaultCmsContent.site,
       ...content.site,
       seo: { ...defaultCmsContent.site.seo, ...content.site.seo },
+      liveEditor: {
+        ...emptyLiveEditorContent,
+        ...defaultCmsContent.site.liveEditor,
+        ...content.site.liveEditor,
+        richText: {
+          ...emptyLiveEditorContent.richText,
+          ...defaultCmsContent.site.liveEditor.richText,
+          ...(content.site.liveEditor?.richText || {}),
+        },
+        boxStyles: {
+          ...emptyLiveEditorContent.boxStyles,
+          ...defaultCmsContent.site.liveEditor.boxStyles,
+          ...(content.site.liveEditor?.boxStyles || {}),
+        },
+      },
       home: { ...defaultCmsContent.site.home, ...content.site.home },
       sponsors: { ...defaultCmsContent.site.sponsors, ...content.site.sponsors },
       about: { ...defaultCmsContent.site.about, ...content.site.about },
@@ -120,6 +136,7 @@ function normalizeContent(content: CmsContent): CmsContent {
     },
   };
 }
+
 
 export const getCmsContent = cache(async (): Promise<CmsContent> => {
   if (!hasFirebaseConfig() && isVercelRuntime()) {

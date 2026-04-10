@@ -17,7 +17,7 @@ function createFirebaseDownloadUrl(bucketName: string, objectName: string, token
   return `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(objectName)}?alt=media&token=${token}`;
 }
 
-function isFirebaseStorageBucketNotFoundError(error: unknown) {
+function hasFirebaseStorageBucketNotFoundError(error: unknown) {
   if (!error || typeof error !== 'object') {
     return false;
   }
@@ -32,7 +32,7 @@ function isFirebaseStorageBucketNotFoundError(error: unknown) {
   );
 }
 
-function isFirebaseStoragePermissionError(error: unknown) {
+function hasFirebaseStoragePermissionError(error: unknown) {
   if (!error || typeof error !== 'object') {
     return false;
   }
@@ -51,11 +51,11 @@ function isFirebaseStoragePermissionError(error: unknown) {
 }
 
 function toFirebaseStorageUploadError(error: unknown) {
-  if (isFirebaseStorageBucketNotFoundError(error)) {
+  if (hasFirebaseStorageBucketNotFoundError(error)) {
     return new Error(FIREBASE_STORAGE_BUCKET_NOT_FOUND_ERROR);
   }
 
-  if (isFirebaseStoragePermissionError(error)) {
+  if (hasFirebaseStoragePermissionError(error)) {
     return new Error(FIREBASE_STORAGE_PERMISSION_ERROR);
   }
 

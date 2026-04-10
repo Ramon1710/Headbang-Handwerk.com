@@ -55,6 +55,17 @@ export interface ProcessStepContent {
   text: string;
 }
 
+export interface LiveEditorBoxStyle {
+  width?: string;
+  height?: string;
+  minHeight?: string;
+}
+
+export interface LiveEditorContent {
+  richText: Record<string, string>;
+  boxStyles: Record<string, LiveEditorBoxStyle>;
+}
+
 export interface HomePageContent {
   heroBadge: string;
   heroTitle: string;
@@ -190,6 +201,7 @@ export interface SiteContent {
   navigationLinks: NavigationLink[];
   navigationCtaLabel: string;
   navigationCtaHref: string;
+  liveEditor: LiveEditorContent;
   home: HomePageContent;
   sponsors: SponsorsPageContent;
   about: AboutPageContent;

@@ -93,6 +93,8 @@ export default async function AdminPage({
     redirect('/admin/login');
   }
 
+  redirect('/');
+
   const cms = await getCmsContent();
   const params = await searchParams;
   const formValues = cmsContentToFormValues(cms);

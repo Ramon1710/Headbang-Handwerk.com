@@ -13,7 +13,7 @@ export default async function AdminLoginPage({
   searchParams: Promise<{ error?: string; next?: string }>;
 }) {
   const params = await searchParams;
-  const redirectTo = params.next && params.next.startsWith('/') ? params.next : '/admin';
+  const redirectTo = params.next && params.next.startsWith('/') ? params.next : '/';
 
   if (await isAdminAuthenticated()) {
     redirect(redirectTo);
@@ -25,7 +25,7 @@ export default async function AdminLoginPage({
         <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Geschützter Bereich</p>
         <h1 className="mt-4 text-3xl font-black text-[color:var(--color-foreground)]">Website nur nach Login sichtbar</h1>
         <p className="mt-4 text-sm leading-7 text-[color:var(--color-muted)]">
-          Ohne gültige Anmeldung werden keine Seiteninhalte angezeigt. Nach dem Login landest du wieder auf der gewünschten Seite und kannst zusätzlich den Admin-Bereich nutzen.
+          Nach dem Login landest du direkt auf der Website und kannst die freigegebenen Inhalte dort direkt bearbeiten.
         </p>
 
         {params.error ? (
