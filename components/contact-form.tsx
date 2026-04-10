@@ -76,7 +76,7 @@ export function ContactForm() {
             type="text"
             value={form.name}
             onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-            className="w-full px-4 py-2.5 rounded-lg bg-[#0a0a0a] border border-[#2a2a2a] text-white text-sm placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
+            className="w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:border-[color:var(--color-accent)] focus:outline-none"
             placeholder="Max Mustermann"
           />
         </div>
@@ -86,7 +86,7 @@ export function ContactForm() {
             type="text"
             value={form.company}
             onChange={(e) => setForm((p) => ({ ...p, company: e.target.value }))}
-            className="w-full px-4 py-2.5 rounded-lg bg-[#0a0a0a] border border-[#2a2a2a] text-white text-sm placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
+            className="w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:border-[color:var(--color-accent)] focus:outline-none"
             placeholder="Mustermann GmbH"
           />
         </div>
@@ -99,7 +99,7 @@ export function ContactForm() {
           type="email"
           value={form.email}
           onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-          className="w-full px-4 py-2.5 rounded-lg bg-[#0a0a0a] border border-[#2a2a2a] text-white text-sm placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
+          className="w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:border-[color:var(--color-accent)] focus:outline-none"
           placeholder="max@mustermann.de"
         />
       </div>
@@ -111,7 +111,7 @@ export function ContactForm() {
           type="text"
           value={form.subject}
           onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))}
-          className="w-full px-4 py-2.5 rounded-lg bg-[#0a0a0a] border border-[#2a2a2a] text-white text-sm placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors"
+          className="w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:border-[color:var(--color-accent)] focus:outline-none"
           placeholder="Dein Betreff..."
         />
       </div>
@@ -127,8 +127,8 @@ export function ContactForm() {
               className={[
                 'px-3 py-1.5 rounded-full text-xs font-medium border transition-all',
                 form.interests.includes(option)
-                  ? 'border-orange-500 bg-orange-500/20 text-orange-400'
-                  : 'border-[#2a2a2a] text-gray-500 hover:border-orange-500/40 hover:text-gray-300',
+                  ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/20 text-[color:var(--color-accent-soft)]'
+                  : 'border-[color:var(--color-border)] text-gray-500 hover:border-[color:var(--color-accent)]/40 hover:text-gray-300',
               ].join(' ')}
             >
               {option}
@@ -144,7 +144,7 @@ export function ContactForm() {
           rows={5}
           value={form.message}
           onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
-          className="w-full px-4 py-2.5 rounded-lg bg-[#0a0a0a] border border-[#2a2a2a] text-white text-sm placeholder-gray-600 focus:outline-none focus:border-orange-500 transition-colors resize-none"
+          className="w-full resize-none rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:border-[color:var(--color-accent)] focus:outline-none"
           placeholder="Deine Nachricht..."
         />
       </div>

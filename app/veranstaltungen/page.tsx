@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Navigation } from '@/components/navigation';
 import { Footer } from '@/components/footer';
 import { EventCard } from '@/components/event-card';
+import { getCmsContent } from '@/lib/cms/storage';
 import { events } from '@/lib/data';
 
 export const metadata: Metadata = {
@@ -9,19 +10,24 @@ export const metadata: Metadata = {
   description: 'Alle Festival-Termine 2025 von Headbang Handwerk.',
 };
 
-export default function VeranstaltungenPage() {
+export default async function VeranstaltungenPage() {
+  const cms = await getCmsContent();
   const confirmed = events.filter((e) => e.status === 'confirmed');
   const planned = events.filter((e) => e.status === 'planned');
 
   return (
     <>
-      <Navigation />
+      <Navigation
+        links={cms.site.navigationLinks}
+        ctaLabel={cms.site.navigationCtaLabel}
+        ctaHref={cms.site.navigationCtaHref}
+      />
       <main className="min-h-screen bg-transparent pt-28 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="copy-center content-flow mb-14">
             <h1 className="text-4xl sm:text-5xl font-black text-white">
               Festival{' '}
-              <span className="text-orange-500">Termine 2025</span>
+              <span className="text-[color:var(--color-accent)]">Termine 2025</span>
             </h1>
             <p className="text-gray-300 text-lg max-w-2xl mx-auto">
               Wir sind auf den größten Metal-Festivals Europas vertreten. Hier findet ihr alle
@@ -58,7 +64,7 @@ export default function VeranstaltungenPage() {
           )}
         </div>
       </main>
-      <Footer />
+      <Footer content={cms.site.footer} />
     </>
   );
 }

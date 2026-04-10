@@ -4,6 +4,7 @@
   --background: #090604;
   --foreground: #f4ede3;
   --accent-orange: #ff7a00;
+  --accent-strong: #d86000;
   --accent-gold: #f6b94f;
   --surface: #15110e;
   --surface-2: #1f1814;
@@ -15,7 +16,10 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-orange: var(--accent-orange);
+  --color-accent: var(--accent-orange);
+  --color-accent-strong: var(--accent-strong);
   --color-gold: var(--accent-gold);
+  --color-accent-soft: var(--accent-gold);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-border: var(--border);
@@ -34,10 +38,10 @@ html {
 
 body {
   background:
-    radial-gradient(circle at 12% 5%, rgba(255, 130, 26, 0.16), transparent 32%),
-    radial-gradient(circle at 90% 20%, rgba(255, 120, 0, 0.12), transparent 38%),
-    radial-gradient(circle at 55% 100%, rgba(255, 125, 0, 0.1), transparent 45%),
-    linear-gradient(180deg, #0a0705 0%, #0a0705 28%, #0c0907 100%);
+    radial-gradient(circle at 12% 5%, color-mix(in srgb, var(--accent-orange) 16%, transparent) 0%, transparent 32%),
+    radial-gradient(circle at 90% 20%, color-mix(in srgb, var(--accent-orange) 12%, transparent) 0%, transparent 38%),
+    radial-gradient(circle at 55% 100%, color-mix(in srgb, var(--accent-orange) 10%, transparent) 0%, transparent 45%),
+    linear-gradient(180deg, color-mix(in srgb, var(--background) 92%, black) 0%, color-mix(in srgb, var(--background) 88%, black) 28%, color-mix(in srgb, var(--background) 84%, black) 100%);
   color: var(--foreground);
   font-family: var(--font-exo), 'Segoe UI', Tahoma, sans-serif;
   min-height: 100vh;
@@ -53,15 +57,15 @@ body::before {
   background:
     repeating-linear-gradient(
       0deg,
-      rgba(255, 166, 93, 0.03) 0,
-      rgba(255, 166, 93, 0.03) 1px,
+      color-mix(in srgb, var(--accent-gold) 3%, transparent) 0,
+      color-mix(in srgb, var(--accent-gold) 3%, transparent) 1px,
       transparent 1px,
       transparent 4px
     ),
     repeating-linear-gradient(
       90deg,
-      rgba(255, 130, 45, 0.02) 0,
-      rgba(255, 130, 45, 0.02) 1px,
+      color-mix(in srgb, var(--accent-orange) 2%, transparent) 0,
+      color-mix(in srgb, var(--accent-orange) 2%, transparent) 1px,
       transparent 1px,
       transparent 5px
     );
@@ -125,7 +129,7 @@ h6 {
   inset: 0;
   border-radius: 2rem;
   background:
-    radial-gradient(circle at top, rgba(255, 143, 42, 0.14), transparent 54%),
+    radial-gradient(circle at top, color-mix(in srgb, var(--accent-orange) 14%, transparent), transparent 54%),
     linear-gradient(180deg, rgba(28, 18, 12, 0.72) 0%, rgba(14, 10, 8, 0.3) 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 215, 171, 0.08),
@@ -175,8 +179,8 @@ h6 {
 
 .fire-divider {
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255, 120, 0, 0.9), transparent);
-  box-shadow: 0 0 24px rgba(255, 120, 0, 0.45);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent-orange) 90%, transparent), transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent-orange) 45%, transparent);
 }
 
 /* Scrollbar */

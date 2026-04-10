@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Navigation } from '@/components/navigation';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
+import { getCmsContent } from '@/lib/cms/storage';
 import { Heart, Target, Rocket } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -14,16 +15,22 @@ const values = [
   { icon: Rocket, title: 'Vision', desc: 'Headbang Handwerk europaweit auf allen großen Metal-Festivals etablieren.' },
 ];
 
-export default function UeberUnsPage() {
+export default async function UeberUnsPage() {
+  const cms = await getCmsContent();
+
   return (
     <>
-      <Navigation />
+      <Navigation
+        links={cms.site.navigationLinks}
+        ctaLabel={cms.site.navigationCtaLabel}
+        ctaHref={cms.site.navigationCtaHref}
+      />
       <main className="min-h-screen bg-transparent pt-28 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="copy-center content-flow mb-16">
             <h1 className="text-4xl sm:text-5xl font-black text-white mb-6">
               Über{' '}
-              <span className="text-orange-500">uns</span>
+              <span className="text-[color:var(--color-accent)]">uns</span>
             </h1>
             <p className="text-gray-400 text-lg leading-relaxed">
               Headbang Handwerk wurde mit einer einfachen Idee gegründet: Das Handwerk braucht
@@ -41,8 +48,8 @@ export default function UeberUnsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             {values.map(({ icon: Icon, title, desc }) => (
               <div key={title} className="section-shell p-6 text-center">
-                <div className="w-12 h-12 rounded-full bg-orange-500/10 ring-1 ring-orange-500/20 flex items-center justify-center mb-4 mx-auto">
-                  <Icon className="w-6 h-6 text-orange-500" />
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--color-accent)]/10 ring-1 ring-[color:var(--color-accent)]/20">
+                  <Icon className="h-6 w-6 text-[color:var(--color-accent)]" />
                 </div>
                 <h3 className="text-white font-bold text-lg mb-2">{title}</h3>
                 <p className="text-gray-300 text-sm leading-relaxed max-w-xs mx-auto">{desc}</p>
@@ -69,7 +76,7 @@ export default function UeberUnsPage() {
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer content={cms.site.footer} />
     </>
   );
 }

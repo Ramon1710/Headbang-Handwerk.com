@@ -2,19 +2,26 @@ import type { Metadata } from 'next';
 import { Navigation } from '@/components/navigation';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
+import { getCmsContent } from '@/lib/cms/storage';
 
 export const metadata: Metadata = { title: 'Danke – Headbang Handwerk' };
 
-export default function DankePage() {
+export default async function DankePage() {
+  const cms = await getCmsContent();
+
   return (
     <>
-      <Navigation />
+      <Navigation
+        links={cms.site.navigationLinks}
+        ctaLabel={cms.site.navigationCtaLabel}
+        ctaHref={cms.site.navigationCtaHref}
+      />
       <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-20 flex items-center justify-center">
         <div className="content-flow text-center max-w-lg mx-auto px-4">
           <div className="text-6xl">🤘</div>
           <h1 className="text-4xl font-black text-white">
             Danke für dein{' '}
-            <span className="text-orange-500">Sponsoring!</span>
+            <span className="text-[color:var(--color-accent)]">Sponsoring!</span>
           </h1>
           <p className="text-gray-400 text-lg">
             Zahlung erfolgreich! Wir freuen uns riesig über deine Unterstützung. Du erhältst in
@@ -26,7 +33,7 @@ export default function DankePage() {
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer content={cms.site.footer} />
     </>
   );
 }

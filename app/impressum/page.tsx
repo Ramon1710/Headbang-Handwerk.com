@@ -1,13 +1,20 @@
 import type { Metadata } from 'next';
 import { Navigation } from '@/components/navigation';
 import { Footer } from '@/components/footer';
+import { getCmsContent } from '@/lib/cms/storage';
 
 export const metadata: Metadata = { title: 'Impressum – Headbang Handwerk' };
 
-export default function ImpressumPage() {
+export default async function ImpressumPage() {
+  const cms = await getCmsContent();
+
   return (
     <>
-      <Navigation />
+      <Navigation
+        links={cms.site.navigationLinks}
+        ctaLabel={cms.site.navigationCtaLabel}
+        ctaHref={cms.site.navigationCtaHref}
+      />
       <main className="min-h-screen bg-transparent pt-28 pb-24">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <h1 className="text-4xl font-black text-white mb-10 text-center">Impressum</h1>
@@ -38,7 +45,7 @@ export default function ImpressumPage() {
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer content={cms.site.footer} />
     </>
   );
 }

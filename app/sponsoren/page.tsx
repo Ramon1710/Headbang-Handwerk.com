@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Navigation } from '@/components/navigation';
 import { Footer } from '@/components/footer';
 import { SponsorPackageCard } from '@/components/sponsor-package-card';
+import { getCmsContent } from '@/lib/cms/storage';
 import { sponsorPackages } from '@/lib/data';
 import { Check } from 'lucide-react';
 
@@ -19,16 +20,22 @@ const benefits = [
   'Hohes Medien- und Social-Media-Potenzial',
 ];
 
-export default function SponsorenPage() {
+export default async function SponsorenPage() {
+  const cms = await getCmsContent();
+
   return (
     <>
-      <Navigation />
+      <Navigation
+        links={cms.site.navigationLinks}
+        ctaLabel={cms.site.navigationCtaLabel}
+        ctaHref={cms.site.navigationCtaHref}
+      />
       <main className="min-h-screen bg-transparent pt-28 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="content-flow text-center mb-14 max-w-3xl mx-auto">
             <h1 className="text-4xl sm:text-5xl font-black text-white">
               Sponsoring{' '}
-              <span className="text-orange-500">Pakete</span>
+              <span className="text-[color:var(--color-accent)]">Pakete</span>
             </h1>
             <p className="text-gray-400 text-lg">
               Bringt eure Marke auf die Hauptbühne des deutschen Handwerks – inmitten der
@@ -41,7 +48,7 @@ export default function SponsorenPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {benefits.map((b) => (
                 <div key={b} className="flex items-start justify-center gap-3 text-center">
-                  <Check className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                  <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-[color:var(--color-accent)]" />
                   <span className="text-gray-300 text-sm">{b}</span>
                 </div>
               ))}
@@ -69,7 +76,7 @@ export default function SponsorenPage() {
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer content={cms.site.footer} />
     </>
   );
 }

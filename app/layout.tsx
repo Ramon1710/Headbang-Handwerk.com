@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Cinzel, Exo_2 } from 'next/font/google';
+import { getCmsContent } from '@/lib/cms/storage';
 import './globals.css';
 
 const cinzel = Cinzel({
@@ -14,30 +15,49 @@ const exo2 = Exo_2({
   weight: ['400', '500', '600', '700', '800'],
 });
 
-export const metadata: Metadata = {
-  title: 'Headbang Handwerk – Handwerk trifft Metal',
-  description:
-    'Wir bringen das Handwerk auf die lautesten Festivals Europas – für Nachwuchs, Sichtbarkeit und ein unvergessliches Erlebnis.',
-  keywords: [
-    'Handwerk', 'Metal', 'Festival', 'Sponsoring', 'Nachwuchs', 'Wacken', 'Summer Breeze',
-  ],
-  openGraph: {
-    title: 'Headbang Handwerk – Handwerk trifft Metal',
-    description:
-      'Wir bringen das Handwerk auf die lautesten Festivals Europas – für Nachwuchs, Sichtbarkeit und ein unvergessliches Erlebnis.',
-    type: 'website',
-    locale: 'de_DE',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const cms = await getCmsContent();
 
-export default function RootLayout({
+  return {
+    title: cms.site.seo.title,
+    description: cms.site.seo.description,
+    keywords: cms.site.seo.keywords,
+    openGraph: {
+      title: cms.site.seo.title,
+      description: cms.site.seo.description,
+      type: 'website',
+      locale: 'de_DE',
+    },
+  };
+}
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cms = await getCmsContent();
+
   return (
     <html lang="de">
-      <body className={`${cinzel.variable} ${exo2.variable}`}>{children}</body>
+      <body
+        className={`${cinzel.variable} ${exo2.variable}`}
+        style={
+          {
+            '--background': cms.theme.background,
+            '--foreground': cms.theme.foreground,
+            '--accent-orange': cms.theme.accent,
+            '--accent-strong': cms.theme.accentStrong,
+            '--accent-gold': cms.theme.accentSoft,
+            '--surface': cms.theme.surface,
+            '--surface-2': cms.theme.surfaceAlt,
+            '--border': cms.theme.border,
+            '--muted': cms.theme.muted,
+          } as React.CSSProperties
+        }
+      >
+        {children}
+      </body>
     </html>
   );
 }

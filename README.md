@@ -29,6 +29,11 @@ Dann die Werte in `.env.local` eintragen:
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` – Stripe Public Key
 - `STRIPE_WEBHOOK_SECRET` – Stripe Webhook Secret
 - `NEXT_PUBLIC_APP_URL` – URL der App (z.B. `https://headbang-handwerk.com`)
+- `CMS_ADMIN_USERNAME` – Loginname für den Admin-Bereich
+- `CMS_ADMIN_PASSWORD` – Passwort für den Admin-Bereich
+- `CMS_SESSION_SECRET` – Secret zum Signieren der Admin-Session
+- `CMS_DATABASE_URL` – Externe MySQL-Verbindung für CMS-Inhalte auf Vercel
+- `CMS_DATABASE_SSL` – optional `false`, falls der MySQL-Host kein SSL nutzt
 
 ### 3. Development Server starten
 
@@ -49,6 +54,13 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 1. Repository bei Vercel verbinden
 2. Umgebungsvariablen in Vercel setzen
 3. Deploy!
+
+## CMS / Admin-Bereich
+
+- Login unter `/admin/login`
+- Ohne konfigurierte Datenbank werden Inhalte lokal in `.cms/content.json` gespeichert. Das ist nur für lokale Entwicklung sinnvoll.
+- Auf Vercel müssen CMS-Änderungen über eine externe Datenbank gespeichert werden, da das Dateisystem dort nicht dauerhaft beschreibbar ist.
+- Die aktuelle Implementierung nutzt MySQL und passt damit auch zu externen Datenbanken bei klassischen Hostern oder Managed-Datenbanken.
 
 ## Seiten
 

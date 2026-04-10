@@ -1,0 +1,155 @@
+import type { CmsContent } from './schema';
+
+export const defaultCmsContent: CmsContent = {
+  theme: {
+    background: '#090604',
+    foreground: '#f4ede3',
+    accent: '#ff7a00',
+    accentStrong: '#d86000',
+    accentSoft: '#f6b94f',
+    surface: '#15110e',
+    surfaceAlt: '#1f1814',
+    border: '#3f2a1b',
+    muted: '#b8a48e',
+  },
+  site: {
+    seo: {
+      title: 'Headbang Handwerk – Handwerk trifft Metal',
+      description:
+        'Wir bringen das Handwerk auf die lautesten Festivals Europas – für Nachwuchs, Sichtbarkeit und ein unvergessliches Erlebnis.',
+      keywords: ['Handwerk', 'Metal', 'Festival', 'Sponsoring', 'Nachwuchs', 'Wacken', 'Summer Breeze'],
+    },
+    navigationLinks: [
+      { label: 'Startseite', href: '/' },
+      { label: 'Veranstaltungen', href: '/veranstaltungen' },
+      { label: 'Sponsoren', href: '/sponsoren' },
+      { label: '3D-Stand', href: '/drei-d-stand' },
+      { label: 'Über uns', href: '/ueber-uns' },
+      { label: 'Kontakt', href: '/kontakt' },
+    ],
+    navigationCtaLabel: 'Jetzt unterstützen',
+    navigationCtaHref: '/sponsoren',
+    home: {
+      heroBadge: 'Startseite mit klarem Projektfokus',
+      heroTitle: 'Handwerk trifft Metal. Leidenschaft trifft Zukunft.',
+      heroLead:
+        'Wir bringen das Handwerk dorthin, wo Energie, Gemeinschaft und Begeisterung aufeinandertreffen – auf die größten Metal-Festivals Europas.',
+      heroBody:
+        'Mit Headbang Handwerk e.V. schaffen wir eine Plattform, die zeigt, wie modern, vielseitig und kraftvoll das Handwerk wirklich ist. Zwischen Bühne, Feuer und tausenden Festivalbesuchern entsteht ein Ort, an dem echtes Können erlebbar wird: live, zum Anfassen und zum Mitmachen.',
+      heroPrimaryCtaLabel: 'Jetzt Partner werden',
+      heroPrimaryCtaHref: '/sponsoren',
+      heroSecondaryCtaLabel: 'Veranstaltungen ansehen',
+      heroSecondaryCtaHref: '/veranstaltungen',
+      heroMetrics: [
+        { value: 'Wacken 2027', label: 'Nächster großer Meilenstein im Projekt' },
+        { value: 'Live-Demos', label: 'Handwerk als Erlebnis statt nur als Botschaft' },
+        { value: 'Partnernetzwerk', label: 'Betriebe, Innungen und Unterstützer an einem Ort' },
+      ],
+      projectFocusEyebrow: 'Projektfokus',
+      projectFocusTitle: 'Wacken Open Air 2027',
+      projectFocusText:
+        'Der nächste große Schritt ist ein eigener Stand mit starken Partnern, sichtbaren Aktionen und einer klaren Botschaft: Handwerk gehört mitten ins Leben und auf große Bühnen.',
+      projectFocusToneLabel: 'Ansprache',
+      projectFocusToneValue: 'Laut. Echt. Nahbar.',
+      projectFocusImpactLabel: 'Wirkung',
+      projectFocusImpactValue: 'Erlebnis statt Bannerdenken',
+      stats: [
+        { value: '2027', label: 'Zieljahr für den nächsten großen Wacken-Auftritt' },
+        { value: '3+', label: 'Festivalformate bereits in Planung oder Vorbereitung' },
+        { value: '4', label: 'Sponsoring-Stufen für unterschiedliche Partnerziele' },
+        { value: '100%', label: 'Fokus auf echtes Erleben statt austauschbarer Werbung' },
+      ],
+      focusEyebrow: 'Unser Ziel ist klar',
+      focusTitle: 'Handwerk sichtbar machen.',
+      focusPoints: [
+        'Nachwuchs begeistern',
+        'Handwerk sichtbar machen',
+        'Unternehmen eine neue Bühne bieten',
+      ],
+      promiseCards: [
+        {
+          title: 'Als Erlebnis, nicht als Pflicht',
+          text: 'Gemeinsam mit Partnern aus der Wirtschaft, Innungen und Betrieben präsentieren wir das Handwerk nicht als Pflicht – sondern als Erlebnis.',
+          icon: 'flame',
+        },
+        {
+          title: 'Laut. Ehrlich. Leidenschaftlich.',
+          text: 'Ob durch interaktive Aktionen, Live-Demonstrationen oder innovative Standkonzepte: Wir zeigen, dass Handwerk genauso laut, ehrlich und leidenschaftlich ist wie die Musik, die diese Festivals prägt.',
+          icon: 'users',
+        },
+      ],
+      processEyebrow: 'So funktioniert die Beteiligung',
+      processTitle: 'Vom Interesse bis zur Festivalpräsenz.',
+      processLead:
+        'Die Startseite führt jetzt klarer durch das Projekt: zuerst der Nutzen, dann der Ablauf, danach die konkreten Einstiegspunkte für Sponsoren und Unterstützer.',
+      processSteps: [
+        {
+          number: '01',
+          title: 'Projekt auswählen',
+          text: 'Du entscheidest, ob du Wacken 2027, kommende Festivals oder einzelne Aktivierungen unterstützen willst.',
+        },
+        {
+          number: '02',
+          title: 'Passendes Paket finden',
+          text: 'Von sichtbarer Grundpräsenz bis zur prominenten Partnerrolle stimmen wir die Beteiligung auf dein Ziel ab.',
+        },
+        {
+          number: '03',
+          title: 'Aktivierung gemeinsam planen',
+          text: 'Wir übersetzen Marke, Gewerk und Botschaft in einen Auftritt, der im Festival funktioniert.',
+        },
+        {
+          number: '04',
+          title: 'Vor Ort Wirkung erzeugen',
+          text: 'Am Stand entstehen Erlebnisse, Gespräche, Content und Kontakte, die weit über das Festival hinaus wirken.',
+        },
+      ],
+      whyEyebrow: 'Warum das funktioniert',
+      whyTitle: 'Handwerk wird nicht erklärt. Es wird erlebt.',
+      whyBody:
+        'Genau darin liegt das Prinzip dieser Startseite: Sie stellt nicht zuerst Details aus, sondern das Ergebnis. Wer hier landet, versteht direkt, worum es geht, warum das Projekt relevant ist und wie man konkret Teil davon wird.',
+      whyBusinessLabel: 'Für Betriebe',
+      whyBusinessText: 'Mehr Sichtbarkeit, stärkere Differenzierung und neue Gesprächsanlässe.',
+      whyYouthLabel: 'Für Nachwuchs',
+      whyYouthText: 'Ein direkter, ungezwungener Zugang zu Berufen, Menschen und echtem Können.',
+      updateEyebrow: 'Aktuelle Information',
+      updateTitle: 'Wacken 2027 steht im Fokus.',
+      updateParagraphs: [
+        'Headbang Handwerk plant den nächsten großen Schritt: einen eigenen Stand auf dem Wacken Open Air 2027.',
+        'Mit Live-Demos, Mitmach-Aktionen und starken Partnern entsteht ein Format, das Handwerk nicht kleiner erklärt, sondern größer inszeniert.',
+        'Gesucht werden Unternehmen, Unterstützer und Branchenpartner, die früh Teil dieses Projekts werden wollen.',
+      ],
+      updatePrimaryCtaLabel: 'Sponsoring ansehen',
+      updatePrimaryCtaHref: '/sponsoren',
+      updateSecondaryCtaLabel: 'Kontakt aufnehmen',
+      updateSecondaryCtaHref: '/kontakt',
+      eventsEyebrow: 'Nächste Anlässe',
+      eventsTitle: 'Veranstaltungen mit echter Bühne für das Handwerk.',
+      eventsCtaLabel: 'Alle Termine ansehen',
+      eventsCtaHref: '/veranstaltungen',
+      packagesEyebrow: 'Einstieg für Partner',
+      packagesTitle: 'Sponsoring-Pakete mit klarer Staffelung.',
+      packagesCtaLabel: 'Alle Pakete im Detail',
+      packagesCtaHref: '/sponsoren',
+      closingEyebrow: 'Werde Teil der Bewegung',
+      closingTitle: 'Unterstütze uns dabei, das Handwerk neu zu denken und sichtbar zu machen.',
+      closingLead:
+        'Als Partner, Sponsor oder Unterstützer bringst du deine Marke dorthin, wo echte Aufmerksamkeit entsteht – mitten ins Leben.',
+      closingStatement: 'Headbang Handwerk – weil echtes Handwerk keine Bühne braucht.\nWir bauen sie einfach.',
+      closingPrimaryCtaLabel: 'Jetzt unterstützen',
+      closingPrimaryCtaHref: '/sponsoren',
+      closingSecondaryCtaLabel: 'Ansprechpartner kontaktieren',
+      closingSecondaryCtaHref: '/kontakt',
+    },
+    footer: {
+      brandHeadline: 'Headbang Handwerk',
+      brandHighlight: ' - wir bringen das Handwerk auf die Bühne.',
+      copyrightName: 'Headbang Handwerk e.V.',
+      socialLinks: [
+        { platform: 'facebook', label: 'Facebook', href: '#' },
+        { platform: 'instagram', label: 'Instagram', href: '#' },
+        { platform: 'youtube', label: 'YouTube', href: '#' },
+      ],
+    },
+  },
+};
