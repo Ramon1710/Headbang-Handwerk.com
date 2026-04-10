@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Navigation } from '@/components/navigation';
+import { SiteNavigation } from '@/components/site-navigation';
 import { Footer } from '@/components/footer';
 import { getCmsContent } from '@/lib/cms/storage';
 import { CheckoutClient } from './checkout-client';
@@ -9,7 +9,7 @@ export default async function CheckoutPage() {
 
   return (
     <>
-      <Navigation
+      <SiteNavigation
         links={cms.site.navigationLinks}
         ctaLabel={cms.site.navigationCtaLabel}
         ctaHref={cms.site.navigationCtaHref}

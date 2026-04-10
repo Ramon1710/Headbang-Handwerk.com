@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Navigation } from '@/components/navigation';
+import { SiteNavigation } from '@/components/site-navigation';
 import { Footer } from '@/components/footer';
 import { SponsorPackageCard } from '@/components/sponsor-package-card';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ export default async function SponsorenPage() {
 
   return (
     <>
-      <Navigation
+      <SiteNavigation
         links={cms.site.navigationLinks}
         ctaLabel={cms.site.navigationCtaLabel}
         ctaHref={cms.site.navigationCtaHref}

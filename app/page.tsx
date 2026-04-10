@@ -11,7 +11,7 @@ import {
   Target,
   Users,
 } from 'lucide-react';
-import { Navigation } from '@/components/navigation';
+import { SiteNavigation } from '@/components/site-navigation';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
 import { getCmsContent } from '@/lib/cms/storage';
@@ -39,7 +39,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Navigation
+      <SiteNavigation
         links={cms.site.navigationLinks}
         ctaLabel={cms.site.navigationCtaLabel}
         ctaHref={cms.site.navigationCtaHref}

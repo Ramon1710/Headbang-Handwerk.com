@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Navigation } from '@/components/navigation';
+import { SiteNavigation } from '@/components/site-navigation';
 import { Footer } from '@/components/footer';
 import { getCmsContent } from '@/lib/cms/storage';
 
@@ -10,7 +10,7 @@ export default async function AGBPage() {
 
   return (
     <>
-      <Navigation
+      <SiteNavigation
         links={cms.site.navigationLinks}
         ctaLabel={cms.site.navigationCtaLabel}
         ctaHref={cms.site.navigationCtaHref}

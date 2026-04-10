@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import type { ComponentProps } from 'react';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 import type { NavigationLink } from '@/lib/cms/schema';
@@ -12,9 +13,11 @@ interface NavigationProps {
   links: NavigationLink[];
   ctaLabel: string;
   ctaHref: string;
+  showLogout?: boolean;
+  logoutAction?: ComponentProps<'form'>['action'];
 }
 
-export function Navigation({ links, ctaLabel, ctaHref }: NavigationProps) {
+export function Navigation({ links, ctaLabel, ctaHref, showLogout = false, logoutAction }: NavigationProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -58,6 +61,13 @@ export function Navigation({ links, ctaLabel, ctaHref }: NavigationProps) {
           </div>
 
           <div className="flex items-center gap-3">
+            {showLogout && logoutAction ? (
+              <form action={logoutAction} className="hidden sm:block">
+                <Button type="submit" size="sm" variant="secondary" className="min-w-32">
+                  Logout
+                </Button>
+              </form>
+            ) : null}
             <Button href={ctaHref} size="sm" className="hidden sm:inline-flex min-w-44">
               {ctaLabel}
             </Button>
@@ -85,6 +95,13 @@ export function Navigation({ links, ctaLabel, ctaHref }: NavigationProps) {
                 {link.label}
               </a>
             ))}
+            {showLogout && logoutAction ? (
+              <form action={logoutAction} className="mt-3 w-full">
+                <Button type="submit" size="sm" variant="secondary" className="w-full">
+                  Logout
+                </Button>
+              </form>
+            ) : null}
             <Button href={ctaHref} size="sm" className="mt-3 w-full">
               {ctaLabel}
             </Button>
