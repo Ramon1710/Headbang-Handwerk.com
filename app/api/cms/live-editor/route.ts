@@ -2,7 +2,13 @@ import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { sanitizeLiveEditorBoxStyle, sanitizeLiveEditorHtml } from '@/lib/cms/live-editor';
-import { getCmsContent, saveCmsContent } from '@/lib/cms/storage';
+import {
+  getCmsContent,
+  isFirebaseAuthSaveError,
+  isInvalidFirebaseSaveError,
+  isReadonlyFallbackError,
+  saveCmsContent,
+} from '@/lib/cms/storage';
 
 export async function POST(request: Request) {
   if (!(await isAdminAuthenticated())) {
@@ -57,7 +63,24 @@ export async function POST(request: Request) {
     }
   }
 
-  await saveCmsContent(next);
+  try {
+    await saveCmsContent(next);
+  } catch (error) {
+    if (isReadonlyFallbackError(error)) {
+      return NextResponse.json({ error: 'missing-config' }, { status: 503 });
+    }
+
+    if (isInvalidFirebaseSaveError(error)) {
+      return NextResponse.json({ error: 'invalid-firebase' }, { status: 500 });
+    }
+
+    if (isFirebaseAuthSaveError(error)) {
+      return NextResponse.json({ error: 'firebase-auth' }, { status: 401 });
+    }
+
+    return NextResponse.json({ error: 'unknown-save-error' }, { status: 500 });
+  }
+
   revalidatePath('/', 'layout');
   revalidatePath('/');
 
