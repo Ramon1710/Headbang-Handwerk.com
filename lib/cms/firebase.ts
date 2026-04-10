@@ -1,10 +1,25 @@
 import { cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
+const INVALID_FIREBASE_CONFIG_ERROR = 'CMS_INVALID_FIREBASE_CONFIG';
+
+function normalizePrivateKey(value?: string) {
+  if (!value) {
+    return null;
+  }
+
+  const trimmed = value.trim().replace(/^"|"$/g, '');
+
+  return trimmed
+    .replace(/\\n/g, '\n')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
+}
+
 function getFirebaseConfig() {
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  const privateKey = normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
 
   if (!projectId || !clientEmail || !privateKey) {
     return null;
@@ -28,12 +43,20 @@ export function getFirebaseDb() {
     throw new Error('Firebase ist nicht vollständig konfiguriert.');
   }
 
-  if (!getApps().length) {
-    initializeApp({
-      credential: cert(config),
-      projectId: config.projectId,
-    });
-  }
+  try {
+    if (!getApps().length) {
+      initializeApp({
+        credential: cert(config),
+        projectId: config.projectId,
+      });
+    }
 
-  return getFirestore();
+    return getFirestore();
+  } catch {
+    throw new Error(INVALID_FIREBASE_CONFIG_ERROR);
+  }
+}
+
+export function isInvalidFirebaseConfigError(error: unknown) {
+  return error instanceof Error && error.message === INVALID_FIREBASE_CONFIG_ERROR;
 }

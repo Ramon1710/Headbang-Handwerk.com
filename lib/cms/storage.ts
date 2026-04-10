@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { defaultCmsContent } from './default-content';
-import { getFirebaseDb, hasFirebaseConfig } from './firebase';
+import { getFirebaseDb, hasFirebaseConfig, isInvalidFirebaseConfigError } from './firebase';
 import type { CmsContent } from './schema';
 
 const READONLY_FALLBACK_ERROR = 'CMS_READONLY_FALLBACK';
@@ -107,6 +107,10 @@ export const getCmsContent = cache(async (): Promise<CmsContent> => {
   try {
     content = hasFirebaseConfig() ? await readFromFirebase() : await readFromFile();
   } catch (error) {
+    if (isInvalidFirebaseConfigError(error) && isVercelRuntime()) {
+      return defaultCmsContent;
+    }
+
     if (!hasFirebaseConfig() && error instanceof Error && error.message === READONLY_FALLBACK_ERROR) {
       return defaultCmsContent;
     }
@@ -129,7 +133,16 @@ export async function saveCmsContent(content: CmsContent) {
   const normalized = normalizeContent(content);
 
   if (hasFirebaseConfig()) {
-    await writeToFirebase(normalized);
+    try {
+      await writeToFirebase(normalized);
+    } catch (error) {
+      if (isInvalidFirebaseConfigError(error) && isVercelRuntime()) {
+        throw new Error(READONLY_FALLBACK_ERROR);
+      }
+
+      throw error;
+    }
+
     return;
   }
 
