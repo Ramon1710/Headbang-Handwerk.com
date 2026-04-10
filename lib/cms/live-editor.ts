@@ -98,11 +98,9 @@ export function resolveLiveBoxStyle(liveEditor: LiveEditorContent | undefined, k
   }
 
   return {
-    position: boxStyle.x || boxStyle.y ? 'relative' : undefined,
     width: boxStyle.width,
     height: boxStyle.height,
     minHeight: boxStyle.minHeight,
-    left: boxStyle.x,
-    top: boxStyle.y,
+    transform: boxStyle.x || boxStyle.y ? `translate(${boxStyle.x || '0px'}, ${boxStyle.y || '0px'})` : undefined,
   };
 }

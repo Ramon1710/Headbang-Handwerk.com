@@ -24,6 +24,11 @@ const FONT_FAMILIES = [
 
 const FONT_SIZES = ['14px', '16px', '18px', '20px', '24px', '28px', '32px', '40px'];
 
+function applyExecCommand(command: 'bold' | 'italic' | 'underline') {
+  document.execCommand('styleWithCSS', false, 'false');
+  document.execCommand(command, false);
+}
+
 function wrapSelectionWithStyle(style: Partial<CSSStyleDeclaration>) {
   const selection = window.getSelection();
 
@@ -35,25 +40,6 @@ function wrapSelectionWithStyle(style: Partial<CSSStyleDeclaration>) {
   const wrapper = document.createElement('span');
 
   Object.assign(wrapper.style, style);
-  wrapper.appendChild(range.extractContents());
-  range.insertNode(wrapper);
-  selection.removeAllRanges();
-
-  const nextRange = document.createRange();
-  nextRange.selectNodeContents(wrapper);
-  selection.addRange(nextRange);
-}
-
-function wrapSelectionWithTag(tagName: 'strong' | 'em' | 'u') {
-  const selection = window.getSelection();
-
-  if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
-    return;
-  }
-
-  const range = selection.getRangeAt(0);
-  const wrapper = document.createElement(tagName);
-
   wrapper.appendChild(range.extractContents());
   range.insertNode(wrapper);
   selection.removeAllRanges();
@@ -161,12 +147,12 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
     return true;
   }
 
-  function handleFormat(tagName: 'strong' | 'em' | 'u') {
+  function handleFormat(command: 'bold' | 'italic' | 'underline') {
     if (!restoreSelection()) {
       return;
     }
 
-    wrapSelectionWithTag(tagName);
+    applyExecCommand(command);
     captureSelection();
   }
 
@@ -235,9 +221,9 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2 rounded-2xl border border-white/8 bg-black/20 p-3">
-              <button type="button" onMouseDown={(event) => { event.preventDefault(); captureSelection(); handleFormat('strong'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Fett</button>
-              <button type="button" onMouseDown={(event) => { event.preventDefault(); captureSelection(); handleFormat('em'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Kursiv</button>
-              <button type="button" onMouseDown={(event) => { event.preventDefault(); captureSelection(); handleFormat('u'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Unterstreichen</button>
+              <button type="button" onMouseDown={(event) => { event.preventDefault(); captureSelection(); handleFormat('bold'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Fett</button>
+              <button type="button" onMouseDown={(event) => { event.preventDefault(); captureSelection(); handleFormat('italic'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Kursiv</button>
+              <button type="button" onMouseDown={(event) => { event.preventDefault(); captureSelection(); handleFormat('underline'); }} className="rounded-lg border border-[#704321] px-3 py-2 text-sm font-semibold text-[#f3dfc4]">Unterstreichen</button>
               <select
                 onFocus={captureSelection}
                 onChange={(event) => {

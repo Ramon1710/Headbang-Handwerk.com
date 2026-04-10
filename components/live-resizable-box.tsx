@@ -63,11 +63,14 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       };
 
       setBoxStyle(nextStyle);
+      const transform = typeof nextStyle.transform === 'string' ? nextStyle.transform : '';
+      const match = transform.match(/translate\(([^,]+),\s*([^\)]+)\)/);
+
       queueSave({
         width,
         minHeight: height,
-        x: typeof nextStyle.left === 'string' ? nextStyle.left : undefined,
-        y: typeof nextStyle.top === 'string' ? nextStyle.top : undefined,
+        x: match?.[1]?.trim(),
+        y: match?.[2]?.trim(),
       });
     });
 
@@ -89,11 +92,14 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
 
     event.preventDefault();
     event.stopPropagation();
+    document.body.style.userSelect = 'none';
 
     const startX = event.clientX;
     const startY = event.clientY;
-    const initialX = typeof boxStyle?.left === 'string' ? Number.parseFloat(boxStyle.left) || 0 : 0;
-    const initialY = typeof boxStyle?.top === 'string' ? Number.parseFloat(boxStyle.top) || 0 : 0;
+    const transform = typeof boxStyle?.transform === 'string' ? boxStyle.transform : '';
+    const currentMatch = transform.match(/translate\(([^,]+),\s*([^\)]+)\)/);
+    const initialX = currentMatch ? Number.parseFloat(currentMatch[1]) || 0 : 0;
+    const initialY = currentMatch ? Number.parseFloat(currentMatch[2]) || 0 : 0;
 
     function handleMouseMove(moveEvent: MouseEvent) {
       const nextX = initialX + (moveEvent.clientX - startX);
@@ -101,15 +107,14 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
 
       setBoxStyle((current) => ({
         ...current,
-        position: 'relative',
-        left: `${Math.round(nextX)}px`,
-        top: `${Math.round(nextY)}px`,
+        transform: `translate(${Math.round(nextX)}px, ${Math.round(nextY)}px)`,
       }));
     }
 
     function handleMouseUp(upEvent: MouseEvent) {
       const nextX = initialX + (upEvent.clientX - startX);
       const nextY = initialY + (upEvent.clientY - startY);
+      document.body.style.userSelect = '';
 
       queueSave({
         width: typeof ref.current?.style.width === 'string' ? ref.current.style.width || undefined : undefined,
