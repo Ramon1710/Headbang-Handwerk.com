@@ -315,11 +315,23 @@ export default async function HomePage({
 
           <section className="mx-auto max-w-7xl py-[3.5rem] lg:py-[7rem]">
             <div className="grid gap-16 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-24">
-              <div className="max-w-3xl lg:pt-2">
+              <LiveResizableBox
+                boxKey="home.processIntro.box"
+                initialStyle={resolveLiveBoxStyle(liveEditor, 'home.processIntro.box')}
+                isAdmin={isAdmin}
+                className="max-w-3xl lg:pt-2"
+              >
                 <LiveEditableText as="p" className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]" editorKey="home.processEyebrow" initialHtml={resolveLiveHtml(liveEditor, 'home.processEyebrow', home.processEyebrow)} isAdmin={isAdmin} title="Prozess Eyebrow" />
                 <LiveEditableText as="h2" className="mt-5 text-4xl font-black leading-[0.96] text-[#fff0da] sm:text-[3rem] lg:text-[3.4rem]" editorKey="home.processTitle" initialHtml={resolveLiveHtml(liveEditor, 'home.processTitle', home.processTitle)} isAdmin={isAdmin} title="Prozess Titel" />
-              </div>
-              <LiveEditableText as="p" className="max-w-2xl text-base leading-8 text-[#dcc8b0] sm:text-[1.04rem] sm:leading-9 lg:pt-6" editorKey="home.processLead" initialHtml={resolveLiveHtml(liveEditor, 'home.processLead', home.processLead)} isAdmin={isAdmin} title="Prozess Einleitung" />
+              </LiveResizableBox>
+              <LiveResizableBox
+                boxKey="home.processLead.box"
+                initialStyle={resolveLiveBoxStyle(liveEditor, 'home.processLead.box')}
+                isAdmin={isAdmin}
+                className="max-w-2xl lg:pt-6"
+              >
+                <LiveEditableText as="p" className="text-base leading-8 text-[#dcc8b0] sm:text-[1.04rem] sm:leading-9" editorKey="home.processLead" initialHtml={resolveLiveHtml(liveEditor, 'home.processLead', home.processLead)} isAdmin={isAdmin} title="Prozess Einleitung" />
+              </LiveResizableBox>
             </div>
 
             <div className="mt-24 grid gap-10 lg:grid-cols-4 lg:gap-x-10 lg:gap-y-16 xl:gap-x-12">
