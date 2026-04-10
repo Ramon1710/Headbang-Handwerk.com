@@ -49,18 +49,23 @@ async function verifyToken(token: string) {
   return crypto.subtle.verify('HMAC', key, hexToBytes(signature), encoder.encode(payload));
 }
 
+function isBypassedPath(pathname: string) {
+  return (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname === '/favicon.ico' ||
+    /\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|txt|xml)$/i.test(pathname)
+  );
+}
+
 function isLoginPath(pathname: string) {
   return pathname === '/admin/login';
 }
 
-function isProtectedPath(pathname: string) {
-  return !pathname.startsWith('/api');
-}
-
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
-  if (!isProtectedPath(pathname)) {
+  if (isBypassedPath(pathname)) {
     return NextResponse.next();
   }
 
@@ -71,24 +76,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  if (authenticated) {
-    return NextResponse.next();
-  }
-
-  if (isLoginPath(pathname)) {
+  if (authenticated || isLoginPath(pathname)) {
     return NextResponse.next();
   }
 
   const loginUrl = new URL('/admin/login', request.url);
-  const nextPath = `${pathname}${search}`;
-
-  if (nextPath && nextPath !== '/admin/login') {
-    loginUrl.searchParams.set('next', nextPath);
-  }
+  loginUrl.searchParams.set('next', `${pathname}${search}` || '/');
 
   return NextResponse.redirect(loginUrl);
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|txt|xml)$).*)'],
+  matcher: '/:path*',
 };
