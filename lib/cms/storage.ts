@@ -4,6 +4,7 @@ import { getFirebaseDb, hasFirebaseConfig, isInvalidFirebaseConfigError } from '
 import type { CmsContent } from './schema';
 
 const READONLY_FALLBACK_ERROR = 'CMS_READONLY_FALLBACK';
+const INVALID_FIREBASE_SAVE_ERROR = 'CMS_INVALID_FIREBASE_SAVE';
 
 function isVercelRuntime() {
   return Boolean(process.env.VERCEL);
@@ -137,7 +138,7 @@ export async function saveCmsContent(content: CmsContent) {
       await writeToFirebase(normalized);
     } catch (error) {
       if (isInvalidFirebaseConfigError(error) && isVercelRuntime()) {
-        throw new Error(READONLY_FALLBACK_ERROR);
+        throw new Error(INVALID_FIREBASE_SAVE_ERROR);
       }
 
       throw error;
@@ -171,4 +172,8 @@ export function cmsStorageMode() {
 
 export function isReadonlyFallbackError(error: unknown) {
   return error instanceof Error && error.message === READONLY_FALLBACK_ERROR;
+}
+
+export function isInvalidFirebaseSaveError(error: unknown) {
+  return error instanceof Error && error.message === INVALID_FIREBASE_SAVE_ERROR;
 }

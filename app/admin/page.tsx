@@ -40,7 +40,7 @@ function TextareaField({ label, name, defaultValue, rows = 4 }: { label: string;
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; saveError?: string }>;
+  searchParams: Promise<{ saved?: string; saveError?: 'missing-config' | 'invalid-firebase' | string }>;
 }) {
   if (!(await isAdminAuthenticated())) {
     redirect('/admin/login');
@@ -89,7 +89,9 @@ export default async function AdminPage({
 
           {params.saveError ? (
             <div className="rounded-2xl border border-red-500/40 bg-red-950/30 px-5 py-4 text-sm text-red-200">
-              Speichern fehlgeschlagen. Für Vercel musst du zuerst FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL und FIREBASE_PRIVATE_KEY setzen.
+              {params.saveError === 'invalid-firebase'
+                ? 'Speichern fehlgeschlagen. Firebase ist gesetzt, aber der Service-Account-Key ist noch ungültig oder falsch formatiert.'
+                : 'Speichern fehlgeschlagen. Für Vercel musst du zuerst FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL und FIREBASE_PRIVATE_KEY setzen.'}
             </div>
           ) : null}
 

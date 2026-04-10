@@ -2,7 +2,12 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { getCmsContent, isReadonlyFallbackError, saveCmsContent } from '@/lib/cms/storage';
+import {
+  getCmsContent,
+  isInvalidFirebaseSaveError,
+  isReadonlyFallbackError,
+  saveCmsContent,
+} from '@/lib/cms/storage';
 import { isAdminAuthenticated, loginAdmin, logoutAdmin } from '@/lib/cms/auth';
 import { mergeCmsContentFromForm } from '@/lib/cms/form-data';
 
@@ -34,8 +39,12 @@ export async function updateCmsAction(formData: FormData) {
   try {
     await saveCmsContent(next);
   } catch (error) {
+    if (isInvalidFirebaseSaveError(error)) {
+      redirect('/admin?saveError=invalid-firebase');
+    }
+
     if (isReadonlyFallbackError(error)) {
-      redirect('/admin?saveError=1');
+      redirect('/admin?saveError=missing-config');
     }
 
     throw error;
