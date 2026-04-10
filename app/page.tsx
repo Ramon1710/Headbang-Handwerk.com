@@ -402,9 +402,12 @@ export default async function HomePage({
             </div>
 
             <div className="mt-24 grid gap-10 lg:grid-cols-3 lg:gap-y-16 xl:gap-x-12">
-              {featuredEvents.map((event) => (
-                <div
+              {featuredEvents.map((event, index) => (
+                <LiveResizableBox
                   key={event.id}
+                  boxKey={`home.featuredEvents.${index}.box`}
+                  initialStyle={resolveLiveBoxStyle(liveEditor, `home.featuredEvents.${index}.box`)}
+                  isAdmin={isAdmin}
                   className="rounded-[1.7rem] border border-[#6e4325]/24 bg-[linear-gradient(180deg,rgba(26,17,12,0.16)_0%,rgba(13,9,7,0.05)_100%)] p-6 shadow-[0_14px_30px_rgba(0,0,0,0.08)] backdrop-blur-[10px]"
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -430,7 +433,7 @@ export default async function HomePage({
                       {event.ctaText}
                     </Button>
                   </div>
-                </div>
+                </LiveResizableBox>
               ))}
             </div>
           </section>
@@ -450,9 +453,12 @@ export default async function HomePage({
             </div>
 
             <div className="mt-24 grid gap-10 lg:grid-cols-3 lg:gap-y-16 xl:gap-x-12">
-              {featuredPackages.map((pkg) => (
-                <div
+              {featuredPackages.map((pkg, index) => (
+                <LiveResizableBox
                   key={pkg.id}
+                  boxKey={`home.featuredPackages.${index}.box`}
+                  initialStyle={resolveLiveBoxStyle(liveEditor, `home.featuredPackages.${index}.box`)}
+                  isAdmin={isAdmin}
                   className={`rounded-[1.8rem] border p-6 shadow-[0_14px_30px_rgba(0,0,0,0.08)] backdrop-blur-[10px] ${
                     pkg.highlighted
                       ? 'border-[#d07a34]/45 bg-[linear-gradient(180deg,rgba(86,40,11,0.2)_0%,rgba(19,13,9,0.08)_100%)]'
@@ -484,7 +490,7 @@ export default async function HomePage({
                       Paket ansehen
                     </Button>
                   </div>
-                </div>
+                </LiveResizableBox>
               ))}
             </div>
           </section>
