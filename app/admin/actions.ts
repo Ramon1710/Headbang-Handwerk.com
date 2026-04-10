@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import {
+  isFirebaseAuthSaveError,
   getCmsContent,
   isInvalidFirebaseSaveError,
   isReadonlyFallbackError,
@@ -39,6 +40,10 @@ export async function updateCmsAction(formData: FormData) {
   try {
     await saveCmsContent(next);
   } catch (error) {
+    if (isFirebaseAuthSaveError(error)) {
+      redirect('/admin?saveError=firebase-auth');
+    }
+
     if (isInvalidFirebaseSaveError(error)) {
       redirect('/admin?saveError=invalid-firebase');
     }

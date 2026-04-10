@@ -1,10 +1,17 @@
 import { cache } from 'react';
 import { defaultCmsContent } from './default-content';
-import { getFirebaseDb, hasFirebaseConfig, isInvalidFirebaseConfigError } from './firebase';
+import {
+  getFirebaseDb,
+  hasFirebaseConfig,
+  isFirebaseAuthError,
+  isInvalidFirebaseConfigError,
+  toFirebaseAuthError,
+} from './firebase';
 import type { CmsContent } from './schema';
 
 const READONLY_FALLBACK_ERROR = 'CMS_READONLY_FALLBACK';
 const INVALID_FIREBASE_SAVE_ERROR = 'CMS_INVALID_FIREBASE_SAVE';
+const FIREBASE_AUTH_SAVE_ERROR = 'CMS_FIREBASE_AUTH_SAVE';
 
 function isVercelRuntime() {
   return Boolean(process.env.VERCEL);
@@ -30,19 +37,35 @@ function isReadonlyFilesystemError(error: unknown) {
 }
 
 async function readFromFirebase(): Promise<CmsContent | null> {
-  const db = getFirebaseDb();
-  const snapshot = await db.collection('cms').doc('site').get();
+  try {
+    const db = getFirebaseDb();
+    const snapshot = await db.collection('cms').doc('site').get();
 
-  if (!snapshot.exists) {
-    return null;
+    if (!snapshot.exists) {
+      return null;
+    }
+
+    return snapshot.data() as CmsContent;
+  } catch (error) {
+    if (isFirebaseAuthError(error)) {
+      throw toFirebaseAuthError();
+    }
+
+    throw error;
   }
-
-  return snapshot.data() as CmsContent;
 }
 
 async function writeToFirebase(content: CmsContent) {
-  const db = getFirebaseDb();
-  await db.collection('cms').doc('site').set(content, { merge: true });
+  try {
+    const db = getFirebaseDb();
+    await db.collection('cms').doc('site').set(content, { merge: true });
+  } catch (error) {
+    if (isFirebaseAuthError(error)) {
+      throw toFirebaseAuthError();
+    }
+
+    throw error;
+  }
 }
 
 async function ensureLocalFile() {
@@ -108,6 +131,10 @@ export const getCmsContent = cache(async (): Promise<CmsContent> => {
   try {
     content = hasFirebaseConfig() ? await readFromFirebase() : await readFromFile();
   } catch (error) {
+    if (isFirebaseAuthError(error) && isVercelRuntime()) {
+      return defaultCmsContent;
+    }
+
     if (isInvalidFirebaseConfigError(error) && isVercelRuntime()) {
       return defaultCmsContent;
     }
@@ -137,6 +164,10 @@ export async function saveCmsContent(content: CmsContent) {
     try {
       await writeToFirebase(normalized);
     } catch (error) {
+      if (isFirebaseAuthError(error) && isVercelRuntime()) {
+        throw new Error(FIREBASE_AUTH_SAVE_ERROR);
+      }
+
       if (isInvalidFirebaseConfigError(error) && isVercelRuntime()) {
         throw new Error(INVALID_FIREBASE_SAVE_ERROR);
       }
@@ -176,4 +207,8 @@ export function isReadonlyFallbackError(error: unknown) {
 
 export function isInvalidFirebaseSaveError(error: unknown) {
   return error instanceof Error && error.message === INVALID_FIREBASE_SAVE_ERROR;
+}
+
+export function isFirebaseAuthSaveError(error: unknown) {
+  return error instanceof Error && error.message === FIREBASE_AUTH_SAVE_ERROR;
 }
