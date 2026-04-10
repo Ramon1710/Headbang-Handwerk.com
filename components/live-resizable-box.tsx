@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { CSSProperties, ReactNode } from 'react';
+import { useLiveLayoutSave } from './live-layout-save-context';
 
 interface LiveResizableBoxProps {
   boxKey: string;
@@ -17,8 +18,14 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   const ref = useRef<HTMLDivElement | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [boxStyle, setBoxStyle] = useState<CSSProperties | undefined>(initialStyle);
+  const liveLayoutSave = useLiveLayoutSave();
 
   function queueSave(style: { width?: string; height?: string; minHeight?: string; x?: string; y?: string }) {
+    if (liveLayoutSave) {
+      liveLayoutSave.setPendingStyle(boxKey, style);
+      return;
+    }
+
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }

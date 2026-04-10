@@ -11,9 +11,10 @@ export async function POST(request: Request) {
 
   const body = (await request.json()) as
     | { kind: 'richText'; key?: string; html?: string }
-    | { kind: 'boxStyle'; key?: string; style?: { width?: string; height?: string; minHeight?: string } };
+    | { kind: 'boxStyle'; key?: string; style?: { width?: string; height?: string; minHeight?: string; x?: string; y?: string } }
+    | { kind: 'boxStyles'; styles?: Record<string, { width?: string; height?: string; minHeight?: string; x?: string; y?: string }> };
 
-  if (!body?.key) {
+  if (body.kind !== 'boxStyles' && !body?.key) {
     return NextResponse.json({ error: 'missing-key' }, { status: 400 });
   }
 
@@ -36,6 +37,12 @@ export async function POST(request: Request) {
 
   if (body.kind === 'boxStyle') {
     next.site.liveEditor.boxStyles[body.key] = sanitizeLiveEditorBoxStyle(body.style || {});
+  }
+
+  if (body.kind === 'boxStyles') {
+    for (const [key, style] of Object.entries(body.styles || {})) {
+      next.site.liveEditor.boxStyles[key] = sanitizeLiveEditorBoxStyle(style || {});
+    }
   }
 
   await saveCmsContent(next);
