@@ -36,6 +36,8 @@ const statusLabels: Record<(typeof featuredEvents)[number]['status'], string> = 
 export default async function HomePage() {
   const cms = await getCmsContent();
   const home = cms.site.home;
+  const heroImageSrc = home.heroImage.assetUrl || headbangStandImage.src;
+  const backgroundImageSrc = home.backgroundImage.assetUrl || wackenBackgroundImage.src;
 
   return (
     <>
@@ -47,7 +49,7 @@ export default async function HomePage() {
       <main
         className="relative isolate overflow-hidden"
         style={{
-          backgroundImage: `linear-gradient(rgba(5, 3, 2, 0.78), rgba(5, 3, 2, 0.96)), url(${wackenBackgroundImage.src})`,
+          backgroundImage: `linear-gradient(rgba(5, 3, 2, 0.78), rgba(5, 3, 2, 0.96)), url(${backgroundImageSrc})`,
           backgroundPosition: 'center top, center top',
           backgroundRepeat: 'no-repeat, no-repeat',
           backgroundSize: 'cover, cover',
@@ -113,12 +115,7 @@ export default async function HomePage() {
                 </div>
 
                 <div className="relative overflow-hidden rounded-[1.7rem] ring-1 ring-white/8">
-                  <Image
-                    src={headbangStandImage}
-                    alt="Headbang Handwerk Stand auf einem Festival"
-                    priority
-                    className="h-auto w-full object-cover"
-                  />
+                  <img src={heroImageSrc} alt="Headbang Handwerk Stand auf einem Festival" className="h-auto w-full object-cover" />
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,4,2,0.02)_0%,rgba(7,4,2,0.34)_100%)]" />
                 </div>
 

@@ -20,8 +20,14 @@ export interface CmsFormValues {
   siteTitle: string;
   siteDescription: string;
   keywords: string;
+  logoAssetUrl: string;
+  logoAssetName: string;
   navCtaLabel: string;
   navCtaHref: string;
+  heroImageAssetUrl: string;
+  heroImageAssetName: string;
+  backgroundImageAssetUrl: string;
+  backgroundImageAssetName: string;
   heroBadge: string;
   heroTitle: string;
   heroLead: string;
@@ -116,8 +122,14 @@ export function cmsContentToFormValues(content: CmsContent): CmsFormValues {
     siteTitle: content.site.seo.title,
     siteDescription: content.site.seo.description,
     keywords: toLines(content.site.seo.keywords),
+    logoAssetUrl: content.site.logo.assetUrl,
+    logoAssetName: content.site.logo.assetName,
     navCtaLabel: content.site.navigationCtaLabel,
     navCtaHref: content.site.navigationCtaHref,
+    heroImageAssetUrl: content.site.home.heroImage.assetUrl,
+    heroImageAssetName: content.site.home.heroImage.assetName,
+    backgroundImageAssetUrl: content.site.home.backgroundImage.assetUrl,
+    backgroundImageAssetName: content.site.home.backgroundImage.assetName,
     heroBadge: content.site.home.heroBadge,
     heroTitle: content.site.home.heroTitle,
     heroLead: content.site.home.heroLead,
@@ -232,10 +244,25 @@ export function mergeCmsContentFromForm(formData: FormData, current: CmsContent)
         description: getString(formData, 'siteDescription', current.site.seo.description),
         keywords: fromLines(formData.get('keywords')),
       },
+      logo: {
+        assetUrl: current.site.logo.assetUrl,
+        assetName: current.site.logo.assetName,
+        assetContentType: current.site.logo.assetContentType,
+      },
       navigationCtaLabel: getString(formData, 'navCtaLabel', current.site.navigationCtaLabel),
       navigationCtaHref: getString(formData, 'navCtaHref', current.site.navigationCtaHref),
       home: {
         ...current.site.home,
+        heroImage: {
+          assetUrl: current.site.home.heroImage.assetUrl,
+          assetName: current.site.home.heroImage.assetName,
+          assetContentType: current.site.home.heroImage.assetContentType,
+        },
+        backgroundImage: {
+          assetUrl: current.site.home.backgroundImage.assetUrl,
+          assetName: current.site.home.backgroundImage.assetName,
+          assetContentType: current.site.home.backgroundImage.assetContentType,
+        },
         heroBadge: getString(formData, 'heroBadge', current.site.home.heroBadge),
         heroTitle: getString(formData, 'heroTitle', current.site.home.heroTitle),
         heroLead: getString(formData, 'heroLead', current.site.home.heroLead),

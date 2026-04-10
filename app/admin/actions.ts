@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { isFirebaseStorageUploadError, uploadStandAsset } from '@/lib/cms/file-storage';
+import { isFirebaseStorageUploadError, uploadCmsAsset, uploadStandAsset } from '@/lib/cms/file-storage';
 import { isFirebaseAuthError } from '@/lib/cms/firebase';
 import {
   isFirebaseAuthSaveError,
@@ -40,8 +40,62 @@ export async function updateCmsAction(formData: FormData) {
 
   const current = await getCmsContent();
   let next = mergeCmsContentFromForm(formData, current);
+  const removeLogoAsset = String(formData.get('logoAssetRemove') || '') === 'on';
+  const logoAssetFile = formData.get('logoAssetFile');
+  const removeHeroImageAsset = String(formData.get('heroImageAssetRemove') || '') === 'on';
+  const heroImageAssetFile = formData.get('heroImageAssetFile');
+  const removeBackgroundImageAsset = String(formData.get('backgroundImageAssetRemove') || '') === 'on';
+  const backgroundImageAssetFile = formData.get('backgroundImageAssetFile');
   const removeStandAsset = String(formData.get('standAssetRemove') || '') === 'on';
   const standAssetFile = formData.get('standAssetFile');
+
+  if (removeLogoAsset) {
+    next = {
+      ...next,
+      site: {
+        ...next.site,
+        logo: {
+          assetUrl: '',
+          assetName: '',
+          assetContentType: '',
+        },
+      },
+    };
+  }
+
+  if (removeHeroImageAsset) {
+    next = {
+      ...next,
+      site: {
+        ...next.site,
+        home: {
+          ...next.site.home,
+          heroImage: {
+            assetUrl: '',
+            assetName: '',
+            assetContentType: '',
+          },
+        },
+      },
+    };
+  }
+
+  if (removeBackgroundImageAsset) {
+    next = {
+      ...next,
+      site: {
+        ...next.site,
+        home: {
+          ...next.site.home,
+          backgroundImage: {
+            assetUrl: '',
+            assetName: '',
+            assetContentType: '',
+          },
+        },
+      },
+    };
+  }
 
   if (removeStandAsset) {
     next = {
@@ -87,6 +141,88 @@ export async function updateCmsAction(formData: FormData) {
     }
   }
 
+  for (const assetUpload of [
+    {
+      file: logoAssetFile,
+      folder: 'logo',
+      fallbackName: 'logo',
+      assign: (uploadedAsset: Awaited<ReturnType<typeof uploadCmsAsset>>) => {
+        next = {
+          ...next,
+          site: {
+            ...next.site,
+            logo: {
+              assetUrl: uploadedAsset.url,
+              assetName: uploadedAsset.name,
+              assetContentType: uploadedAsset.contentType,
+            },
+          },
+        };
+      },
+    },
+    {
+      file: heroImageAssetFile,
+      folder: 'home-hero',
+      fallbackName: 'hero-bild',
+      assign: (uploadedAsset: Awaited<ReturnType<typeof uploadCmsAsset>>) => {
+        next = {
+          ...next,
+          site: {
+            ...next.site,
+            home: {
+              ...next.site.home,
+              heroImage: {
+                assetUrl: uploadedAsset.url,
+                assetName: uploadedAsset.name,
+                assetContentType: uploadedAsset.contentType,
+              },
+            },
+          },
+        };
+      },
+    },
+    {
+      file: backgroundImageAssetFile,
+      folder: 'home-background',
+      fallbackName: 'hintergrund-bild',
+      assign: (uploadedAsset: Awaited<ReturnType<typeof uploadCmsAsset>>) => {
+        next = {
+          ...next,
+          site: {
+            ...next.site,
+            home: {
+              ...next.site.home,
+              backgroundImage: {
+                assetUrl: uploadedAsset.url,
+                assetName: uploadedAsset.name,
+                assetContentType: uploadedAsset.contentType,
+              },
+            },
+          },
+        };
+      },
+    },
+  ]) {
+    if (!(assetUpload.file instanceof File) || assetUpload.file.size <= 0) {
+      continue;
+    }
+
+    try {
+      const uploadedAsset = await uploadCmsAsset(assetUpload.file, assetUpload.folder, assetUpload.fallbackName);
+      assetUpload.assign(uploadedAsset);
+    } catch (error) {
+      if (isFirebaseStorageUploadError(error)) {
+        redirect('/admin?saveError=stand-upload');
+      }
+
+      if (isFirebaseAuthError(error)) {
+        redirect('/admin?saveError=firebase-auth');
+      }
+
+      throw error;
+    }
+  }
+
   try {
     await saveCmsContent(next);
   } catch (error) {
@@ -108,6 +244,7 @@ export async function updateCmsAction(formData: FormData) {
   revalidatePath('/', 'layout');
   revalidatePath('/');
   revalidatePath('/admin');
+  revalidatePath('/kontakt');
   revalidatePath('/veranstaltungen');
   revalidatePath('/ueber-uns');
   revalidatePath('/drei-d-stand');

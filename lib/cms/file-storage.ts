@@ -20,7 +20,7 @@ function sanitizeFilename(filename: string) {
     .toLowerCase();
 }
 
-export async function uploadStandAsset(file: File) {
+export async function uploadCmsAsset(file: File, folder: string, fallbackName: string) {
   if (!hasFirebaseConfig()) {
     throw new Error(FIREBASE_STORAGE_UPLOAD_ERROR);
   }
@@ -34,8 +34,8 @@ export async function uploadStandAsset(file: File) {
   }
 
   const extension = extname(file.name);
-  const baseName = sanitizeFilename(file.name.replace(new RegExp(`${extension}$`), '')) || 'stand-datei';
-  const objectName = `cms/stand/${Date.now()}-${randomUUID()}-${baseName}${extension.toLowerCase()}`;
+  const baseName = sanitizeFilename(file.name.replace(new RegExp(`${extension}$`), '')) || fallbackName;
+  const objectName = `cms/${folder}/${Date.now()}-${randomUUID()}-${baseName}${extension.toLowerCase()}`;
   const buffer = Buffer.from(await file.arrayBuffer());
   let lastError: unknown;
 
@@ -72,6 +72,10 @@ export async function uploadStandAsset(file: File) {
   }
 
   throw lastError instanceof Error ? new Error(FIREBASE_STORAGE_UPLOAD_ERROR) : new Error(FIREBASE_STORAGE_UPLOAD_ERROR);
+}
+
+export async function uploadStandAsset(file: File) {
+  return uploadCmsAsset(file, 'stand', 'stand-datei');
 }
 
 export function isFirebaseStorageUploadError(error: unknown) {

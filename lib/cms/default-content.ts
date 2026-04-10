@@ -25,6 +25,11 @@ export const defaultCmsContent: CmsContent = {
         'Wir bringen das Handwerk auf die lautesten Festivals Europas – für Nachwuchs, Sichtbarkeit und ein unvergessliches Erlebnis.',
       keywords: ['Handwerk', 'Metal', 'Festival', 'Sponsoring', 'Nachwuchs', 'Wacken', 'Summer Breeze'],
     },
+    logo: {
+      assetUrl: '',
+      assetName: '',
+      assetContentType: '',
+    },
     navigationLinks: [
       { label: 'Startseite', href: '/' },
       { label: 'Veranstaltungen', href: '/veranstaltungen' },
@@ -146,6 +151,16 @@ export const defaultCmsContent: CmsContent = {
       closingPrimaryCtaHref: '/sponsoren',
       closingSecondaryCtaLabel: 'Ansprechpartner kontaktieren',
       closingSecondaryCtaHref: '/kontakt',
+      heroImage: {
+        assetUrl: '',
+        assetName: '',
+        assetContentType: '',
+      },
+      backgroundImage: {
+        assetUrl: '',
+        assetName: '',
+        assetContentType: '',
+      },
     },
     sponsors: {
       title: 'Sponsoring',

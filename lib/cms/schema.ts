@@ -21,6 +21,12 @@ export interface NavigationLink {
   href: string;
 }
 
+export interface MediaAsset {
+  assetUrl: string;
+  assetName: string;
+  assetContentType: string;
+}
+
 export interface FooterSocialLink {
   platform: 'facebook' | 'instagram' | 'youtube';
   label: string;
@@ -105,6 +111,8 @@ export interface HomePageContent {
   closingPrimaryCtaHref: string;
   closingSecondaryCtaLabel: string;
   closingSecondaryCtaHref: string;
+  heroImage: MediaAsset;
+  backgroundImage: MediaAsset;
 }
 
 export interface FooterContent {
@@ -178,6 +186,7 @@ export interface SeoContent {
 
 export interface SiteContent {
   seo: SeoContent;
+  logo: MediaAsset;
   navigationLinks: NavigationLink[];
   navigationCtaLabel: string;
   navigationCtaHref: string;

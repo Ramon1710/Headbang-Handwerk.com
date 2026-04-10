@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import type { ComponentProps } from 'react';
-import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 import type { NavigationLink } from '@/lib/cms/schema';
 import { cn } from '@/lib/utils';
@@ -13,6 +12,7 @@ interface NavigationProps {
   links: NavigationLink[];
   ctaLabel: string;
   ctaHref: string;
+  logoSrc?: string;
   showAdminLink?: boolean;
   adminHref?: string;
   showLogout?: boolean;
@@ -23,6 +23,7 @@ export function Navigation({
   links,
   ctaLabel,
   ctaHref,
+  logoSrc,
   showAdminLink = false,
   adminHref = '/admin',
   showLogout = false,
@@ -30,6 +31,7 @@ export function Navigation({
 }: NavigationProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const resolvedLogoSrc = logoSrc || headbangLogo.src;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -50,10 +52,9 @@ export function Navigation({
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-3 min-h-24">
           <a href="/" className="flex items-center gap-3 group" aria-label="Headbang Handwerk">
-            <Image
-              src={headbangLogo}
+            <img
+              src={resolvedLogoSrc}
               alt="Headbang Handwerk Logo"
-              priority
               className="h-auto max-h-[78px] w-40 object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.65)] sm:max-h-[92px] sm:w-48"
             />
           </a>
