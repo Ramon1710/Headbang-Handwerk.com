@@ -71,13 +71,15 @@ function sanitizeCssValue(value?: string) {
 }
 
 export function sanitizeLiveEditorBoxStyle(style: Partial<LiveEditorBoxStyle>) {
-  return {
+  const sanitized = {
     width: sanitizeCssValue(style.width),
     height: sanitizeCssValue(style.height),
     minHeight: sanitizeCssValue(style.minHeight),
     x: sanitizeCssValue(style.x),
     y: sanitizeCssValue(style.y),
   } satisfies LiveEditorBoxStyle;
+
+  return Object.fromEntries(Object.entries(sanitized).filter(([, value]) => value !== undefined)) as LiveEditorBoxStyle;
 }
 
 export function resolveLiveHtml(liveEditor: LiveEditorContent | undefined, key: string, fallbackText: string) {
