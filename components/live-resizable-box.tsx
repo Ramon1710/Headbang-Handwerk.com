@@ -57,6 +57,23 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     };
   }, []);
 
+  function getCurrentOffsets(style: CSSProperties | undefined) {
+    const left = typeof style?.left === 'string' ? Number.parseFloat(style.left) || 0 : 0;
+    const top = typeof style?.top === 'string' ? Number.parseFloat(style.top) || 0 : 0;
+
+    if (left || top) {
+      return { x: left, y: top };
+    }
+
+    const transform = typeof style?.transform === 'string' ? style.transform : '';
+    const match = transform.match(/translate\(([^,]+),\s*([^\)]+)\)/);
+
+    return {
+      x: match ? Number.parseFloat(match[1]) || 0 : 0,
+      y: match ? Number.parseFloat(match[2]) || 0 : 0,
+    };
+  }
+
   function handleMoveStart(event: React.PointerEvent<HTMLButtonElement>) {
     if (!isAdmin || !ref.current) {
       return;
@@ -69,10 +86,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
 
     const startX = event.clientX;
     const startY = event.clientY;
-    const transform = typeof boxStyle?.transform === 'string' ? boxStyle.transform : '';
-    const currentMatch = transform.match(/translate\(([^,]+),\s*([^\)]+)\)/);
-    const initialX = currentMatch ? Number.parseFloat(currentMatch[1]) || 0 : 0;
-    const initialY = currentMatch ? Number.parseFloat(currentMatch[2]) || 0 : 0;
+    const { x: initialX, y: initialY } = getCurrentOffsets(boxStyle);
 
     function handlePointerMove(moveEvent: PointerEvent) {
       const nextX = initialX + (moveEvent.clientX - startX);
@@ -80,7 +94,9 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
 
       setBoxStyle((current) => ({
         ...current,
-        transform: `translate(${Math.round(nextX)}px, ${Math.round(nextY)}px)`,
+        left: `${Math.round(nextX)}px`,
+        top: `${Math.round(nextY)}px`,
+        transform: undefined,
       }));
     }
 
@@ -134,10 +150,8 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     const startHeight = rect.height;
     const minWidth = 180;
     const minHeight = 120;
-    const transform = typeof boxStyle?.transform === 'string' ? boxStyle.transform : '';
-    const currentMatch = transform.match(/translate\(([^,]+),\s*([^\)]+)\)/);
-    const currentX = currentMatch ? currentMatch[1]?.trim() : undefined;
-    const currentY = currentMatch ? currentMatch[2]?.trim() : undefined;
+    const currentX = typeof boxStyle?.left === 'string' ? boxStyle.left : undefined;
+    const currentY = typeof boxStyle?.top === 'string' ? boxStyle.top : undefined;
 
     function handlePointerMove(moveEvent: PointerEvent) {
       const nextWidth = Math.max(minWidth, startWidth + (moveEvent.clientX - startX));
