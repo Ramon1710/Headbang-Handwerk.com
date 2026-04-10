@@ -11,6 +11,10 @@ import {
 
 const FIREBASE_STORAGE_UPLOAD_ERROR = 'CMS_FIREBASE_STORAGE_UPLOAD';
 
+function createFirebaseDownloadUrl(bucketName: string, objectName: string, token: string) {
+  return `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(objectName)}?alt=media&token=${token}`;
+}
+
 function sanitizeFilename(filename: string) {
   return filename
     .normalize('NFKD')
@@ -43,22 +47,21 @@ export async function uploadCmsAsset(file: File, folder: string, fallbackName: s
     try {
       const bucket = getStorage().bucket(bucketName);
       const storedFile = bucket.file(objectName);
+      const downloadToken = randomUUID();
 
       await storedFile.save(buffer, {
         resumable: false,
         contentType: file.type || undefined,
         metadata: {
           cacheControl: 'public,max-age=31536000,immutable',
+          metadata: {
+            firebaseStorageDownloadTokens: downloadToken,
+          },
         },
       });
 
-      const [signedUrl] = await storedFile.getSignedUrl({
-        action: 'read',
-        expires: '03-09-2491',
-      });
-
       return {
-        url: signedUrl,
+        url: createFirebaseDownloadUrl(bucket.name, objectName, downloadToken),
         name: file.name,
         contentType: file.type || 'application/octet-stream',
       };

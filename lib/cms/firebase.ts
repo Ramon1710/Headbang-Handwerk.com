@@ -25,6 +25,20 @@ function normalizePrivateKey(value?: string) {
     .replace(/\r/g, '\n');
 }
 
+function normalizeStorageBucket(value?: string) {
+  const normalized = normalizeValue(value);
+
+  if (!normalized) {
+    return null;
+  }
+
+  return normalized
+    .replace(/^gs:\/\//, '')
+    .replace(/^https?:\/\/storage.googleapis.com\//, '')
+    .replace(/^https?:\/\/firebasestorage.googleapis.com\/v0\/b\//, '')
+    .replace(/\/.*$/, '');
+}
+
 function getFirebaseConfig() {
   const projectId = normalizeValue(process.env.FIREBASE_PROJECT_ID);
   const clientEmail = normalizeValue(process.env.FIREBASE_CLIENT_EMAIL);
@@ -46,7 +60,7 @@ export function hasFirebaseConfig() {
 }
 
 export function getFirebaseStorageBucketCandidates() {
-  const explicitBucket = normalizeValue(process.env.FIREBASE_STORAGE_BUCKET);
+  const explicitBucket = normalizeStorageBucket(process.env.FIREBASE_STORAGE_BUCKET);
 
   if (explicitBucket) {
     return [explicitBucket];
@@ -58,7 +72,7 @@ export function getFirebaseStorageBucketCandidates() {
     return [];
   }
 
-  return [`${projectId}.appspot.com`, `${projectId}.firebasestorage.app`];
+  return Array.from(new Set([`${projectId}.appspot.com`, `${projectId}.firebasestorage.app`]));
 }
 
 export function getFirebaseDb() {
@@ -73,6 +87,7 @@ export function getFirebaseDb() {
       initializeApp({
         credential: cert(config),
         projectId: config.projectId,
+        storageBucket: normalizeStorageBucket(process.env.FIREBASE_STORAGE_BUCKET) || undefined,
       });
     }
 
