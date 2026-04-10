@@ -179,13 +179,13 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   }
 
   return (
-    <div className="relative">
-      <div
-        ref={ref}
-        className={`relative ${className}`}
-        style={isAdmin ? { ...boxStyle, overflow: 'auto' } : boxStyle}
-        title={isAdmin ? 'Klick zum Bearbeiten, unten rechts Größe ändern, oben links verschieben' : undefined}
-      >
+    <div
+      ref={ref}
+      className="relative min-w-0 min-h-0 self-start justify-self-start"
+      style={isAdmin ? boxStyle : boxStyle}
+      title={isAdmin ? 'Klick zum Bearbeiten, unten rechts Größe ändern, oben links verschieben' : undefined}
+    >
+      <div className={`relative h-full w-full overflow-auto ${className}`}>
         {isAdmin ? (
           <button
             type="button"
