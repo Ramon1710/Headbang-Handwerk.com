@@ -15,6 +15,7 @@ interface LiveResizableBoxProps {
 export function LiveResizableBox({ boxKey, className, children, initialStyle, isAdmin }: LiveResizableBoxProps) {
   const router = useRouter();
   const ref = useRef<HTMLDivElement | null>(null);
+  const dragButtonRef = useRef<HTMLButtonElement | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [boxStyle, setBoxStyle] = useState<CSSProperties | undefined>(initialStyle);
 
@@ -24,7 +25,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     }
 
     saveTimeoutRef.current = setTimeout(async () => {
-      const response = await fetch('/api/cms/live-editor', {
+      await fetch('/api/cms/live-editor', {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
@@ -35,10 +36,6 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
           style,
         }),
       });
-
-      if (response.ok) {
-        router.refresh();
-      }
     }, 350);
   }
 
@@ -85,7 +82,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     };
   }, [boxKey, boxStyle, isAdmin, router]);
 
-  function handleMoveStart(event: React.MouseEvent<HTMLButtonElement>) {
+  function handleMoveStart(event: React.PointerEvent<HTMLButtonElement>) {
     if (!isAdmin || !ref.current) {
       return;
     }
@@ -93,6 +90,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     event.preventDefault();
     event.stopPropagation();
     document.body.style.userSelect = 'none';
+    event.currentTarget.setPointerCapture(event.pointerId);
 
     const startX = event.clientX;
     const startY = event.clientY;
@@ -101,7 +99,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     const initialX = currentMatch ? Number.parseFloat(currentMatch[1]) || 0 : 0;
     const initialY = currentMatch ? Number.parseFloat(currentMatch[2]) || 0 : 0;
 
-    function handleMouseMove(moveEvent: MouseEvent) {
+    function handlePointerMove(moveEvent: PointerEvent) {
       const nextX = initialX + (moveEvent.clientX - startX);
       const nextY = initialY + (moveEvent.clientY - startY);
 
@@ -111,9 +109,9 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       }));
     }
 
-    function handleMouseUp(upEvent: MouseEvent) {
-      const nextX = initialX + (upEvent.clientX - startX);
-      const nextY = initialY + (upEvent.clientY - startY);
+    function finishDrag(endClientX: number, endClientY: number) {
+      const nextX = initialX + (endClientX - startX);
+      const nextY = initialY + (endClientY - startY);
       document.body.style.userSelect = '';
 
       queueSave({
@@ -123,12 +121,25 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
         y: `${Math.round(nextY)}px`,
       });
 
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerCancel);
     }
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    function handlePointerUp(upEvent: PointerEvent) {
+      finishDrag(upEvent.clientX, upEvent.clientY);
+    }
+
+    function handlePointerCancel() {
+      document.body.style.userSelect = '';
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerCancel);
+    }
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerCancel);
   }
 
   return (
@@ -141,9 +152,10 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       >
         {isAdmin ? (
           <button
+            ref={dragButtonRef}
             type="button"
-            onMouseDown={handleMoveStart}
-            className="absolute left-2 top-2 z-10 cursor-grab rounded-full border border-[#ff9d3c]/70 bg-[#1a110b] px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#ffcf98] shadow-[0_12px_30px_rgba(0,0,0,0.28)] active:cursor-grabbing"
+            onPointerDown={handleMoveStart}
+            className="absolute left-2 top-2 z-10 cursor-grab touch-none rounded-full border border-[#ff9d3c]/70 bg-[#1a110b] px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#ffcf98] shadow-[0_12px_30px_rgba(0,0,0,0.28)] active:cursor-grabbing"
           >
             Bewegen
           </button>
