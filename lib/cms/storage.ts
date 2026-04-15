@@ -113,6 +113,9 @@ function normalizeContent(content: CmsContent): CmsContent {
       ...content.site,
       seo: { ...defaultCmsContent.site.seo, ...content.site.seo },
       events: Array.isArray(content.site.events) ? content.site.events : defaultCmsContent.site.events,
+      sponsorPackages: Array.isArray(content.site.sponsorPackages)
+        ? content.site.sponsorPackages
+        : defaultCmsContent.site.sponsorPackages,
       liveEditor: {
         ...emptyLiveEditorContent,
         ...defaultCmsContent.site.liveEditor,

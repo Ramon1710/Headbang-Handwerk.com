@@ -21,19 +21,17 @@ import { logoutAction } from '@/app/admin/actions';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { resolveLiveBoxStyle, resolveLiveHtml, resolveLiveRichHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
-import { events, sponsorPackages } from '@/lib/data';
+import type { Event } from '@/lib/types';
 import { formatPrice } from '@/lib/utils';
 import standBeispielKiImage from '../Stand Beispiel KI.png';
 import wackenBackgroundImage from '../Wacken Hintergrund Bild.png';
 
-const featuredEvents = events.slice(0, 3);
-const featuredPackages = sponsorPackages.slice(0, 3);
 const promiseIcons = {
   flame: Flame,
   users: Users,
 };
 
-const statusLabels: Record<(typeof featuredEvents)[number]['status'], string> = {
+const statusLabels: Record<Event['status'], string> = {
   confirmed: 'Bestätigt',
   planned: 'Geplant',
   completed: 'Abgeschlossen',
@@ -63,6 +61,8 @@ export default async function HomePage({
   const isAdmin = isAuthenticatedAdmin && params?.view !== 'user';
   const home = cms.site.home;
   const liveEditor = cms.site.liveEditor;
+  const featuredEvents = cms.site.events.slice(0, 3);
+  const featuredPackages = cms.site.sponsorPackages.slice(0, 3);
   const heroImageSrc = standBeispielKiImage.src;
   const backgroundImageSrc = home.backgroundImage.assetUrl || wackenBackgroundImage.src;
 

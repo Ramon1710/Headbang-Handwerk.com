@@ -1,4 +1,4 @@
-import type { Event } from '@/lib/types';
+import type { Event, SponsorPackage } from '@/lib/types';
 
 export interface ThemeSettings {
   background: string;
@@ -206,6 +206,7 @@ export interface SiteContent {
   navigationCtaLabel: string;
   navigationCtaHref: string;
   events: Event[];
+  sponsorPackages: SponsorPackage[];
   liveEditor: LiveEditorContent;
   home: HomePageContent;
   sponsors: SponsorsPageContent;

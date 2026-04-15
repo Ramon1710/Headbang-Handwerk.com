@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { sponsorPackages } from '@/lib/data';
+import { getCmsContent } from '@/lib/cms/storage';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
   apiVersion: '2026-02-25.clover',
@@ -13,8 +13,9 @@ export async function POST(req: NextRequest) {
     }
 
     const { packageId, company, email } = await req.json();
+    const cms = await getCmsContent();
 
-    const pkg = sponsorPackages.find((p) => p.id === packageId);
+    const pkg = cms.site.sponsorPackages.find((p) => p.id === packageId);
     if (!pkg) {
       return NextResponse.json({ error: 'Package not found' }, { status: 404 });
     }

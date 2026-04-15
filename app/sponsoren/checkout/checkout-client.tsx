@@ -4,16 +4,33 @@ import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { sponsorPackages } from '@/lib/data';
+import type { SponsorPackage } from '@/lib/types';
 import { formatPrice } from '@/lib/utils';
 
-export function CheckoutClient() {
+interface CheckoutClientProps {
+  sponsorPackages: SponsorPackage[];
+}
+
+export function CheckoutClient({ sponsorPackages }: CheckoutClientProps) {
   const params = useSearchParams();
   const packageId = params.get('package') || 'silber';
-  const pkg = sponsorPackages.find((p) => p.id === packageId) ?? sponsorPackages[1];
+  const fallbackPackage = sponsorPackages.find((pkg) => pkg.highlighted) ?? sponsorPackages[0];
+  const pkg = sponsorPackages.find((p) => p.id === packageId) ?? fallbackPackage;
   const [loading, setLoading] = useState(false);
   const [company, setCompany] = useState('');
   const [email, setEmail] = useState('');
+
+  if (!pkg) {
+    return (
+      <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
+        <div className="content-flow mx-auto max-w-2xl px-4 text-center text-gray-300 sm:px-6">
+          <h1 className="text-3xl font-black text-white">Derzeit sind keine Sponsoring-Pakete verfügbar.</h1>
+          <p>Bitte kontaktiert uns direkt, damit wir euch ein individuelles Angebot erstellen können.</p>
+          <Button href="/kontakt" size="lg" className="mx-auto w-full max-w-sm">Kontakt aufnehmen</Button>
+        </div>
+      </main>
+    );
+  }
 
   const handleCheckout = async () => {
     setLoading(true);
