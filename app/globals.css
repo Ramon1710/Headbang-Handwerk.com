@@ -205,20 +205,20 @@ h6 {
 }
 
 .live-resizable-box {
-  width: var(--live-box-width-mobile, var(--live-box-width-desktop, auto));
-  height: var(--live-box-height-mobile, var(--live-box-height-desktop, auto));
-  min-height: var(--live-box-min-height-mobile, var(--live-box-min-height-desktop, auto));
-  left: var(--live-box-x-mobile, var(--live-box-x-desktop, auto));
-  top: var(--live-box-y-mobile, var(--live-box-y-desktop, auto));
+  width: var(--live-box-width-mobile, auto);
+  height: var(--live-box-height-mobile, auto);
+  min-height: var(--live-box-min-height-mobile, auto);
+  left: var(--live-box-x-mobile, auto);
+  top: var(--live-box-y-mobile, auto);
 }
 
 @media (min-width: 768px) {
   .live-resizable-box {
-    width: var(--live-box-width-desktop, var(--live-box-width-mobile, auto));
-    height: var(--live-box-height-desktop, var(--live-box-height-mobile, auto));
-    min-height: var(--live-box-min-height-desktop, var(--live-box-min-height-mobile, auto));
-    left: var(--live-box-x-desktop, var(--live-box-x-mobile, auto));
-    top: var(--live-box-y-desktop, var(--live-box-y-mobile, auto));
+    width: var(--live-box-width-desktop, auto);
+    height: var(--live-box-height-desktop, auto);
+    min-height: var(--live-box-min-height-desktop, auto);
+    left: var(--live-box-x-desktop, auto);
+    top: var(--live-box-y-desktop, auto);
   }
 }
 

@@ -37,11 +37,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   }
 
   function getViewportStyle(styles: ResolvedLiveBoxStyle | undefined, targetViewport: LiveViewport) {
-    if (targetViewport === 'mobile') {
-      return styles?.mobile || styles?.desktop;
-    }
-
-    return styles?.desktop || styles?.mobile;
+    return targetViewport === 'mobile' ? styles?.mobile : styles?.desktop;
   }
 
   function buildResponsiveStyle(styles: ResolvedLiveBoxStyle | undefined) {
@@ -212,9 +208,9 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     const rect = ref.current.getBoundingClientRect();
     const startWidth = rect.width;
     const startHeight = rect.height;
-    const minWidth = 180;
-    const minHeight = 120;
     const activeViewport = viewport;
+    const minWidth = activeViewport === 'mobile' ? 96 : 180;
+    const minHeight = activeViewport === 'mobile' ? 72 : 120;
     const currentStyle = getViewportStyle(boxStyles, activeViewport);
     const currentX = currentStyle?.x;
     const currentY = currentStyle?.y;
