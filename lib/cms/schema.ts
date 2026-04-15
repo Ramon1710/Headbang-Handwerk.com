@@ -1,3 +1,5 @@
+import type { Event } from '@/lib/types';
+
 export interface ThemeSettings {
   background: string;
   foreground: string;
@@ -203,6 +205,7 @@ export interface SiteContent {
   navigationLinks: NavigationLink[];
   navigationCtaLabel: string;
   navigationCtaHref: string;
+  events: Event[];
   liveEditor: LiveEditorContent;
   home: HomePageContent;
   sponsors: SponsorsPageContent;

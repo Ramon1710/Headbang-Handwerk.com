@@ -1,3 +1,4 @@
+import { events } from '@/lib/data';
 import type { CmsContent } from './schema';
 
 export const defaultCmsContent: CmsContent = {
@@ -40,6 +41,7 @@ export const defaultCmsContent: CmsContent = {
     ],
     navigationCtaLabel: 'Jetzt unterstützen',
     navigationCtaHref: '/sponsoren',
+    events,
     liveEditor: {
       richText: {},
       boxStyles: {},
