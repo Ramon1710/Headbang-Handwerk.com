@@ -1,6 +1,11 @@
 import type { CSSProperties } from 'react';
 import type { LiveEditorBoxStyle, LiveEditorContent } from './schema';
 
+export interface ResolvedLiveBoxStyle {
+  desktop?: LiveEditorBoxStyle;
+  mobile?: LiveEditorBoxStyle;
+}
+
 export const emptyLiveEditorContent: LiveEditorContent = {
   richText: {},
   boxStyles: {},
@@ -96,18 +101,16 @@ export function resolveLiveRichHtml(liveEditor: LiveEditorContent | undefined, k
   return html && html.trim() ? html : fallbackHtml;
 }
 
-export function resolveLiveBoxStyle(liveEditor: LiveEditorContent | undefined, key: string): CSSProperties | undefined {
-  const boxStyle = liveEditor?.boxStyles[key];
+export function resolveLiveBoxStyle(liveEditor: LiveEditorContent | undefined, key: string): ResolvedLiveBoxStyle | undefined {
+  const desktop = liveEditor?.boxStyles[key];
+  const mobile = liveEditor?.boxStyles[`${key}@mobile`];
 
-  if (!boxStyle) {
+  if (!desktop && !mobile) {
     return undefined;
   }
 
   return {
-    width: boxStyle.width,
-    height: boxStyle.height,
-    minHeight: boxStyle.minHeight,
-    left: boxStyle.x,
-    top: boxStyle.y,
+    desktop,
+    mobile,
   };
 }

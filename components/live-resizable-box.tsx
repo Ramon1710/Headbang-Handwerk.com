@@ -1,28 +1,71 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import type { CSSProperties, ReactNode } from 'react';
+import type { ResolvedLiveBoxStyle } from '@/lib/cms/live-editor';
 import { useLiveLayoutSave } from './live-layout-save-context';
+
+type LiveViewport = 'desktop' | 'mobile';
 
 interface LiveResizableBoxProps {
   boxKey: string;
   className: string;
   children: ReactNode;
-  initialStyle?: CSSProperties;
+  initialStyle?: ResolvedLiveBoxStyle;
   isAdmin: boolean;
 }
 
 export function LiveResizableBox({ boxKey, className, children, initialStyle, isAdmin }: LiveResizableBoxProps) {
-  const router = useRouter();
   const ref = useRef<HTMLDivElement | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [boxStyle, setBoxStyle] = useState<CSSProperties | undefined>(initialStyle);
+  const [viewport, setViewport] = useState<LiveViewport>('desktop');
+  const [boxStyles, setBoxStyles] = useState<ResolvedLiveBoxStyle | undefined>(initialStyle);
   const liveLayoutSave = useLiveLayoutSave();
 
-  function queueSave(style: { width?: string; height?: string; minHeight?: string; x?: string; y?: string }) {
+  function getStorageKey(targetViewport: LiveViewport) {
+    return targetViewport === 'mobile' ? `${boxKey}@mobile` : boxKey;
+  }
+
+  function updateViewportStyle(style: Partial<ResolvedLiveBoxStyle[LiveViewport]>, targetViewport: LiveViewport = viewport) {
+    setBoxStyles((current) => ({
+      ...current,
+      [targetViewport]: {
+        ...(current?.[targetViewport] || {}),
+        ...style,
+      },
+    }));
+  }
+
+  function getViewportStyle(styles: ResolvedLiveBoxStyle | undefined, targetViewport: LiveViewport) {
+    if (targetViewport === 'mobile') {
+      return styles?.mobile || styles?.desktop;
+    }
+
+    return styles?.desktop || styles?.mobile;
+  }
+
+  function buildResponsiveStyle(styles: ResolvedLiveBoxStyle | undefined) {
+    const nextStyle = {
+      '--live-box-width-desktop': styles?.desktop?.width,
+      '--live-box-height-desktop': styles?.desktop?.height,
+      '--live-box-min-height-desktop': styles?.desktop?.minHeight,
+      '--live-box-x-desktop': styles?.desktop?.x,
+      '--live-box-y-desktop': styles?.desktop?.y,
+      '--live-box-width-mobile': styles?.mobile?.width,
+      '--live-box-height-mobile': styles?.mobile?.height,
+      '--live-box-min-height-mobile': styles?.mobile?.minHeight,
+      '--live-box-x-mobile': styles?.mobile?.x,
+      '--live-box-y-mobile': styles?.mobile?.y,
+    } as CSSProperties;
+
+    return nextStyle;
+  }
+
+  function queueSave(style: { width?: string; height?: string; minHeight?: string; x?: string; y?: string }, targetViewport: LiveViewport) {
+    const storageKey = getStorageKey(targetViewport);
+
     if (liveLayoutSave) {
-      liveLayoutSave.setPendingStyle(boxKey, style);
+      liveLayoutSave.setPendingStyle(storageKey, style);
       return;
     }
 
@@ -38,7 +81,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
         },
         body: JSON.stringify({
           kind: 'boxStyle',
-          key: boxKey,
+          key: storageKey,
           style,
         }),
       });
@@ -46,8 +89,26 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   }
 
   useEffect(() => {
-    setBoxStyle(initialStyle);
+    setBoxStyles(initialStyle);
   }, [initialStyle]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const updateViewport = () => {
+      setViewport(mediaQuery.matches ? 'mobile' : 'desktop');
+    };
+
+    updateViewport();
+    mediaQuery.addEventListener('change', updateViewport);
+
+    return () => {
+      mediaQuery.removeEventListener('change', updateViewport);
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -57,15 +118,15 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     };
   }, []);
 
-  function getCurrentOffsets(style: CSSProperties | undefined) {
-    const left = typeof style?.left === 'string' ? Number.parseFloat(style.left) || 0 : 0;
-    const top = typeof style?.top === 'string' ? Number.parseFloat(style.top) || 0 : 0;
+  function getCurrentOffsets(style: ResolvedLiveBoxStyle[LiveViewport] | undefined) {
+    const left = typeof style?.x === 'string' ? Number.parseFloat(style.x) || 0 : 0;
+    const top = typeof style?.y === 'string' ? Number.parseFloat(style.y) || 0 : 0;
 
     if (left || top) {
       return { x: left, y: top };
     }
 
-    const transform = typeof style?.transform === 'string' ? style.transform : '';
+    const transform = '';
     const match = transform.match(/translate\(([^,]+),\s*([^\)]+)\)/);
 
     return {
@@ -86,18 +147,20 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
 
     const startX = event.clientX;
     const startY = event.clientY;
-    const { x: initialX, y: initialY } = getCurrentOffsets(boxStyle);
+    const activeViewport = viewport;
+    const { x: initialX, y: initialY } = getCurrentOffsets(getViewportStyle(boxStyles, activeViewport));
 
     function handlePointerMove(moveEvent: PointerEvent) {
       const nextX = initialX + (moveEvent.clientX - startX);
       const nextY = initialY + (moveEvent.clientY - startY);
 
-      setBoxStyle((current) => ({
-        ...current,
-        left: `${Math.round(nextX)}px`,
-        top: `${Math.round(nextY)}px`,
-        transform: undefined,
-      }));
+      updateViewportStyle(
+        {
+          x: `${Math.round(nextX)}px`,
+          y: `${Math.round(nextY)}px`,
+        },
+        activeViewport
+      );
     }
 
     function finishDrag(endClientX: number, endClientY: number) {
@@ -106,11 +169,12 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       document.body.style.userSelect = '';
 
       queueSave({
-        width: typeof ref.current?.style.width === 'string' ? ref.current.style.width || undefined : undefined,
-        minHeight: typeof ref.current?.style.minHeight === 'string' ? ref.current.style.minHeight || undefined : undefined,
+        width: getViewportStyle(boxStyles, activeViewport)?.width,
+        height: getViewportStyle(boxStyles, activeViewport)?.height,
+        minHeight: getViewportStyle(boxStyles, activeViewport)?.minHeight,
         x: `${Math.round(nextX)}px`,
         y: `${Math.round(nextY)}px`,
-      });
+      }, activeViewport);
 
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
@@ -150,19 +214,23 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     const startHeight = rect.height;
     const minWidth = 180;
     const minHeight = 120;
-    const currentX = typeof boxStyle?.left === 'string' ? boxStyle.left : undefined;
-    const currentY = typeof boxStyle?.top === 'string' ? boxStyle.top : undefined;
+    const activeViewport = viewport;
+    const currentStyle = getViewportStyle(boxStyles, activeViewport);
+    const currentX = currentStyle?.x;
+    const currentY = currentStyle?.y;
 
     function handlePointerMove(moveEvent: PointerEvent) {
       const nextWidth = Math.max(minWidth, startWidth + (moveEvent.clientX - startX));
       const nextHeight = Math.max(minHeight, startHeight + (moveEvent.clientY - startY));
 
-      setBoxStyle((current) => ({
-        ...current,
-        width: `${Math.round(nextWidth)}px`,
-        height: `${Math.round(nextHeight)}px`,
-        minHeight: `${Math.round(nextHeight)}px`,
-      }));
+      updateViewportStyle(
+        {
+          width: `${Math.round(nextWidth)}px`,
+          height: `${Math.round(nextHeight)}px`,
+          minHeight: `${Math.round(nextHeight)}px`,
+        },
+        activeViewport
+      );
     }
 
     function finishResize(endClientX: number, endClientY: number) {
@@ -176,7 +244,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
         minHeight: `${Math.round(nextHeight)}px`,
         x: currentX,
         y: currentY,
-      });
+      }, activeViewport);
 
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
@@ -202,8 +270,8 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   return (
     <div
       ref={ref}
-      className="relative min-w-0 min-h-0 self-start justify-self-start"
-      style={isAdmin ? boxStyle : boxStyle}
+      className="live-resizable-box relative min-h-0 min-w-0 self-start justify-self-start"
+      style={buildResponsiveStyle(boxStyles)}
       title={isAdmin ? 'Klick zum Bearbeiten, unten rechts Größe ändern, oben links verschieben' : undefined}
     >
       <div className={`relative h-full w-full overflow-auto ${className}`}>
