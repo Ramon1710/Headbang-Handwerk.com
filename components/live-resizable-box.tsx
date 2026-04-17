@@ -274,9 +274,11 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
         <button
           type="button"
           onPointerDown={handleMoveStart}
-          className="absolute left-2 top-2 z-20 cursor-grab touch-none rounded-full border border-[#ff9d3c]/70 bg-[#1a110b] px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#ffcf98] shadow-[0_12px_30px_rgba(0,0,0,0.28)] active:cursor-grabbing"
+          className="absolute left-2 right-8 top-2 z-20 flex h-10 cursor-grab touch-none items-start justify-start bg-transparent active:cursor-grabbing"
         >
-          Bewegen
+          <span className="rounded-full border border-[#ff9d3c]/70 bg-[#1a110b] px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#ffcf98] shadow-[0_12px_30px_rgba(0,0,0,0.28)]">
+            Bewegen
+          </span>
         </button>
       ) : null}
       <div className={`relative h-full w-full overflow-auto ${className}`}>
