@@ -303,7 +303,7 @@ export default async function HomePage({
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.09)_0%,rgba(255,155,57,0.02)_100%)] ring-1 ring-[#a76737]/28 backdrop-blur-[6px]">
                       <Icon className="h-5 w-5 text-[#ffab4e]" />
                     </div>
-                    <LiveEditableText as="div" className="mt-5 h-full" editorKey={`home.promiseCards.${index}.content`} initialHtml={resolveLiveRichHtml(liveEditor, `home.promiseCards.${index}.content`, `${textParagraphHtml(title, 'text-xl font-black text-[#fff0da]')}${textParagraphHtml(text, 'mt-4 text-sm leading-7 text-[#d9c3a8] sm:text-[0.97rem]')}`)} isAdmin={isAdmin} title={`Versprechen ${index + 1}`} />
+                    <LiveEditableText as="div" className="mt-5" editorKey={`home.promiseCards.${index}.content`} initialHtml={resolveLiveRichHtml(liveEditor, `home.promiseCards.${index}.content`, `${textParagraphHtml(title, 'text-xl font-black text-[#fff0da]')}${textParagraphHtml(text, 'mt-4 text-sm leading-7 text-[#d9c3a8] sm:text-[0.97rem]')}`)} isAdmin={isAdmin} title={`Versprechen ${index + 1}`} />
                   </LiveResizableBox>
                   );
                 })}

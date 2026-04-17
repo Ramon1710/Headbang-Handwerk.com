@@ -23,6 +23,7 @@ const FONT_FAMILIES = [
 ];
 
 const FONT_SIZES = ['14px', '16px', '18px', '20px', '24px', '28px', '32px', '40px'];
+const DEFAULT_TEXT_COLOR = '#f5e7d5';
 
 function applyExecCommand(command: 'bold' | 'italic' | 'underline') {
   document.execCommand('styleWithCSS', false, 'false');
@@ -252,6 +253,19 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
                   <option key={fontSize} value={fontSize}>{fontSize}</option>
                 ))}
               </select>
+              <label className="flex items-center gap-2 rounded-lg border border-[#704321] bg-[#1a130f] px-3 py-2 text-sm text-[#f3dfc4]">
+                <span>Schriftfarbe</span>
+                <input
+                  type="color"
+                  defaultValue={DEFAULT_TEXT_COLOR}
+                  onMouseDown={captureSelection}
+                  onFocus={captureSelection}
+                  onChange={(event) => {
+                    handleStyleWrap({ color: event.target.value });
+                  }}
+                  className="h-8 w-10 cursor-pointer rounded border border-[#704321] bg-transparent p-0"
+                />
+              </label>
             </div>
 
             <div
