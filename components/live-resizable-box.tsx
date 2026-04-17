@@ -270,28 +270,28 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       style={buildResponsiveStyle(boxStyles)}
       title={isAdmin ? 'Klick zum Bearbeiten, unten rechts Größe ändern, oben links verschieben' : undefined}
     >
+      {isAdmin ? (
+        <button
+          type="button"
+          onPointerDown={handleMoveStart}
+          className="absolute left-2 top-2 z-20 cursor-grab touch-none rounded-full border border-[#ff9d3c]/70 bg-[#1a110b] px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#ffcf98] shadow-[0_12px_30px_rgba(0,0,0,0.28)] active:cursor-grabbing"
+        >
+          Bewegen
+        </button>
+      ) : null}
       <div className={`relative h-full w-full overflow-auto ${className}`}>
-        {isAdmin ? (
-          <button
-            type="button"
-            onPointerDown={handleMoveStart}
-            className="absolute left-2 top-2 z-10 cursor-grab touch-none rounded-full border border-[#ff9d3c]/70 bg-[#1a110b] px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#ffcf98] shadow-[0_12px_30px_rgba(0,0,0,0.28)] active:cursor-grabbing"
-          >
-            Bewegen
-          </button>
-        ) : null}
         {children}
-        {isAdmin ? (
-          <button
-            type="button"
-            onPointerDown={handleResizeStart}
-            aria-label="Größe ändern"
-            className="absolute bottom-2 right-2 z-10 h-5 w-5 cursor-se-resize touch-none rounded-sm"
-          >
-            <span aria-hidden="true" className="pointer-events-none absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2 border-[#ff9d3c]/80" />
-          </button>
-        ) : null}
       </div>
+      {isAdmin ? (
+        <button
+          type="button"
+          onPointerDown={handleResizeStart}
+          aria-label="Größe ändern"
+          className="absolute bottom-2 right-2 z-20 h-5 w-5 cursor-se-resize touch-none rounded-sm"
+        >
+          <span aria-hidden="true" className="pointer-events-none absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2 border-[#ff9d3c]/80" />
+        </button>
+      ) : null}
     </div>
   );
 }

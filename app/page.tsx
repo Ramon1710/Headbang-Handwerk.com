@@ -374,14 +374,18 @@ export default async function HomePage({
               </LiveResizableBox>
 
               <LiveResizableBox boxKey="home.update.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'home.update.box')} isAdmin={isAdmin} className="rounded-[2rem] border border-[#704321]/26 bg-[linear-gradient(180deg,rgba(24,16,11,0.16)_0%,rgba(12,8,6,0.05)_100%)] p-9 shadow-[0_14px_34px_rgba(0,0,0,0.08)] backdrop-blur-[10px] sm:p-10 lg:p-12">
-                <LiveEditableText as="div" className="h-full" editorKey="home.update.content" initialHtml={resolveLiveRichHtml(liveEditor, 'home.update.content', `${textParagraphHtml(home.updateEyebrow, 'text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]')}${textParagraphHtml(home.updateTitle, 'mt-4 text-3xl font-black text-[#ffd08f] sm:text-[2.3rem]')}${home.updateParagraphs.map((paragraph) => textParagraphHtml(paragraph, 'mt-6 text-base leading-8 text-[#ead9c3]')).join('')}`)} isAdmin={isAdmin} title="Update Box" />
-                <div className="mt-[4.5rem] flex flex-col gap-5 sm:flex-row sm:gap-6">
-                  <Button href={home.updatePrimaryCtaHref} size="lg" className="justify-center">
-                    {home.updatePrimaryCtaLabel}
-                  </Button>
-                  <Button href={home.updateSecondaryCtaHref} size="lg" variant="secondary" className="justify-center">
-                    {home.updateSecondaryCtaLabel}
-                  </Button>
+                <LiveEditableText as="div" editorKey="home.update.content" initialHtml={resolveLiveRichHtml(liveEditor, 'home.update.content', `${textParagraphHtml(home.updateEyebrow, 'text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]')}${textParagraphHtml(home.updateTitle, 'mt-4 text-3xl font-black text-[#ffd08f] sm:text-[2.3rem]')}${home.updateParagraphs.map((paragraph) => textParagraphHtml(paragraph, 'mt-6 text-base leading-8 text-[#ead9c3]')).join('')}`)} isAdmin={isAdmin} title="Update Box" />
+                <div className="mt-[4.5rem] flex flex-col items-start gap-5 sm:flex-row sm:gap-6">
+                  <LiveResizableBox boxKey="home.updatePrimaryCta.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'home.updatePrimaryCta.box')} isAdmin={isAdmin} className="self-start overflow-visible">
+                    <Button href={home.updatePrimaryCtaHref} size="lg" className="justify-center whitespace-nowrap">
+                      {home.updatePrimaryCtaLabel}
+                    </Button>
+                  </LiveResizableBox>
+                  <LiveResizableBox boxKey="home.updateSecondaryCta.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'home.updateSecondaryCta.box')} isAdmin={isAdmin} className="self-start overflow-visible">
+                    <Button href={home.updateSecondaryCtaHref} size="lg" variant="secondary" className="justify-center whitespace-nowrap">
+                      {home.updateSecondaryCtaLabel}
+                    </Button>
+                  </LiveResizableBox>
                 </div>
               </LiveResizableBox>
             </div>
