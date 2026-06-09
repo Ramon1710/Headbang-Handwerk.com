@@ -275,7 +275,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
         <button
           type="button"
           onPointerDown={handleMoveStart}
-          className="absolute left-2 top-2 z-20 inline-flex cursor-grab touch-none items-start justify-start active:cursor-grabbing"
+          className="absolute left-1/2 top-0 z-20 inline-flex -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none items-start justify-start active:cursor-grabbing"
         >
           <span className="rounded-full border border-[#ff9d3c]/70 bg-[#1a110b] px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#ffcf98] shadow-[0_12px_30px_rgba(0,0,0,0.28)]">
             Bewegen
