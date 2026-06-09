@@ -75,7 +75,7 @@ function parsePackageFromFormData(formData: FormData, existingId?: string): Spon
 
 async function assertAdmin() {
   if (!(await isAdminAuthenticated())) {
-    redirect('/admin/login?next=/sponsoren');
+    redirect('/admin-login?next=/sponsoren');
   }
 }
 

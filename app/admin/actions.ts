@@ -28,7 +28,7 @@ export async function loginAction(formData: FormData) {
 
   if (!success) {
     const target = redirectTo.startsWith('/') ? redirectTo : '/';
-    redirect(`/admin/login?error=1&next=${encodeURIComponent(target)}`);
+    redirect(`/admin-login?error=1&next=${encodeURIComponent(target)}`);
   }
 
   redirect(redirectTo.startsWith('/') ? redirectTo : '/');
@@ -36,12 +36,12 @@ export async function loginAction(formData: FormData) {
 
 export async function logoutAction() {
   await logoutAdmin();
-  redirect('/admin/login');
+  redirect('/admin-login');
 }
 
 export async function updateCmsAction(formData: FormData) {
   if (!(await isAdminAuthenticated())) {
-    redirect('/admin/login');
+    redirect('/admin-login');
   }
 
   const current = await getCmsContent();

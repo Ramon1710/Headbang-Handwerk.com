@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { ContactForm } from '@/components/contact-form';
 import { EditablePageShell } from '@/components/editable-page-shell';
 import { LiveEditableText } from '@/components/live-editable-text';
 import { LiveResizableBox } from '@/components/live-resizable-box';
@@ -32,7 +31,14 @@ export default async function FormularPage({
 
         <LiveResizableBox boxKey="formPage.form.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'formPage.form.box')} isAdmin={isAdmin} className="section-shell mt-8 p-8">
           <LiveEditableText as="h2" className="mb-6 text-center text-2xl font-black text-white" editorKey="formPage.formTitle" initialHtml={resolveLiveHtml(liveEditor, 'formPage.formTitle', 'Kontaktformular')} isAdmin={isAdmin} title="Formular Überschrift" normalizeTypography />
-          <ContactForm />
+          <div className="mx-auto w-full max-w-[824px] overflow-hidden rounded-[1.4rem] border border-[color:var(--color-border)] bg-black/10">
+            <iframe
+              src="https://formular.vereinsplaner.com/embed/0ea97d8f-0446-4a9c-b172-2042aa012f2c"
+              title="Mitglied werden Formular"
+              className="block w-full border-0"
+              style={{ height: '1200px' }}
+            />
+          </div>
         </LiveResizableBox>
       </div>
     </EditablePageShell>

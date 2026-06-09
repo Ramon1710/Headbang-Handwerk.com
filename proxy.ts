@@ -58,8 +58,16 @@ function isBypassedPath(pathname: string) {
   );
 }
 
-function isLoginPath(pathname: string) {
+function isLegacyLoginPath(pathname: string) {
   return pathname === '/admin/login';
+}
+
+function isLoginPath(pathname: string) {
+  return pathname === '/admin-login';
+}
+
+function isProtectedAdminPath(pathname: string) {
+  return pathname === '/admin' || pathname.startsWith('/admin/');
 }
 
 export async function proxy(request: NextRequest) {
@@ -69,18 +77,22 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get(SESSION_COOKIE)?.value;
-  const authenticated = Boolean(token && (await verifyToken(token)));
-
-  if (authenticated && isLoginPath(pathname)) {
-    return NextResponse.redirect(new URL('/', request.url));
+  if (isLegacyLoginPath(pathname)) {
+    return NextResponse.redirect(new URL(`/admin-login${search}`, request.url));
   }
 
-  if (authenticated || isLoginPath(pathname)) {
+  if (isLoginPath(pathname) || !isProtectedAdminPath(pathname)) {
     return NextResponse.next();
   }
 
-  const loginUrl = new URL('/admin/login', request.url);
+  const token = request.cookies.get(SESSION_COOKIE)?.value;
+  const authenticated = Boolean(token && (await verifyToken(token)));
+
+  if (authenticated) {
+    return NextResponse.next();
+  }
+
+  const loginUrl = new URL('/admin-login', request.url);
   loginUrl.searchParams.set('next', `${pathname}${search}` || '/');
 
   return NextResponse.redirect(loginUrl);

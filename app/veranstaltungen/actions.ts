@@ -78,7 +78,7 @@ function parseEventFromFormData(formData: FormData, existingId?: string, existin
 
 async function assertAdmin() {
   if (!(await isAdminAuthenticated())) {
-    redirect('/admin/login?next=/veranstaltungen');
+    redirect('/admin-login?next=/veranstaltungen');
   }
 }
 

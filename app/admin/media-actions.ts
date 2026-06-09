@@ -23,7 +23,7 @@ function emptyAsset(): MediaAsset {
 
 async function assertAdmin(nextPath: string) {
   if (!(await isAdminAuthenticated())) {
-    redirect(`/admin/login?next=${encodeURIComponent(nextPath)}`);
+    redirect(`/admin-login?next=${encodeURIComponent(nextPath)}`);
   }
 }
 

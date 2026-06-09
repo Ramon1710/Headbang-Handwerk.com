@@ -90,7 +90,7 @@ export default async function AdminPage({
   }>;
 }) {
   if (!(await isAdminAuthenticated())) {
-    redirect('/admin/login');
+    redirect('/admin-login');
   }
 
   redirect('/');

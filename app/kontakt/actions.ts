@@ -11,7 +11,7 @@ function sanitizeText(value: FormDataEntryValue | null) {
 
 export async function updateContactInfoAction(formData: FormData) {
   if (!(await isAdminAuthenticated())) {
-    redirect('/admin/login?next=/kontakt');
+    redirect('/admin-login?next=/kontakt');
   }
 
   const current = await getCmsContent();

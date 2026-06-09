@@ -91,7 +91,7 @@ function parseProductFromFormData(formData: FormData, existingId?: string): Merc
 
 async function assertAdmin() {
   if (!(await isAdminAuthenticated())) {
-    redirect('/admin/login?next=/merchandise');
+    redirect('/admin-login?next=/merchandise');
   }
 }
 
