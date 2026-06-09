@@ -42,6 +42,7 @@ function getMediaErrorMessage(mediaError?: string) {
 function HomeActionCard({
   boxKey,
   titleKey,
+  ctaKey,
   title,
   href,
   linkLabel,
@@ -50,6 +51,7 @@ function HomeActionCard({
 }: {
   boxKey: string;
   titleKey: string;
+  ctaKey: string;
   title: string;
   href: string;
   linkLabel: string;
@@ -72,10 +74,25 @@ function HomeActionCard({
         title={title}
         normalizeTypography
       />
-      <Button href={href} variant="secondary" className="mt-4 w-full justify-center">
-        {linkLabel}
-        <ArrowRight className="h-4 w-4" />
-      </Button>
+      {isAdmin ? (
+        <div className="mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2.5 text-sm font-bold tracking-wide text-[color:var(--color-accent-soft)]">
+          <LiveEditableText
+            as="span"
+            className="text-sm font-bold tracking-wide text-[color:var(--color-accent-soft)]"
+            editorKey={ctaKey}
+            initialHtml={resolveLiveHtml(liveEditor, ctaKey, linkLabel)}
+            isAdmin={isAdmin}
+            title={`${title} Buttontext`}
+            normalizeTypography
+          />
+          <ArrowRight className="h-4 w-4" />
+        </div>
+      ) : (
+        <Button href={href} variant="secondary" className="mt-4 w-full justify-center">
+          {resolveLiveHtml(liveEditor, ctaKey, linkLabel).replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
+          <ArrowRight className="h-4 w-4" />
+        </Button>
+      )}
     </LiveResizableBox>
   );
 }
@@ -226,12 +243,12 @@ export default async function HomePage({
                   boxKey="home.simple.image.box"
                   initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.image.box')}
                   isAdmin={isAdmin}
-                  className="overflow-hidden rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
+                  className="h-full min-h-[22rem] overflow-hidden rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
                 >
                   {heroImageSrc ? (
-                    <img src={heroImageSrc} alt={home.heroImage.assetName || 'Startseitenbild'} className="h-[22rem] w-full object-cover" />
+                    <img src={heroImageSrc} alt={home.heroImage.assetName || 'Startseitenbild'} className="h-full w-full object-cover" />
                   ) : (
-                    <div className="flex h-[22rem] items-center justify-center bg-black/20 text-[color:var(--color-muted)]">
+                    <div className="flex h-full min-h-[22rem] items-center justify-center bg-black/20 text-[color:var(--color-muted)]">
                       <ImageIcon className="h-10 w-10" />
                     </div>
                   )}
@@ -240,13 +257,13 @@ export default async function HomePage({
             </div>
 
             <div className="mt-5 grid gap-4 md:grid-cols-3">
-              <HomeActionCard boxKey="home.simple.form.box" titleKey="home.simple.form.title" title="Mitglied werden" href="/formular" linkLabel="Zum Formular" isAdmin={isAdmin} liveEditor={liveEditor} />
-              <HomeActionCard boxKey="home.simple.partner.box" titleKey="home.simple.partner.title" title="Partner werden" href="/partner-unterstuetzerinfo" linkLabel="Zum Inforeiter" isAdmin={isAdmin} liveEditor={liveEditor} />
-              <HomeActionCard boxKey="home.simple.sponsor.box" titleKey="home.simple.sponsor.title" title="Sponsor werden" href="/sponsoren" linkLabel="Zum Sponsoring" isAdmin={isAdmin} liveEditor={liveEditor} />
+              <HomeActionCard boxKey="home.simple.form.box" titleKey="home.simple.form.title" ctaKey="home.simple.form.cta" title="Mitglied werden" href="/formular" linkLabel="Zum Formular" isAdmin={isAdmin} liveEditor={liveEditor} />
+              <HomeActionCard boxKey="home.simple.partner.box" titleKey="home.simple.partner.title" ctaKey="home.simple.partner.cta" title="Partner werden" href="/partner-unterstuetzerinfo" linkLabel="Zum Inforeiter" isAdmin={isAdmin} liveEditor={liveEditor} />
+              <HomeActionCard boxKey="home.simple.sponsor.box" titleKey="home.simple.sponsor.title" ctaKey="home.simple.sponsor.cta" title="Sponsor werden" href="/sponsoren" linkLabel="Zum Sponsoring" isAdmin={isAdmin} liveEditor={liveEditor} />
             </div>
 
             <div className="mt-4 grid gap-4 md:grid-cols-[1fr_1fr_1.2fr]">
-              <HomeActionCard boxKey="home.simple.support.box" titleKey="home.simple.support.title" title="Unterstützer werden" href="/partner-unterstuetzerinfo" linkLabel="Mehr erfahren" isAdmin={isAdmin} liveEditor={liveEditor} />
+              <HomeActionCard boxKey="home.simple.support.box" titleKey="home.simple.support.title" ctaKey="home.simple.support.cta" title="Unterstützer werden" href="/partner-unterstuetzerinfo" linkLabel="Mehr erfahren" isAdmin={isAdmin} liveEditor={liveEditor} />
 
               <LiveResizableBox
                 boxKey="home.simple.smallinfo.box"
@@ -298,10 +315,25 @@ export default async function HomePage({
                   title="Sponsor Info Text"
                   normalizeTypography
                 />
-                <Button href="/sponsoren" className="mt-4 w-full justify-center">
-                  Sponsor werden
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
+                {isAdmin ? (
+                  <div className="mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-accent)] bg-[linear-gradient(180deg,var(--color-accent)_0%,var(--color-accent-strong)_54%,color-mix(in_srgb,var(--color-accent-strong)_72%,black)_100%)] px-7 py-3.5 text-base font-bold tracking-wide text-white shadow-[0_8px_20px_color-mix(in_srgb,var(--color-accent)_35%,transparent),inset_0_1px_0_color-mix(in_srgb,var(--color-accent-soft)_60%,transparent)]">
+                    <LiveEditableText
+                      as="span"
+                      className="text-base font-bold tracking-wide text-white"
+                      editorKey="home.closingPrimaryCtaLabel"
+                      initialHtml={resolveLiveHtml(liveEditor, 'home.closingPrimaryCtaLabel', home.closingPrimaryCtaLabel)}
+                      isAdmin={isAdmin}
+                      title="Sponsor Info Buttontext"
+                      normalizeTypography
+                    />
+                    <ArrowRight className="h-4 w-4" />
+                  </div>
+                ) : (
+                  <Button href="/sponsoren" className="mt-4 w-full justify-center">
+                    {resolveLiveHtml(liveEditor, 'home.closingPrimaryCtaLabel', home.closingPrimaryCtaLabel).replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                )}
               </LiveResizableBox>
             </div>
           </div>
