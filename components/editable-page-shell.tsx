@@ -21,7 +21,7 @@ export function EditablePageShell({ cms, isAdmin, mainClassName, children }: Edi
         ctaHref={cms.site.navigationCtaHref}
       />
       <LiveLayoutSaveProvider enabled={isAdmin}>
-        <main className={mainClassName}>
+        <main className={`${mainClassName} w-full`}>
           {isAdmin ? (
             <>
               <form action={logoutAction} className="fixed left-4 top-4 z-[61]">
@@ -37,7 +37,7 @@ export function EditablePageShell({ cms, isAdmin, mainClassName, children }: Edi
               </div>
             </>
           ) : null}
-          {children}
+          <div className="site-shell">{children}</div>
         </main>
         <Footer content={cms.site.footer} isAdmin={isAdmin} liveEditor={cms.site.liveEditor} />
       </LiveLayoutSaveProvider>

@@ -192,7 +192,7 @@ export default async function HomePage({
 
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_12%,rgba(255,143,42,0.18)_0%,transparent_30%),linear-gradient(180deg,rgba(6,3,2,0.15)_0%,rgba(6,3,2,0.82)_100%)]" />
 
-          <div className="relative z-10 mx-auto max-w-7xl px-4 pb-10 pt-28 sm:px-6 md:pb-12 lg:px-8">
+          <div className="site-shell relative z-10 px-4 pb-10 pt-28 sm:px-6 md:pb-12 lg:px-8">
             {isAdmin ? (
               <section className="mb-6 rounded-[1.6rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.84)_100%)] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
                 <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
