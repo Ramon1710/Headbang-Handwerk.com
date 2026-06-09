@@ -22,7 +22,7 @@ export function Footer({
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-16 border-t border-[color:var(--color-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-background)_88%,black)_0%,var(--color-background)_100%)]">
+    <footer className="relative mt-6 border-t border-[color:var(--color-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-background)_88%,black)_0%,var(--color-background)_100%)] sm:mt-8">
       <div className="fire-divider" />
       <div className="w-full px-4 py-14 text-center sm:px-6">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center">

@@ -43,17 +43,19 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   }
 
   function buildResponsiveStyle(styles: ResolvedLiveBoxStyle | undefined) {
+    const mobileStyle = isAdmin ? styles?.mobile : undefined;
+
     const nextStyle = {
       '--live-box-width-desktop': styles?.desktop?.width,
       '--live-box-height-desktop': styles?.desktop?.height,
       '--live-box-min-height-desktop': styles?.desktop?.minHeight,
       '--live-box-x-desktop': allowPosition ? styles?.desktop?.x : undefined,
       '--live-box-y-desktop': allowPosition ? styles?.desktop?.y : undefined,
-      '--live-box-width-mobile': styles?.mobile?.width,
-      '--live-box-height-mobile': styles?.mobile?.height,
-      '--live-box-min-height-mobile': styles?.mobile?.minHeight,
-      '--live-box-x-mobile': allowPosition ? styles?.mobile?.x : undefined,
-      '--live-box-y-mobile': allowPosition ? styles?.mobile?.y : undefined,
+      '--live-box-width-mobile': mobileStyle?.width,
+      '--live-box-height-mobile': mobileStyle?.height,
+      '--live-box-min-height-mobile': mobileStyle?.minHeight,
+      '--live-box-x-mobile': allowPosition ? mobileStyle?.x : undefined,
+      '--live-box-y-mobile': allowPosition ? mobileStyle?.y : undefined,
       maxWidth: '100%',
     } as CSSProperties;
 
