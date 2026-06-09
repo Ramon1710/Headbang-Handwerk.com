@@ -22,11 +22,17 @@ export default async function MerchandisePage({
   const merchandise = cms.site.merchandise;
   const adminErrorMessage =
     query?.adminError === 'missing-config'
-      ? 'Speichern ist auf Vercel ohne Firebase nicht möglich. Prüfe FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL und FIREBASE_PRIVATE_KEY.'
+      ? 'Speichern ist auf Vercel ohne Firebase nicht möglich. Prüfe FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY und für Datei-Uploads auch FIREBASE_STORAGE_BUCKET.'
       : query?.adminError === 'invalid-firebase'
         ? 'Firebase ist gesetzt, aber ungültig formatiert. Prüfe besonders FIREBASE_PRIVATE_KEY.'
         : query?.adminError === 'firebase-auth'
           ? 'Firebase lehnt das Speichern ab. Prüfe den Service-Account und seine Rechte.'
+          : query?.adminError === 'image-upload-bucket'
+            ? 'Das Merchandise-Bild konnte nicht hochgeladen werden, weil der Firebase-Storage-Bucket nicht gefunden wurde. Prüfe FIREBASE_STORAGE_BUCKET in Vercel.'
+            : query?.adminError === 'image-upload-permission'
+              ? 'Das Merchandise-Bild konnte nicht hochgeladen werden, weil dem Service Account Rechte auf Firebase Storage fehlen.'
+              : query?.adminError === 'image-upload'
+                ? 'Das Merchandise-Bild konnte nicht hochgeladen werden. Prüfe Firebase Storage und den Service Account.'
           : query?.adminError
             ? 'Aktion fehlgeschlagen. Bitte Eingaben prüfen.'
             : null;
@@ -61,6 +67,16 @@ export default async function MerchandisePage({
               <input name="price" placeholder="Preis, z.B. 29" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <input name="badge" placeholder="Badge, z.B. Neu" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <input name="imageUrl" placeholder="Bild-URL optional" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+              <label className="block lg:col-span-2">
+                <span className="mb-2 block text-sm font-semibold text-white">Produktbild hochladen</span>
+                <input
+                  type="file"
+                  name="imageFile"
+                  accept=".png,.jpg,.jpeg,.webp"
+                  className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-white focus:border-[color:var(--color-accent)]"
+                />
+                <span className="mt-2 block text-xs text-[color:var(--color-muted)]">Alternativ kannst du weiterhin eine direkte Bild-URL eintragen.</span>
+              </label>
               <input name="sizes" placeholder="Größen, kommasepariert" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <input name="colors" placeholder="Farben, kommasepariert" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <textarea name="description" rows={4} placeholder="Beschreibung" className="lg:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
@@ -90,6 +106,16 @@ export default async function MerchandisePage({
                   <input name="price" defaultValue={String(product.price)} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                   <input name="badge" defaultValue={product.badge || ''} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                   <input name="imageUrl" defaultValue={product.imageUrl || ''} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                  <label className="block md:col-span-2">
+                    <span className="mb-2 block text-sm font-semibold text-white">Neues Produktbild hochladen</span>
+                    <input
+                      type="file"
+                      name="imageFile"
+                      accept=".png,.jpg,.jpeg,.webp"
+                      className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-white focus:border-[color:var(--color-accent)]"
+                    />
+                    {product.imageUrl ? <span className="mt-2 block text-xs text-[color:var(--color-muted)]">Aktuell ist bereits ein Produktbild hinterlegt.</span> : null}
+                  </label>
                   <input name="sizes" defaultValue={(product.sizes || []).join(', ')} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                   <input name="colors" defaultValue={(product.colors || []).join(', ')} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                   <textarea name="description" rows={4} defaultValue={product.description} className="md:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />

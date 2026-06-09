@@ -3,6 +3,13 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
+import {
+  isFirebaseStorageBucketNotFoundError,
+  isFirebaseStoragePermissionError,
+  isFirebaseStorageUploadError,
+  uploadCmsAsset,
+} from '@/lib/cms/file-storage';
+import { hasFirebaseConfig, isFirebaseAuthError, isInvalidFirebaseConfigError } from '@/lib/cms/firebase';
 import { getCmsContent, isFirebaseAuthSaveError, isInvalidFirebaseSaveError, isReadonlyFallbackError, saveCmsContent } from '@/lib/cms/storage';
 import type { CmsContent } from '@/lib/cms/schema';
 import type { MerchandiseProduct } from '@/lib/types';
@@ -43,6 +50,26 @@ function ensureProductId(products: MerchandiseProduct[], requestedId: string, na
   }
 
   return nextId;
+}
+
+function redirectForMerchandiseUploadError(error: unknown): never {
+  if (isInvalidFirebaseConfigError(error)) {
+    redirect('/merchandise?adminError=invalid-firebase');
+  }
+
+  if (isFirebaseStorageBucketNotFoundError(error)) {
+    redirect('/merchandise?adminError=image-upload-bucket');
+  }
+
+  if (isFirebaseStoragePermissionError(error)) {
+    redirect('/merchandise?adminError=image-upload-permission');
+  }
+
+  if (isFirebaseStorageUploadError(error) || isFirebaseAuthError(error)) {
+    redirect('/merchandise?adminError=image-upload');
+  }
+
+  throw error;
 }
 
 function parseProductFromFormData(formData: FormData, existingId?: string): MerchandiseProduct {
@@ -123,6 +150,21 @@ export async function addMerchandiseProductAction(formData: FormData) {
     redirect('/merchandise?adminError=invalid-product');
   }
 
+  const imageFile = formData.get('imageFile');
+
+  if (imageFile instanceof File && imageFile.size > 0) {
+    if (!hasFirebaseConfig()) {
+      redirect('/merchandise?adminError=missing-config');
+    }
+
+    try {
+      const uploadedAsset = await uploadCmsAsset(imageFile, 'merchandise', 'merchandise-bild');
+      product.imageUrl = uploadedAsset.url;
+    } catch (error) {
+      redirectForMerchandiseUploadError(error);
+    }
+  }
+
   product.id = ensureProductId(current.site.merchandise.products, sanitizeText(formData.get('id')), product.name);
 
   await persistMerchandise(async () => ({
@@ -151,6 +193,21 @@ export async function updateMerchandiseProductAction(formData: FormData) {
   }
 
   const nextProduct = parseProductFromFormData(formData, productId);
+
+  const imageFile = formData.get('imageFile');
+
+  if (imageFile instanceof File && imageFile.size > 0) {
+    if (!hasFirebaseConfig()) {
+      redirect('/merchandise?adminError=missing-config');
+    }
+
+    try {
+      const uploadedAsset = await uploadCmsAsset(imageFile, 'merchandise', 'merchandise-bild');
+      nextProduct.imageUrl = uploadedAsset.url;
+    } catch (error) {
+      redirectForMerchandiseUploadError(error);
+    }
+  }
 
   await persistMerchandise(async () => ({
     ...current,

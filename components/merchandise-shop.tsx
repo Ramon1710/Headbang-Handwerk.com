@@ -67,6 +67,12 @@ export function MerchandiseShop({ products }: MerchandiseShopProps) {
 
         return (
           <article key={product.id} className="section-shell p-7">
+            {product.imageUrl ? (
+              <div className="mb-6 overflow-hidden rounded-[1.2rem] border border-white/10 bg-black/20">
+                <img src={product.imageUrl} alt={product.name} className="h-64 w-full object-cover" />
+              </div>
+            ) : null}
+
             <div className="flex items-start justify-between gap-4">
               <div>
                 {product.badge ? (

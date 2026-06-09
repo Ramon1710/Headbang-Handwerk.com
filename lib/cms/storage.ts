@@ -38,6 +38,65 @@ function isReadonlyFilesystemError(error: unknown) {
   return code === 'EROFS' || code === 'EACCES' || code === 'EPERM';
 }
 
+function normalizeStringList(value: unknown): string[] | undefined {
+  if (Array.isArray(value)) {
+    const entries = value
+      .map((entry) => String(entry ?? '').trim())
+      .filter(Boolean);
+
+    return entries.length ? entries : undefined;
+  }
+
+  if (typeof value === 'string') {
+    const entries = value
+      .split(',')
+      .map((entry) => entry.trim())
+      .filter(Boolean);
+
+    return entries.length ? entries : undefined;
+  }
+
+  return undefined;
+}
+
+function normalizeMerchandiseProduct(product: unknown) {
+  if (!product || typeof product !== 'object') {
+    return null;
+  }
+
+  const candidate = product as Record<string, unknown>;
+  const name = String(candidate.name ?? '').trim();
+  const description = String(candidate.description ?? '').trim();
+  const rawPrice = candidate.price;
+  const parsedPrice =
+    typeof rawPrice === 'number'
+      ? rawPrice
+      : Number.parseFloat(String(rawPrice ?? '').replace(',', '.'));
+
+  if (!name || !description || !Number.isFinite(parsedPrice) || parsedPrice <= 0) {
+    return null;
+  }
+
+  const id = String(candidate.id ?? '').trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  if (!id) {
+    return null;
+  }
+
+  const badge = String(candidate.badge ?? '').trim();
+  const imageUrl = String(candidate.imageUrl ?? '').trim();
+
+  return {
+    id,
+    name,
+    description,
+    price: parsedPrice,
+    ...(badge ? { badge } : {}),
+    ...(imageUrl ? { imageUrl } : {}),
+    ...(normalizeStringList(candidate.sizes) ? { sizes: normalizeStringList(candidate.sizes) } : {}),
+    ...(normalizeStringList(candidate.colors) ? { colors: normalizeStringList(candidate.colors) } : {}),
+  };
+}
+
 async function readFromFirebase(): Promise<CmsContent | null> {
   try {
     const db = getFirebaseDb();
@@ -148,6 +207,8 @@ function normalizeContent(content: CmsContent): CmsContent {
         ...content.site.merchandise,
         products: Array.isArray(content.site.merchandise?.products)
           ? content.site.merchandise.products
+              .map(normalizeMerchandiseProduct)
+              .filter((product): product is NonNullable<ReturnType<typeof normalizeMerchandiseProduct>> => Boolean(product))
           : defaultCmsContent.site.merchandise.products,
       },
       footer: { ...defaultCmsContent.site.footer, ...content.site.footer },
