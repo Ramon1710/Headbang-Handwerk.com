@@ -128,16 +128,20 @@ export default async function UeberUnsPage({
             <LiveEditableText as="h2" className="mb-6 text-2xl font-bold text-white" editorKey="about.teamTitle" initialHtml={resolveLiveHtml(liveEditor, 'about.teamTitle', about.teamTitle)} isAdmin={isAdmin} title="Über uns Team Titel" />
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {about.teamRoles.map((role, index) => (
-                <LiveResizableBox key={role} boxKey={`about.teamRoles.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamRoles.${index}.box`)} isAdmin={isAdmin} className="flex h-full flex-col items-center text-center">
-                  <div className="mb-4 h-40 w-full overflow-hidden rounded-[1.4rem] bg-[linear-gradient(180deg,rgba(42,31,24,0.95)_0%,rgba(21,15,11,0.86)_100%)] ring-1 ring-white/6">
-                    {about.teamImages[index]?.assetUrl ? (
-                      <img src={about.teamImages[index].assetUrl} alt={about.teamImages[index].assetName || role} className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-5xl text-gray-600">👤</div>
-                    )}
-                  </div>
-                  <LiveEditableText as="p" className="text-sm text-gray-400" editorKey={`about.teamRoles.${index}`} initialHtml={resolveLiveHtml(liveEditor, `about.teamRoles.${index}`, role)} isAdmin={isAdmin} title={`Über uns Teamrolle ${index + 1}`} />
-                </LiveResizableBox>
+                <div key={`${role}-${index}`} className="flex h-full flex-col items-center gap-3 text-center">
+                  <LiveResizableBox boxKey={`about.teamRoles.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamRoles.${index}.box`)} isAdmin={isAdmin} className="w-full">
+                    <div className="h-40 w-full overflow-hidden rounded-[1.4rem] bg-[linear-gradient(180deg,rgba(42,31,24,0.95)_0%,rgba(21,15,11,0.86)_100%)] ring-1 ring-white/6">
+                      {about.teamImages[index]?.assetUrl ? (
+                        <img src={about.teamImages[index].assetUrl} alt={about.teamImages[index].assetName || role} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-5xl text-gray-600">👤</div>
+                      )}
+                    </div>
+                  </LiveResizableBox>
+                  <LiveResizableBox boxKey={`about.teamRoles.${index}.captionBox`} initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamRoles.${index}.captionBox`)} isAdmin={isAdmin} className="w-full">
+                    <LiveEditableText as="p" className="text-sm text-gray-400" editorKey={`about.teamRoles.${index}`} initialHtml={resolveLiveHtml(liveEditor, `about.teamRoles.${index}`, role)} isAdmin={isAdmin} title={`Über uns Teamrolle ${index + 1}`} />
+                  </LiveResizableBox>
+                </div>
               ))}
             </div>
           </LiveResizableBox>

@@ -165,6 +165,23 @@ async function writeToFile(content: CmsContent) {
   await fs.writeFile(paths.file, JSON.stringify(content, null, 2), 'utf8');
 }
 
+function normalizeFooterSocialLinks(content: CmsContent) {
+  const defaults = defaultCmsContent.site.footer.socialLinks;
+  const currentLinks = Array.isArray(content.site.footer?.socialLinks) ? content.site.footer.socialLinks : [];
+
+  return defaults.map((defaultLink) => {
+    const currentLink = currentLinks.find((link) => link.platform === defaultLink.platform);
+    const href = String(currentLink?.href ?? '').trim();
+    const normalizedHref = defaultLink.platform === 'instagram' ? defaultLink.href : href || defaultLink.href;
+
+    return {
+      ...defaultLink,
+      ...currentLink,
+      href: normalizedHref,
+    };
+  });
+}
+
 function normalizeContent(content: CmsContent): CmsContent {
   return {
     theme: { ...defaultCmsContent.theme, ...content.theme },
@@ -211,7 +228,11 @@ function normalizeContent(content: CmsContent): CmsContent {
               .filter((product): product is NonNullable<ReturnType<typeof normalizeMerchandiseProduct>> => Boolean(product))
           : defaultCmsContent.site.merchandise.products,
       },
-      footer: { ...defaultCmsContent.site.footer, ...content.site.footer },
+      footer: {
+        ...defaultCmsContent.site.footer,
+        ...content.site.footer,
+        socialLinks: normalizeFooterSocialLinks(content),
+      },
     },
   };
 }
