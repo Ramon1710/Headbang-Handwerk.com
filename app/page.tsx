@@ -302,23 +302,23 @@ export default async function HomePage({
             </div>
 
             <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-start md:flex-wrap">
-              <div className={isAdmin ? 'min-w-0 md:flex-none md:self-start' : 'min-w-0 md:flex-1'}>
+              <div className="min-w-0 md:flex-1">
                 <HomeActionCard boxKey="home.simple.form.box" titleKey="home.simple.form.title" ctaKey="home.simple.form.cta" title="Mitglied werden" href="/formular" linkLabel="Zum Formular" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
-              <div className={isAdmin ? 'min-w-0 md:flex-none md:self-start' : 'min-w-0 md:flex-1'}>
+              <div className="min-w-0 md:flex-1">
                 <HomeActionCard boxKey="home.simple.partner.box" titleKey="home.simple.partner.title" ctaKey="home.simple.partner.cta" title="Partner werden" href="/partner-unterstuetzerinfo" linkLabel="Zum Inforeiter" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
-              <div className={isAdmin ? 'min-w-0 md:flex-none md:self-start' : 'min-w-0 md:flex-1'}>
+              <div className="min-w-0 md:flex-1">
                 <HomeActionCard boxKey="home.simple.sponsor.box" titleKey="home.simple.sponsor.title" ctaKey="home.simple.sponsor.cta" title="Sponsor werden" href="/sponsoren" linkLabel="Zum Sponsoring" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
             </div>
 
             <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-start md:flex-wrap">
-              <div className={isAdmin ? 'min-w-0 md:flex-none md:self-start' : 'min-w-0 md:flex-1'}>
+              <div className="min-w-0 md:flex-1">
                 <HomeActionCard boxKey="home.simple.support.box" titleKey="home.simple.support.title" ctaKey="home.simple.support.cta" title="Unterstützer werden" href="/partner-unterstuetzerinfo" linkLabel="Mehr erfahren" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
 
-              <div className={isAdmin ? 'min-w-0 md:flex-none md:self-start' : 'min-w-0 md:flex-1'}>
+              <div className="min-w-0 md:flex-1">
                 <LiveResizableBox
                   boxKey="home.simple.smallinfo.box"
                   initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.smallinfo.box')}
@@ -346,7 +346,7 @@ export default async function HomePage({
                 </LiveResizableBox>
               </div>
 
-              <div className={isAdmin ? 'min-w-0 md:flex-none md:self-start' : 'min-w-0 md:flex-[1.2]'}>
+              <div className="min-w-0 md:flex-[1.2]">
                 <LiveResizableBox
                   boxKey="home.simple.sponsorinfo.box"
                   initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.sponsorinfo.box')}

@@ -50,13 +50,14 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       '--live-box-width-desktop': desktopStyle?.width,
       '--live-box-height-desktop': desktopStyle?.height,
       '--live-box-min-height-desktop': desktopStyle?.minHeight,
-      '--live-box-x-desktop': allowPosition ? desktopStyle?.x : undefined,
-      '--live-box-y-desktop': allowPosition ? desktopStyle?.y : undefined,
+      '--live-box-offset-x-desktop': allowPosition ? desktopStyle?.x : undefined,
+      '--live-box-offset-y-desktop': allowPosition ? desktopStyle?.y : undefined,
       '--live-box-width-mobile': '100%',
       '--live-box-height-mobile': mobileStyle?.height,
       '--live-box-min-height-mobile': mobileStyle?.minHeight,
-      '--live-box-x-mobile': undefined,
-      '--live-box-y-mobile': allowPosition ? mobileStyle?.y : undefined,
+      '--live-box-offset-x-mobile': undefined,
+      '--live-box-offset-y-mobile': allowPosition ? mobileStyle?.y : undefined,
+      '--live-box-overflow-x-correction': `${mobileOverflowCorrection}px`,
       maxWidth: isAdmin && viewport === 'desktop' ? undefined : '100%',
     } as CSSProperties;
 
@@ -389,10 +390,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     <div
       ref={ref}
       className={`live-resizable-box relative min-h-0 min-w-0 self-start ${isAdmin ? 'justify-self-center' : 'mx-auto w-full justify-self-stretch'}`}
-      style={{
-        ...buildResponsiveStyle(boxStyles),
-        transform: mobileOverflowCorrection ? `translateX(${mobileOverflowCorrection}px)` : undefined,
-      }}
+      style={buildResponsiveStyle(boxStyles)}
       title={isAdmin ? allowPosition ? 'Klick zum Bearbeiten, unten rechts Größe ändern, oben mittig verschieben' : 'Klick zum Bearbeiten, unten rechts Größe ändern' : undefined}
     >
       {isAdmin && allowPosition ? (
