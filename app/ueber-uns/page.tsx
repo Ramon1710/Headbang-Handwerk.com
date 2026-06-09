@@ -3,6 +3,7 @@ import { EditablePageShell } from '@/components/editable-page-shell';
 import { LiveEditableText } from '@/components/live-editable-text';
 import { LiveResizableBox } from '@/components/live-resizable-box';
 import { Button } from '@/components/ui/button';
+import { updateAboutTeamImagesAction } from '@/app/admin/media-actions';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { resolveLiveBoxStyle, resolveLiveHtml, resolveLiveRichHtml, textParagraphHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
@@ -21,7 +22,7 @@ const values = [
 export default async function UeberUnsPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ view?: string }>;
+  searchParams?: Promise<{ view?: string; adminSaved?: string; mediaError?: string }>;
 }) {
   const params = searchParams ? await searchParams : undefined;
   const cms = await getCmsContent();
@@ -33,6 +34,37 @@ export default async function UeberUnsPage({
   return (
     <EditablePageShell cms={cms} isAdmin={isAdmin} mainClassName="min-h-screen bg-transparent pt-28 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {isAdmin ? (
+            <section className="mb-10 rounded-[1.8rem] border border-[color:var(--color-border)]/70 bg-[linear-gradient(180deg,rgba(22,14,10,0.88)_0%,rgba(10,7,5,0.82)_100%)] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
+              <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--color-accent-soft)]">Team Bilder</p>
+                  <h2 className="mt-2 text-2xl font-black text-white">Fotos für das Team hochladen und tauschen</h2>
+                </div>
+                <div className="text-sm font-semibold">
+                  {params?.adminSaved ? <p className="rounded-xl border border-green-500/30 bg-green-950/40 px-4 py-3 text-green-200">Team-Bilder gespeichert.</p> : null}
+                  {params?.mediaError ? <p className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-red-200">Upload fehlgeschlagen. Bitte Firebase-Storage prüfen.</p> : null}
+                </div>
+              </div>
+
+              <form action={updateAboutTeamImagesAction} className="mt-6 grid gap-4 lg:grid-cols-3">
+                {about.teamRoles.map((role, index) => (
+                  <div key={`${role}-${index}`} className="rounded-[1.3rem] border border-white/8 bg-black/15 p-4">
+                    <p className="mb-3 text-sm font-semibold text-white">Teamfeld {index + 1}</p>
+                    <input type="file" name={`teamImageFile${index}`} accept=".png,.jpg,.jpeg,.webp" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-black" />
+                    <label className="mt-3 flex items-center gap-3 rounded-xl border border-white/8 bg-black/10 px-4 py-3 text-sm text-[color:var(--color-muted)]">
+                      <input type="checkbox" name={`removeTeamImage${index}`} className="h-4 w-4" />
+                      Bild entfernen
+                    </label>
+                  </div>
+                ))}
+                <div className="lg:col-span-3 flex justify-end">
+                  <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">Team-Bilder speichern</button>
+                </div>
+              </form>
+            </section>
+          ) : null}
+
           <LiveResizableBox boxKey="about.intro.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'about.intro.box')} isAdmin={isAdmin} className="copy-center content-flow mb-16">
             <h1 className="mb-6 text-4xl font-black text-white sm:text-5xl">
               <LiveEditableText as="span" className="inline" editorKey="about.title" initialHtml={resolveLiveHtml(liveEditor, 'about.title', about.title)} isAdmin={isAdmin} title="Über uns Titel" />{' '}
@@ -71,9 +103,13 @@ export default async function UeberUnsPage({
             <LiveEditableText as="h2" className="mb-6 text-2xl font-bold text-white" editorKey="about.teamTitle" initialHtml={resolveLiveHtml(liveEditor, 'about.teamTitle', about.teamTitle)} isAdmin={isAdmin} title="Über uns Team Titel" />
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {about.teamRoles.map((role, index) => (
-                <LiveResizableBox key={role} boxKey={`about.teamRoles.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamRoles.${index}.box`)} isAdmin={isAdmin} allowPosition={false} className="flex h-full flex-col items-center text-center">
-                  <div className="w-20 h-20 rounded-full bg-[linear-gradient(180deg,rgba(42,31,24,0.95)_0%,rgba(21,15,11,0.86)_100%)] ring-1 ring-white/6 mx-auto mb-3 flex items-center justify-center text-gray-600 text-2xl">
-                    👤
+                <LiveResizableBox key={role} boxKey={`about.teamRoles.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamRoles.${index}.box`)} isAdmin={isAdmin} className="flex h-full flex-col items-center text-center">
+                  <div className="mb-4 h-40 w-full overflow-hidden rounded-[1.4rem] bg-[linear-gradient(180deg,rgba(42,31,24,0.95)_0%,rgba(21,15,11,0.86)_100%)] ring-1 ring-white/6">
+                    {about.teamImages[index]?.assetUrl ? (
+                      <img src={about.teamImages[index].assetUrl} alt={about.teamImages[index].assetName || role} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-5xl text-gray-600">👤</div>
+                    )}
                   </div>
                   <LiveEditableText as="p" className="text-sm text-gray-400" editorKey={`about.teamRoles.${index}`} initialHtml={resolveLiveHtml(liveEditor, `about.teamRoles.${index}`, role)} isAdmin={isAdmin} title={`Über uns Teamrolle ${index + 1}`} />
                 </LiveResizableBox>

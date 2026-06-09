@@ -31,6 +31,8 @@ export function SponsorPackageCard({ pkg }: SponsorPackageCardProps) {
           {formatPrice(pkg.price)}
         </div>
         <p className="cms-box-body max-w-xs mx-auto text-gray-400">{pkg.visibility}</p>
+        <p className="cms-box-body mt-2 text-sm text-gray-300">Logo: {pkg.logoSize}</p>
+        <p className="cms-box-body text-sm text-gray-300">Platzierung: {pkg.placement}</p>
       </div>
 
       <ul className="space-y-2.5 mb-8 flex-1">

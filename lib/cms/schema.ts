@@ -161,6 +161,7 @@ export interface AboutPageContent {
   values: AboutValueItem[];
   teamTitle: string;
   teamRoles: string[];
+  teamImages: MediaAsset[];
   ctaLabel: string;
   ctaHref: string;
 }

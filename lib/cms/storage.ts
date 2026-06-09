@@ -134,7 +134,13 @@ function normalizeContent(content: CmsContent): CmsContent {
       },
       home: { ...defaultCmsContent.site.home, ...content.site.home },
       sponsors: { ...defaultCmsContent.site.sponsors, ...content.site.sponsors },
-      about: { ...defaultCmsContent.site.about, ...content.site.about },
+      about: {
+        ...defaultCmsContent.site.about,
+        ...content.site.about,
+        teamImages: Array.isArray(content.site.about?.teamImages)
+          ? content.site.about.teamImages
+          : defaultCmsContent.site.about.teamImages,
+      },
       contact: { ...defaultCmsContent.site.contact, ...content.site.contact },
       stand: { ...defaultCmsContent.site.stand, ...content.site.stand },
       merchandise: {

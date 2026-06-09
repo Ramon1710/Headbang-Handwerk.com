@@ -33,6 +33,8 @@ export const defaultCmsContent: CmsContent = {
     },
     navigationLinks: [
       { label: 'Startseite', href: '/' },
+      { label: 'Formular', href: '/formular' },
+      { label: 'Partner & Unterstützer', href: '/partner-unterstuetzerinfo' },
       { label: 'Veranstaltungen', href: '/veranstaltungen' },
       { label: 'Sponsoren', href: '/sponsoren' },
       { label: 'Merchandise', href: '/merchandise' },
@@ -212,6 +214,23 @@ export const defaultCmsContent: CmsContent = {
       ],
       teamTitle: 'Das Team',
       teamRoles: ['Gründer & Projektleitung', 'Marketing & Social Media', 'Technik & Aufbau'],
+      teamImages: [
+        {
+          assetUrl: '',
+          assetName: '',
+          assetContentType: '',
+        },
+        {
+          assetUrl: '',
+          assetName: '',
+          assetContentType: '',
+        },
+        {
+          assetUrl: '',
+          assetName: '',
+          assetContentType: '',
+        },
+      ],
       ctaLabel: 'Kontakt aufnehmen',
       ctaHref: '/kontakt',
     },
@@ -282,7 +301,7 @@ export const defaultCmsContent: CmsContent = {
       copyrightName: 'Headbang Handwerk e.V.',
       socialLinks: [
         { platform: 'facebook', label: 'Facebook', href: '#' },
-        { platform: 'instagram', label: 'Instagram', href: '#' },
+        { platform: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/headbang.handwerk/' },
         { platform: 'youtube', label: 'YouTube', href: '#' },
       ],
     },
