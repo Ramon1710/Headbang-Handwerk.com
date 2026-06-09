@@ -21,6 +21,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [viewport, setViewport] = useState<LiveViewport>('desktop');
   const [boxStyles, setBoxStyles] = useState<ResolvedLiveBoxStyle | undefined>(initialStyle);
+  const [mobileOverflowCorrection, setMobileOverflowCorrection] = useState(0);
   const liveLayoutSave = useLiveLayoutSave();
 
   function getStorageKey(targetViewport: LiveViewport) {
@@ -53,6 +54,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       '--live-box-min-height-mobile': styles?.mobile?.minHeight,
       '--live-box-x-mobile': allowPosition ? styles?.mobile?.x : undefined,
       '--live-box-y-mobile': allowPosition ? styles?.mobile?.y : undefined,
+      maxWidth: '100%',
     } as CSSProperties;
 
     return nextStyle;
@@ -114,6 +116,49 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (viewport !== 'mobile' || !ref.current) {
+      setMobileOverflowCorrection(0);
+      return;
+    }
+
+    const element = ref.current;
+    const parent = element.parentElement;
+
+    if (!parent) {
+      setMobileOverflowCorrection(0);
+      return;
+    }
+
+    const measure = () => {
+      const boxRect = element.getBoundingClientRect();
+      const parentRect = parent.getBoundingClientRect();
+      let nextCorrection = 0;
+
+      if (boxRect.right > parentRect.right) {
+        nextCorrection = parentRect.right - boxRect.right;
+      }
+
+      if (boxRect.left + nextCorrection < parentRect.left) {
+        nextCorrection += parentRect.left - (boxRect.left + nextCorrection);
+      }
+
+      setMobileOverflowCorrection((current) => (current === nextCorrection ? current : nextCorrection));
+    };
+
+    const frameId = window.requestAnimationFrame(measure);
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(element);
+    resizeObserver.observe(parent);
+    window.addEventListener('resize', measure);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [boxStyles, viewport]);
 
   function getCurrentOffsets(style: ResolvedLiveBoxStyle[LiveViewport] | undefined) {
     const left = typeof style?.x === 'string' ? Number.parseFloat(style.x) || 0 : 0;
@@ -268,7 +313,10 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     <div
       ref={ref}
       className="live-resizable-box relative min-h-0 min-w-0 self-start justify-self-start"
-      style={buildResponsiveStyle(boxStyles)}
+      style={{
+        ...buildResponsiveStyle(boxStyles),
+        transform: mobileOverflowCorrection ? `translateX(${mobileOverflowCorrection}px)` : undefined,
+      }}
       title={isAdmin ? allowPosition ? 'Klick zum Bearbeiten, unten rechts Größe ändern, oben mittig verschieben' : 'Klick zum Bearbeiten, unten rechts Größe ändern' : undefined}
     >
       {isAdmin && allowPosition ? (
