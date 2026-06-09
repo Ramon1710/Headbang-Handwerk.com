@@ -24,6 +24,8 @@ export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix 
   const { label, variant } = statusMap[event.status];
   const resolvedKeyPrefix = editorKeyPrefix || `events.cards.${event.id}`;
   const standHref = getEventStandHref(event.id);
+  const canOpenStand = event.status === 'confirmed';
+  const ctaHref = event.ctaUrl || '/kontakt';
 
   const cardContent = (
     <>
@@ -92,14 +94,14 @@ export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix 
 
   return (
     <div className="rounded-[1.8rem] bg-[linear-gradient(180deg,rgba(28,18,12,0.72)_0%,rgba(12,9,7,0.3)_100%)] p-8 text-center ring-1 ring-white/6 shadow-[0_20px_50px_rgba(0,0,0,0.22)] transition-all duration-300 hover:-translate-y-1 hover:ring-[color:var(--color-accent)]/30">
-      {isAdmin ? (
+      {isAdmin || !canOpenStand ? (
         cardContent
       ) : (
         <a href={standHref} className="block rounded-[1.2rem] transition focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent)] focus:ring-offset-2 focus:ring-offset-black">
           {cardContent}
         </a>
       )}
-      <Button href={standHref} size="sm" variant="secondary" className="w-full">
+      <Button href={ctaHref} size="sm" variant="secondary" className="w-full">
         <LiveEditableText
           as="span"
           className="inline"

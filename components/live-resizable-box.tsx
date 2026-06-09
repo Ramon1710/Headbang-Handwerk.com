@@ -383,7 +383,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   return (
     <div
       ref={ref}
-      className={`live-resizable-box relative min-h-0 min-w-0 self-start mx-auto ${isAdmin ? '' : 'w-full justify-self-stretch'}`}
+      className={`live-resizable-box relative min-h-0 min-w-0 self-start ${isAdmin ? 'justify-self-center' : 'mx-auto w-full justify-self-stretch'}`}
       style={{
         ...buildResponsiveStyle(boxStyles),
         transform: mobileOverflowCorrection ? `translateX(${mobileOverflowCorrection}px)` : undefined,

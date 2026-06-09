@@ -56,9 +56,9 @@ export function Footer({
             boxKey="footer.social.box"
             initialStyle={resolveLiveBoxStyle(liveEditor, 'footer.social.box')}
             isAdmin={isAdmin}
-            className="mb-10"
+            className="mb-10 px-3 py-3 sm:px-4 sm:py-4"
           >
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-4">
             {content.socialLinks.map(({ platform, label, href }) => {
               const Icon = icons[platform];
 

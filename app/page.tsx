@@ -229,8 +229,8 @@ export default async function HomePage({
               </section>
             ) : null}
 
-            <div className="grid gap-4 lg:grid-cols-[1.8fr_1fr] lg:gap-5">
-              <div className="grid gap-4">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-5">
+              <div className="flex min-w-0 flex-[1.8] flex-col gap-4">
                 <LiveResizableBox
                   boxKey="home.simple.head.box"
                   initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.head.box')}
@@ -283,7 +283,7 @@ export default async function HomePage({
                 </LiveResizableBox>
               </div>
 
-              <div className="grid gap-4">
+              <div className="flex min-w-0 flex-1 flex-col gap-4">
                 <LiveResizableBox
                   boxKey="home.simple.image.box"
                   initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.image.box')}
@@ -301,85 +301,97 @@ export default async function HomePage({
               </div>
             </div>
 
-            <div className="mt-5 grid gap-4 md:grid-cols-3">
-              <HomeActionCard boxKey="home.simple.form.box" titleKey="home.simple.form.title" ctaKey="home.simple.form.cta" title="Mitglied werden" href="/formular" linkLabel="Zum Formular" isAdmin={isAdmin} liveEditor={liveEditor} />
-              <HomeActionCard boxKey="home.simple.partner.box" titleKey="home.simple.partner.title" ctaKey="home.simple.partner.cta" title="Partner werden" href="/partner-unterstuetzerinfo" linkLabel="Zum Inforeiter" isAdmin={isAdmin} liveEditor={liveEditor} />
-              <HomeActionCard boxKey="home.simple.sponsor.box" titleKey="home.simple.sponsor.title" ctaKey="home.simple.sponsor.cta" title="Sponsor werden" href="/sponsoren" linkLabel="Zum Sponsoring" isAdmin={isAdmin} liveEditor={liveEditor} />
+            <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-start">
+              <div className="min-w-0 md:flex-1">
+                <HomeActionCard boxKey="home.simple.form.box" titleKey="home.simple.form.title" ctaKey="home.simple.form.cta" title="Mitglied werden" href="/formular" linkLabel="Zum Formular" isAdmin={isAdmin} liveEditor={liveEditor} />
+              </div>
+              <div className="min-w-0 md:flex-1">
+                <HomeActionCard boxKey="home.simple.partner.box" titleKey="home.simple.partner.title" ctaKey="home.simple.partner.cta" title="Partner werden" href="/partner-unterstuetzerinfo" linkLabel="Zum Inforeiter" isAdmin={isAdmin} liveEditor={liveEditor} />
+              </div>
+              <div className="min-w-0 md:flex-1">
+                <HomeActionCard boxKey="home.simple.sponsor.box" titleKey="home.simple.sponsor.title" ctaKey="home.simple.sponsor.cta" title="Sponsor werden" href="/sponsoren" linkLabel="Zum Sponsoring" isAdmin={isAdmin} liveEditor={liveEditor} />
+              </div>
             </div>
 
-            <div className="mt-4 grid gap-4 md:grid-cols-[1fr_1fr_1.2fr]">
-              <HomeActionCard boxKey="home.simple.support.box" titleKey="home.simple.support.title" ctaKey="home.simple.support.cta" title="Unterstützer werden" href="/partner-unterstuetzerinfo" linkLabel="Mehr erfahren" isAdmin={isAdmin} liveEditor={liveEditor} />
+            <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-start">
+              <div className="min-w-0 md:flex-1">
+                <HomeActionCard boxKey="home.simple.support.box" titleKey="home.simple.support.title" ctaKey="home.simple.support.cta" title="Unterstützer werden" href="/partner-unterstuetzerinfo" linkLabel="Mehr erfahren" isAdmin={isAdmin} liveEditor={liveEditor} />
+              </div>
 
-              <LiveResizableBox
-                boxKey="home.simple.smallinfo.box"
-                initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.smallinfo.box')}
-                isAdmin={isAdmin}
-                className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
-              >
-                <LiveEditableText
-                  as="h3"
-                  className="section-title uppercase"
-                  editorKey="home.updateTitle"
-                  initialHtml={resolveLiveHtml(liveEditor, 'home.updateTitle', home.updateTitle)}
+              <div className="min-w-0 md:flex-1">
+                <LiveResizableBox
+                  boxKey="home.simple.smallinfo.box"
+                  initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.smallinfo.box')}
                   isAdmin={isAdmin}
-                  title="Info Überschrift"
-                  normalizeTypography
-                />
-                <LiveEditableText
-                  as="p"
-                  className="body-copy mt-3"
-                  editorKey="home.updateParagraphs.0"
-                  initialHtml={resolveLiveHtml(liveEditor, 'home.updateParagraphs.0', home.updateParagraphs[0] || '')}
-                  isAdmin={isAdmin}
-                  title="Info Text"
-                  normalizeTypography
-                />
-              </LiveResizableBox>
+                  className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
+                >
+                  <LiveEditableText
+                    as="h3"
+                    className="section-title uppercase"
+                    editorKey="home.updateTitle"
+                    initialHtml={resolveLiveHtml(liveEditor, 'home.updateTitle', home.updateTitle)}
+                    isAdmin={isAdmin}
+                    title="Info Überschrift"
+                    normalizeTypography
+                  />
+                  <LiveEditableText
+                    as="p"
+                    className="body-copy mt-3"
+                    editorKey="home.updateParagraphs.0"
+                    initialHtml={resolveLiveHtml(liveEditor, 'home.updateParagraphs.0', home.updateParagraphs[0] || '')}
+                    isAdmin={isAdmin}
+                    title="Info Text"
+                    normalizeTypography
+                  />
+                </LiveResizableBox>
+              </div>
 
-              <LiveResizableBox
-                boxKey="home.simple.sponsorinfo.box"
-                initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.sponsorinfo.box')}
-                isAdmin={isAdmin}
-                className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
-              >
-                <LiveEditableText
-                  as="h3"
-                  className="section-title uppercase"
-                  editorKey="home.closingTitle"
-                  initialHtml={resolveLiveHtml(liveEditor, 'home.closingTitle', home.closingTitle)}
+              <div className="min-w-0 md:flex-[1.2]">
+                <LiveResizableBox
+                  boxKey="home.simple.sponsorinfo.box"
+                  initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.sponsorinfo.box')}
                   isAdmin={isAdmin}
-                  title="Sponsor Info Überschrift"
-                  normalizeTypography
-                />
-                <LiveEditableText
-                  as="p"
-                  className="body-copy mt-3"
-                  editorKey="home.closingLead"
-                  initialHtml={resolveLiveHtml(liveEditor, 'home.closingLead', home.closingLead)}
-                  isAdmin={isAdmin}
-                  title="Sponsor Info Text"
-                  normalizeTypography
-                />
-                {isAdmin ? (
-                  <div className="link-copy mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-accent)] bg-[color:var(--color-surface)] px-7 py-3.5 text-base font-bold tracking-wide shadow-[0_8px_20px_color-mix(in_srgb,var(--color-accent)_18%,transparent)]">
-                    <LiveEditableText
-                      as="span"
-                      className="link-copy text-base font-bold tracking-wide"
-                      editorKey="home.closingPrimaryCtaLabel"
-                      initialHtml={resolveLiveHtml(liveEditor, 'home.closingPrimaryCtaLabel', home.closingPrimaryCtaLabel)}
-                      isAdmin={isAdmin}
-                      title="Sponsor Info Buttontext"
-                      normalizeTypography
-                    />
-                    <ArrowRight className="h-4 w-4" />
-                  </div>
-                ) : (
-                  <Button href="/sponsoren" className="mt-4 w-full justify-center">
-                    {resolveLiveHtml(liveEditor, 'home.closingPrimaryCtaLabel', home.closingPrimaryCtaLabel).replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                )}
-              </LiveResizableBox>
+                  className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
+                >
+                  <LiveEditableText
+                    as="h3"
+                    className="section-title uppercase"
+                    editorKey="home.closingTitle"
+                    initialHtml={resolveLiveHtml(liveEditor, 'home.closingTitle', home.closingTitle)}
+                    isAdmin={isAdmin}
+                    title="Sponsor Info Überschrift"
+                    normalizeTypography
+                  />
+                  <LiveEditableText
+                    as="p"
+                    className="body-copy mt-3"
+                    editorKey="home.closingLead"
+                    initialHtml={resolveLiveHtml(liveEditor, 'home.closingLead', home.closingLead)}
+                    isAdmin={isAdmin}
+                    title="Sponsor Info Text"
+                    normalizeTypography
+                  />
+                  {isAdmin ? (
+                    <div className="link-copy mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-accent)] bg-[color:var(--color-surface)] px-7 py-3.5 text-base font-bold tracking-wide shadow-[0_8px_20px_color-mix(in_srgb,var(--color-accent)_18%,transparent)]">
+                      <LiveEditableText
+                        as="span"
+                        className="link-copy text-base font-bold tracking-wide"
+                        editorKey="home.closingPrimaryCtaLabel"
+                        initialHtml={resolveLiveHtml(liveEditor, 'home.closingPrimaryCtaLabel', home.closingPrimaryCtaLabel)}
+                        isAdmin={isAdmin}
+                        title="Sponsor Info Buttontext"
+                        normalizeTypography
+                      />
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
+                  ) : (
+                    <Button href="/sponsoren" className="mt-4 w-full justify-center">
+                      {resolveLiveHtml(liveEditor, 'home.closingPrimaryCtaLabel', home.closingPrimaryCtaLabel).replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  )}
+                </LiveResizableBox>
+              </div>
             </div>
           </div>
         </main>
