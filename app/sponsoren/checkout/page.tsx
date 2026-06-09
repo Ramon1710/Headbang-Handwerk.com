@@ -14,7 +14,7 @@ export default async function CheckoutPage() {
         ctaLabel={cms.site.navigationCtaLabel}
         ctaHref={cms.site.navigationCtaHref}
       />
-      <Suspense fallback={<div className="min-h-screen bg-[#0a0a0a] pt-24 flex items-center justify-center text-gray-400">Laden...</div>}>
+      <Suspense fallback={<div className="body-copy min-h-screen bg-[#0a0a0a] pt-24 flex items-center justify-center">Laden...</div>}>
         <CheckoutClient sponsorPackages={cms.site.sponsorPackages} />
       </Suspense>
       <Footer content={cms.site.footer} />

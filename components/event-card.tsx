@@ -41,7 +41,7 @@ export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix 
       </div>
       <LiveEditableText
         as="h3"
-        className="cms-box-title mb-1 font-bold text-white"
+        className="section-title mb-2 text-[1.7rem]"
         editorKey={`${resolvedKeyPrefix}.title`}
         initialHtml={resolveLiveHtml(liveEditor, `${resolvedKeyPrefix}.title`, event.title)}
         isAdmin={isAdmin}
@@ -49,14 +49,14 @@ export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix 
       />
       <LiveEditableText
         as="p"
-        className="cms-box-label mb-4 font-medium text-[color:var(--color-accent)]"
+        className="body-copy mb-4 text-sm"
         editorKey={`${resolvedKeyPrefix}.festivalName`}
         initialHtml={resolveLiveHtml(liveEditor, `${resolvedKeyPrefix}.festivalName`, event.festivalName)}
         isAdmin={isAdmin}
         title={`Festivalname ${event.title}`}
       />
       <div className="space-y-2 mb-4 max-w-xs mx-auto">
-        <div className="cms-box-body flex items-center justify-center gap-2 text-gray-300">
+        <div className="body-copy flex items-center justify-center gap-2 text-sm">
           <Calendar className="w-4 h-4 flex-shrink-0 text-[color:var(--color-accent)]" />
           <LiveEditableText
             as="span"
@@ -67,7 +67,7 @@ export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix 
             title={`Veranstaltungsdatum ${event.title}`}
           />
         </div>
-        <div className="cms-box-body flex items-center justify-center gap-2 text-gray-300">
+        <div className="body-copy flex items-center justify-center gap-2 text-sm">
           <MapPin className="w-4 h-4 flex-shrink-0 text-[color:var(--color-accent)]" />
           <LiveEditableText
             as="span"
@@ -81,7 +81,7 @@ export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix 
       </div>
       <LiveEditableText
         as="p"
-        className="cms-box-body mb-6 max-w-sm mx-auto leading-relaxed text-gray-400"
+        className="body-copy mb-6 mx-auto max-w-sm"
         editorKey={`${resolvedKeyPrefix}.description`}
         initialHtml={resolveLiveHtml(liveEditor, `${resolvedKeyPrefix}.description`, event.description)}
         isAdmin={isAdmin}
@@ -91,7 +91,7 @@ export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix 
   );
 
   return (
-    <div className="rounded-[1.8rem] bg-[linear-gradient(180deg,rgba(28,18,12,0.72)_0%,rgba(12,9,7,0.3)_100%)] p-7 text-center ring-1 ring-white/6 transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.22)] hover:-translate-y-1 hover:ring-[color:var(--color-accent)]/30">
+    <div className="rounded-[1.8rem] bg-[linear-gradient(180deg,rgba(28,18,12,0.72)_0%,rgba(12,9,7,0.3)_100%)] p-8 text-center ring-1 ring-white/6 shadow-[0_20px_50px_rgba(0,0,0,0.22)] transition-all duration-300 hover:-translate-y-1 hover:ring-[color:var(--color-accent)]/30">
       {isAdmin ? (
         cardContent
       ) : (

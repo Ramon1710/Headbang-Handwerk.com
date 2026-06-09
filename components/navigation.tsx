@@ -81,7 +81,7 @@ export function Navigation({
               <a
                 key={link.href}
                 href={link.href}
-                className="px-3 py-2 text-[0.97rem] font-semibold text-[color:var(--color-foreground)] hover:text-[color:var(--color-accent-soft)] rounded-md transition-colors"
+                className="link-copy px-3 py-2 text-[0.97rem] font-semibold rounded-md transition-colors"
               >
                 {link.label}
               </a>
@@ -111,7 +111,7 @@ export function Navigation({
             </Button>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="lg:hidden p-2 text-[color:var(--color-muted)] hover:text-[color:var(--color-accent-soft)] rounded-md transition-colors"
+              className="link-copy lg:hidden rounded-md p-2 transition-colors"
               aria-label="Menü öffnen"
             >
               {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -128,7 +128,7 @@ export function Navigation({
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className="px-3 py-2.5 text-sm font-semibold text-[color:var(--color-foreground)] hover:text-[color:var(--color-accent-soft)] rounded-md transition-colors"
+                className="link-copy rounded-md px-3 py-2.5 text-sm font-semibold transition-colors"
               >
                 {link.label}
               </a>

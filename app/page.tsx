@@ -79,7 +79,7 @@ function HomeActionCard({
       boxKey={boxKey}
       initialStyle={resolveLiveBoxStyle(liveEditor, boxKey)}
       isAdmin={isAdmin}
-      className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.9)_0%,rgba(10,7,5,0.82)_100%)] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
+      className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.9)_0%,rgba(10,7,5,0.82)_100%)] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)] sm:p-7"
     >
       <LiveEditableText
         as="div"
@@ -91,10 +91,10 @@ function HomeActionCard({
         normalizeTypography
       />
       {isAdmin ? (
-        <div className="mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2.5 text-sm font-bold tracking-wide text-[color:var(--color-accent-soft)]">
+        <div className="link-copy mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2.5 text-sm font-bold tracking-wide">
           <LiveEditableText
             as="span"
-            className="text-sm font-bold tracking-wide text-[color:var(--color-accent-soft)]"
+            className="link-copy text-sm font-bold tracking-wide"
             editorKey={ctaKey}
             initialHtml={resolveLiveHtml(liveEditor, ctaKey, linkLabel)}
             isAdmin={isAdmin}
@@ -239,7 +239,7 @@ export default async function HomePage({
                 >
                   <LiveEditableText
                     as="h1"
-                    className="text-3xl font-black text-white sm:text-4xl"
+                    className="page-title text-center"
                     editorKey="home.heroTitle"
                     initialHtml={resolveLiveHtml(liveEditor, 'home.heroTitle', home.heroTitle)}
                     isAdmin={isAdmin}
@@ -256,7 +256,7 @@ export default async function HomePage({
                 >
                   <LiveEditableText
                     as="p"
-                    className="text-2xl font-bold text-[color:var(--color-accent-soft)] sm:text-3xl"
+                    className="body-copy-lg"
                     editorKey="home.heroLead"
                     initialHtml={resolveLiveHtml(liveEditor, 'home.heroLead', home.heroLead)}
                     isAdmin={isAdmin}
@@ -273,7 +273,7 @@ export default async function HomePage({
                 >
                   <LiveEditableText
                     as="div"
-                    className="text-lg leading-8 text-[#ead9c3]"
+                    className="body-copy-lg"
                     editorKey="home.heroBody"
                     initialHtml={resolveLiveHtml(liveEditor, 'home.heroBody', home.heroBody)}
                     isAdmin={isAdmin}
@@ -318,7 +318,7 @@ export default async function HomePage({
               >
                 <LiveEditableText
                   as="h3"
-                  className="font-[family-name:var(--font-cinzel)] text-3xl font-black uppercase leading-none text-white"
+                  className="section-title uppercase"
                   editorKey="home.updateTitle"
                   initialHtml={resolveLiveHtml(liveEditor, 'home.updateTitle', home.updateTitle)}
                   isAdmin={isAdmin}
@@ -327,7 +327,7 @@ export default async function HomePage({
                 />
                 <LiveEditableText
                   as="p"
-                  className="mt-3 text-base leading-7 text-[#ead9c3]"
+                  className="body-copy mt-3"
                   editorKey="home.updateParagraphs.0"
                   initialHtml={resolveLiveHtml(liveEditor, 'home.updateParagraphs.0', home.updateParagraphs[0] || '')}
                   isAdmin={isAdmin}
@@ -344,7 +344,7 @@ export default async function HomePage({
               >
                 <LiveEditableText
                   as="h3"
-                  className="font-[family-name:var(--font-cinzel)] text-3xl font-black uppercase leading-none text-white"
+                  className="section-title uppercase"
                   editorKey="home.closingTitle"
                   initialHtml={resolveLiveHtml(liveEditor, 'home.closingTitle', home.closingTitle)}
                   isAdmin={isAdmin}
@@ -353,7 +353,7 @@ export default async function HomePage({
                 />
                 <LiveEditableText
                   as="p"
-                  className="mt-3 text-base leading-7 text-[#ead9c3]"
+                  className="body-copy mt-3"
                   editorKey="home.closingLead"
                   initialHtml={resolveLiveHtml(liveEditor, 'home.closingLead', home.closingLead)}
                   isAdmin={isAdmin}
@@ -361,10 +361,10 @@ export default async function HomePage({
                   normalizeTypography
                 />
                 {isAdmin ? (
-                  <div className="mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-accent)] bg-[linear-gradient(180deg,var(--color-accent)_0%,var(--color-accent-strong)_54%,color-mix(in_srgb,var(--color-accent-strong)_72%,black)_100%)] px-7 py-3.5 text-base font-bold tracking-wide text-white shadow-[0_8px_20px_color-mix(in_srgb,var(--color-accent)_35%,transparent),inset_0_1px_0_color-mix(in_srgb,var(--color-accent-soft)_60%,transparent)]">
+                  <div className="link-copy mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-accent)] bg-[color:var(--color-surface)] px-7 py-3.5 text-base font-bold tracking-wide shadow-[0_8px_20px_color-mix(in_srgb,var(--color-accent)_18%,transparent)]">
                     <LiveEditableText
                       as="span"
-                      className="text-base font-bold tracking-wide text-white"
+                      className="link-copy text-base font-bold tracking-wide"
                       editorKey="home.closingPrimaryCtaLabel"
                       initialHtml={resolveLiveHtml(liveEditor, 'home.closingPrimaryCtaLabel', home.closingPrimaryCtaLabel)}
                       isAdmin={isAdmin}

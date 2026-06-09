@@ -24,15 +24,15 @@ export function Footer({
   return (
     <footer className="relative mt-6 border-t border-[color:var(--color-border)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-background)_88%,black)_0%,var(--color-background)_100%)] sm:mt-8">
       <div className="fire-divider" />
-      <div className="w-full px-4 py-14 text-center sm:px-6">
-        <div className="mx-auto flex w-full max-w-6xl flex-col items-center">
+      <div className="site-shell w-full px-4 py-14 text-center sm:px-6">
+        <div className="flex w-full flex-col items-center">
           <LiveResizableBox
             boxKey="footer.brand.box"
             initialStyle={resolveLiveBoxStyle(liveEditor, 'footer.brand.box')}
             isAdmin={isAdmin}
             className="mb-5"
           >
-            <p className="text-[1.9rem] font-semibold text-[color:var(--color-accent-soft)] sm:text-[2.2rem]">
+            <p className="section-title text-center sm:text-[2.2rem]">
               <LiveEditableText
                 as="span"
                 className="inline"
@@ -43,7 +43,7 @@ export function Footer({
               />{' '}
               <LiveEditableText
                 as="span"
-                className="inline text-[color:var(--color-foreground)]"
+                className="inline"
                 editorKey="footer.brandHighlight"
                 initialHtml={resolveLiveHtml(liveEditor, 'footer.brandHighlight', content.brandHighlight)}
                 isAdmin={isAdmin}
@@ -67,7 +67,7 @@ export function Footer({
                 key={label}
                 href={href}
                 aria-label={label}
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-2)_92%,black)_0%,color-mix(in_srgb,var(--color-surface)_76%,black)_100%)] text-[color:var(--color-accent-soft)] ring-1 ring-[color:var(--color-border)] transition-all hover:text-[color:var(--color-foreground)] hover:ring-[color:var(--color-accent)]"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-2)_92%,black)_0%,color-mix(in_srgb,var(--color-surface)_76%,black)_100%)] text-[color:var(--text-link)] ring-1 ring-[color:var(--color-border)] transition-all hover:ring-[color:var(--color-accent)]"
               >
                 <Icon className="w-5 h-5" />
               </a>
@@ -83,7 +83,7 @@ export function Footer({
               isAdmin={isAdmin}
               className="w-full max-w-4xl"
             >
-              <div className="flex w-full flex-wrap items-center justify-center gap-x-5 gap-y-3 border-t border-[color:var(--color-border)] pt-5 text-center text-sm text-[color:var(--color-muted)]">
+              <div className="body-copy flex w-full flex-wrap items-center justify-center gap-x-5 gap-y-3 border-t border-[color:var(--color-border)] pt-5 text-center text-sm">
                 <p>
                   © {year}{' '}
                   <LiveEditableText
@@ -95,10 +95,10 @@ export function Footer({
                     title="Footer Copyright"
                   />
                 </p>
-                <a href="/impressum" className="transition-colors hover:text-[color:var(--color-accent-soft)]">Impressum</a>
-                <a href="/datenschutz" className="transition-colors hover:text-[color:var(--color-accent-soft)]">Datenschutz</a>
-                <a href="/agb" className="transition-colors hover:text-[color:var(--color-accent-soft)]">AGB</a>
-                <a href="/kontakt" className="transition-colors hover:text-[color:var(--color-accent-soft)]">Kontakt</a>
+                <a href="/impressum" className="link-copy transition-colors">Impressum</a>
+                <a href="/datenschutz" className="link-copy transition-colors">Datenschutz</a>
+                <a href="/agb" className="link-copy transition-colors">AGB</a>
+                <a href="/kontakt" className="link-copy transition-colors">Kontakt</a>
               </div>
             </LiveResizableBox>
           </div>

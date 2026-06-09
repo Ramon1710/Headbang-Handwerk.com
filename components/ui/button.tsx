@@ -21,10 +21,10 @@ export function Button({
 
   const variants = {
     primary:
-      'text-white border border-[color:var(--color-accent)] bg-[linear-gradient(180deg,var(--color-accent)_0%,var(--color-accent-strong)_54%,color-mix(in_srgb,var(--color-accent-strong)_72%,black)_100%)] shadow-[0_8px_20px_color-mix(in_srgb,var(--color-accent)_35%,transparent),inset_0_1px_0_color-mix(in_srgb,var(--color-accent-soft)_60%,transparent)] hover:brightness-110 hover:-translate-y-0.5',
+      'border border-[color:var(--color-accent)] bg-[linear-gradient(180deg,rgba(31,20,14,0.92)_0%,rgba(16,10,7,0.84)_100%)] text-[color:var(--text-link)] shadow-[0_8px_20px_color-mix(in_srgb,var(--color-accent)_28%,transparent),inset_0_1px_0_color-mix(in_srgb,var(--color-accent-soft)_20%,transparent)] hover:-translate-y-0.5 hover:border-[color:var(--color-accent-soft)]',
     secondary:
-      'border border-[color:var(--color-border)] text-[color:var(--color-accent-soft)] bg-[color:var(--color-surface)] hover:bg-[color:var(--color-surface-2)] hover:border-[color:var(--color-accent)]',
-    ghost: 'text-[color:var(--color-muted)] hover:text-[color:var(--color-foreground)] hover:bg-white/10',
+      'border border-[color:var(--color-border)] text-[color:var(--text-link)] bg-[color:var(--color-surface)] hover:bg-[color:var(--color-surface-2)] hover:border-[color:var(--color-accent)]',
+    ghost: 'text-[color:var(--text-link)] hover:bg-white/10',
     danger: 'bg-red-600 hover:bg-red-500 text-white',
   };
 

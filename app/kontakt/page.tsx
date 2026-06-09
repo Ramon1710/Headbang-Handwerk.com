@@ -54,16 +54,16 @@ export default async function KontaktPage({
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <LiveResizableBox boxKey="contact.info.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'contact.info.box')} isAdmin={isAdmin} className="lg:col-span-1 content-flow text-center text-panel text-panel-roomy h-fit">
-              <h1 className="text-4xl font-black text-white">
-                <LiveEditableText as="span" className="inline text-[color:var(--color-accent)]" editorKey="contact.title" initialHtml={resolveLiveHtml(liveEditor, 'contact.title', contact.title)} isAdmin={isAdmin} title="Kontakt Titel" />
+              <h1 className="page-title">
+                <LiveEditableText as="span" className="inline" editorKey="contact.title" initialHtml={resolveLiveHtml(liveEditor, 'contact.title', contact.title)} isAdmin={isAdmin} title="Kontakt Titel" />
               </h1>
-              <LiveEditableText as="p" className="mx-auto max-w-md leading-relaxed text-gray-300" editorKey="contact.lead" initialHtml={resolveLiveHtml(liveEditor, 'contact.lead', contact.lead)} isAdmin={isAdmin} title="Kontakt Einleitung" />
+              <LiveEditableText as="p" className="body-copy mx-auto max-w-md" editorKey="contact.lead" initialHtml={resolveLiveHtml(liveEditor, 'contact.lead', contact.lead)} isAdmin={isAdmin} title="Kontakt Einleitung" />
 
               <div className="space-y-4 max-w-sm mx-auto">
                 <LiveResizableBox boxKey="contact.email.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'contact.email.box')} isAdmin={isAdmin} className="max-w-sm mx-auto">
                 <a
                   href={`mailto:${contact.email}`}
-                  className="flex items-center justify-center gap-3 text-gray-300 transition-colors hover:text-[color:var(--color-accent-soft)]"
+                  className="link-copy flex items-center justify-center gap-3 transition-colors"
                 >
                   <div className="w-10 h-10 rounded-full bg-[linear-gradient(180deg,rgba(38,26,19,0.92)_0%,rgba(18,12,8,0.72)_100%)] ring-1 ring-white/8 flex items-center justify-center">
                     <Mail className="h-4 w-4 text-[color:var(--color-accent)]" />
@@ -74,7 +74,7 @@ export default async function KontaktPage({
                 <LiveResizableBox boxKey="contact.instagram.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'contact.instagram.box')} isAdmin={isAdmin} className="max-w-sm mx-auto">
                 <a
                   href={instagramLink}
-                  className="flex items-center justify-center gap-3 text-gray-300 transition-colors hover:text-[color:var(--color-accent-soft)]"
+                  className="link-copy flex items-center justify-center gap-3 transition-colors"
                 >
                   <div className="w-10 h-10 rounded-full bg-[linear-gradient(180deg,rgba(38,26,19,0.92)_0%,rgba(18,12,8,0.72)_100%)] ring-1 ring-white/8 flex items-center justify-center">
                     <Instagram className="h-4 w-4 text-[color:var(--color-accent)]" />
@@ -85,7 +85,7 @@ export default async function KontaktPage({
                 <LiveResizableBox boxKey="contact.facebook.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'contact.facebook.box')} isAdmin={isAdmin} className="max-w-sm mx-auto">
                 <a
                   href={facebookLink}
-                  className="flex items-center justify-center gap-3 text-gray-300 transition-colors hover:text-[color:var(--color-accent-soft)]"
+                  className="link-copy flex items-center justify-center gap-3 transition-colors"
                 >
                   <div className="w-10 h-10 rounded-full bg-[linear-gradient(180deg,rgba(38,26,19,0.92)_0%,rgba(18,12,8,0.72)_100%)] ring-1 ring-white/8 flex items-center justify-center">
                     <Facebook className="h-4 w-4 text-[color:var(--color-accent)]" />
@@ -97,8 +97,8 @@ export default async function KontaktPage({
             </LiveResizableBox>
 
             <div className="lg:col-span-2">
-              <LiveResizableBox boxKey="contact.form.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'contact.form.box')} isAdmin={isAdmin} className="section-shell p-8">
-                <LiveEditableText as="h2" className="mb-6 text-center text-xl font-bold text-white" editorKey="contact.formTitle" initialHtml={resolveLiveHtml(liveEditor, 'contact.formTitle', contact.formTitle)} isAdmin={isAdmin} title="Kontakt Formular Titel" />
+              <LiveResizableBox boxKey="contact.form.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'contact.form.box')} isAdmin={isAdmin} className="section-shell content-box">
+                <LiveEditableText as="h2" className="section-title mb-6 text-center text-[1.8rem]" editorKey="contact.formTitle" initialHtml={resolveLiveHtml(liveEditor, 'contact.formTitle', contact.formTitle)} isAdmin={isAdmin} title="Kontakt Formular Titel" />
                 <ContactForm />
               </LiveResizableBox>
             </div>

@@ -87,10 +87,10 @@ export default async function MerchandisePage({
           </section>
         ) : null}
 
-        <section className="section-shell p-8 text-center sm:p-10 lg:p-12">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">{merchandise.eyebrow}</p>
-          <h1 className="mt-5 text-4xl font-black text-white sm:text-5xl">{merchandise.title}</h1>
-          <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-[color:var(--color-muted)]">
+        <section className="section-shell content-box text-center sm:p-10 lg:p-12">
+          <p className="body-copy text-sm font-semibold uppercase tracking-[0.28em]">{merchandise.eyebrow}</p>
+          <h1 className="page-title mt-5">{merchandise.title}</h1>
+          <p className="body-copy-lg mx-auto mt-6 max-w-3xl">
             {merchandise.lead}
           </p>
           <MerchandiseShop products={merchandise.products} />

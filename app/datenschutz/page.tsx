@@ -23,9 +23,9 @@ export default async function DatenschutzPage({
     <EditablePageShell cms={cms} isAdmin={isAdmin} mainClassName="min-h-screen bg-transparent pt-28 pb-24">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <LiveResizableBox boxKey="privacy.title.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'privacy.title.box')} isAdmin={isAdmin} className="mb-10 text-center">
-            <LiveEditableText as="h1" className="text-4xl font-black text-white" editorKey="privacy.title" initialHtml={resolveLiveHtml(liveEditor, 'privacy.title', 'Datenschutzerklärung')} isAdmin={isAdmin} title="Datenschutz Titel" />
+            <LiveEditableText as="h1" className="page-title" editorKey="privacy.title" initialHtml={resolveLiveHtml(liveEditor, 'privacy.title', 'Datenschutzerklärung')} isAdmin={isAdmin} title="Datenschutz Titel" />
           </LiveResizableBox>
-          <div className="legal-copy content-flow text-gray-300">
+          <div className="legal-copy content-flow body-copy">
             <LiveResizableBox boxKey="privacy.section.0.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'privacy.section.0.box')} isAdmin={isAdmin} className="content-flow">
               <LiveEditableText as="div" className="content-flow" editorKey="privacy.section.0.content" initialHtml={resolveLiveRichHtml(liveEditor, 'privacy.section.0.content', `${textParagraphHtml('1. Datenschutz auf einen Blick', 'mb-3 text-xl font-bold text-white')}${textParagraphHtml('Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen.', 'text-sm leading-relaxed')}`)} isAdmin={isAdmin} title="Datenschutz Abschnitt 1" />
             </LiveResizableBox>

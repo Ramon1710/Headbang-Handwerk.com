@@ -24,13 +24,13 @@ export default async function FormularPage({
   return (
     <EditablePageShell cms={cms} isAdmin={isAdmin} mainClassName="min-h-screen bg-transparent pt-28 pb-24">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <LiveResizableBox boxKey="formPage.intro.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'formPage.intro.box')} isAdmin={isAdmin} className="section-shell p-8 text-center sm:p-10 lg:p-12">
-          <LiveEditableText as="h1" className="text-4xl font-black text-white sm:text-5xl" editorKey="formPage.title" initialHtml={resolveLiveHtml(liveEditor, 'formPage.title', 'Mitglied werden / Formular')} isAdmin={isAdmin} title="Formular Titel" normalizeTypography />
-          <LiveEditableText as="p" className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-[color:var(--color-muted)]" editorKey="formPage.lead" initialHtml={resolveLiveHtml(liveEditor, 'formPage.lead', 'Hier könnt ihr euer gewünschtes Formular oder den direkten Erstkontakt für Mitgliedschaften und Anfragen einfügen.')} isAdmin={isAdmin} title="Formular Einleitung" normalizeTypography />
+        <LiveResizableBox boxKey="formPage.intro.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'formPage.intro.box')} isAdmin={isAdmin} className="section-shell content-box text-center sm:p-10 lg:p-12">
+          <LiveEditableText as="h1" className="page-title" editorKey="formPage.title" initialHtml={resolveLiveHtml(liveEditor, 'formPage.title', 'Mitglied werden / Formular')} isAdmin={isAdmin} title="Formular Titel" normalizeTypography />
+          <LiveEditableText as="p" className="body-copy-lg mx-auto mt-6 max-w-3xl" editorKey="formPage.lead" initialHtml={resolveLiveHtml(liveEditor, 'formPage.lead', 'Hier könnt ihr euer gewünschtes Formular oder den direkten Erstkontakt für Mitgliedschaften und Anfragen einfügen.')} isAdmin={isAdmin} title="Formular Einleitung" normalizeTypography />
         </LiveResizableBox>
 
-        <LiveResizableBox boxKey="formPage.form.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'formPage.form.box')} isAdmin={isAdmin} className="section-shell mt-8 p-8">
-          <LiveEditableText as="h2" className="mb-6 text-center text-2xl font-black text-white" editorKey="formPage.formTitle" initialHtml={resolveLiveHtml(liveEditor, 'formPage.formTitle', 'Kontaktformular')} isAdmin={isAdmin} title="Formular Überschrift" normalizeTypography />
+        <LiveResizableBox boxKey="formPage.form.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'formPage.form.box')} isAdmin={isAdmin} className="section-shell content-box mt-8">
+          <LiveEditableText as="h2" className="section-title mb-6 text-center" editorKey="formPage.formTitle" initialHtml={resolveLiveHtml(liveEditor, 'formPage.formTitle', 'Kontaktformular')} isAdmin={isAdmin} title="Formular Überschrift" normalizeTypography />
           <div className="mx-auto w-full max-w-[824px] overflow-hidden rounded-[1.4rem] border border-[color:var(--color-border)] bg-black/10">
             <iframe
               src="https://formular.vereinsplaner.com/embed/0ea97d8f-0446-4a9c-b172-2042aa012f2c"

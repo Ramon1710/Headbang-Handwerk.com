@@ -52,10 +52,10 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       '--live-box-min-height-desktop': desktopStyle?.minHeight,
       '--live-box-x-desktop': allowPosition ? desktopStyle?.x : undefined,
       '--live-box-y-desktop': allowPosition ? desktopStyle?.y : undefined,
-      '--live-box-width-mobile': mobileStyle?.width,
+      '--live-box-width-mobile': '100%',
       '--live-box-height-mobile': mobileStyle?.height,
       '--live-box-min-height-mobile': mobileStyle?.minHeight,
-      '--live-box-x-mobile': allowPosition ? mobileStyle?.x : undefined,
+      '--live-box-x-mobile': undefined,
       '--live-box-y-mobile': allowPosition ? mobileStyle?.y : undefined,
       maxWidth: '100%',
     } as CSSProperties;
@@ -181,7 +181,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   }
 
   function handleMoveStart(event: React.PointerEvent<HTMLButtonElement>) {
-    if (!isAdmin || !ref.current || !allowPosition) {
+    if (!isAdmin || !ref.current || !allowPosition || viewport === 'mobile') {
       return;
     }
 
@@ -312,6 +312,74 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     window.addEventListener('pointercancel', handlePointerCancel);
   }
 
+  function handleWidthResizeStart(event: React.PointerEvent<HTMLButtonElement>) {
+    if (!isAdmin || !ref.current || viewport === 'mobile') {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    document.body.style.userSelect = 'none';
+    event.currentTarget.setPointerCapture(event.pointerId);
+
+    const startX = event.clientX;
+    const rect = ref.current.getBoundingClientRect();
+    const startWidth = rect.width;
+    const activeViewport = viewport;
+    const minWidth = 180;
+    const currentStyle = getViewportStyle(boxStyles, activeViewport);
+    const currentHeight = currentStyle?.height;
+    const currentMinHeight = currentStyle?.minHeight;
+    const currentX = currentStyle?.x;
+    const currentY = currentStyle?.y;
+
+    function handlePointerMove(moveEvent: PointerEvent) {
+      const nextWidth = Math.max(minWidth, startWidth + (moveEvent.clientX - startX));
+
+      updateViewportStyle(
+        {
+          width: `${Math.round(nextWidth)}px`,
+        },
+        activeViewport
+      );
+    }
+
+    function finishResize(endClientX: number) {
+      const nextWidth = Math.max(minWidth, startWidth + (endClientX - startX));
+      document.body.style.userSelect = '';
+
+      queueSave(
+        {
+          width: `${Math.round(nextWidth)}px`,
+          height: currentHeight,
+          minHeight: currentMinHeight,
+          x: currentX,
+          y: currentY,
+        },
+        activeViewport
+      );
+
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerCancel);
+    }
+
+    function handlePointerUp(upEvent: PointerEvent) {
+      finishResize(upEvent.clientX);
+    }
+
+    function handlePointerCancel() {
+      document.body.style.userSelect = '';
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerCancel);
+    }
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerCancel);
+  }
+
   return (
     <div
       ref={ref}
@@ -333,15 +401,25 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
           </span>
         </button>
       ) : null}
-      <div className={`relative h-full w-full overflow-y-auto overflow-x-hidden ${className}`}>
+      <div className={`relative h-full w-full overflow-x-hidden ${className}`}>
         {children}
       </div>
       {isAdmin ? (
         <button
           type="button"
+          onPointerDown={handleWidthResizeStart}
+          aria-label="Breite ändern"
+          className="absolute bottom-2 left-1/2 z-20 hidden h-5 w-12 -translate-x-1/2 cursor-ew-resize rounded-full border border-[#ff9d3c]/60 bg-[#1a110b]/90 md:block"
+        >
+          <span aria-hidden="true" className="pointer-events-none absolute inset-x-2 top-1/2 h-0.5 -translate-y-1/2 bg-[#ffcf98]" />
+        </button>
+      ) : null}
+      {isAdmin ? (
+        <button
+          type="button"
           onPointerDown={handleResizeStart}
           aria-label="Größe ändern"
-          className="absolute bottom-2 right-2 z-20 h-5 w-5 cursor-se-resize touch-none rounded-sm"
+          className="absolute bottom-2 right-2 z-20 h-6 w-6 cursor-se-resize touch-none rounded-sm bg-[#1a110b]/88"
         >
           <span aria-hidden="true" className="pointer-events-none absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2 border-[#ff9d3c]/80" />
         </button>

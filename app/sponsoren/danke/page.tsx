@@ -17,13 +17,13 @@ export default async function DankePage() {
         ctaHref={cms.site.navigationCtaHref}
       />
       <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-20 flex items-center justify-center">
-        <div className="content-flow text-center max-w-lg mx-auto px-4">
+        <div className="content-flow body-copy text-center max-w-lg mx-auto px-4">
           <div className="text-6xl">🤘</div>
-          <h1 className="text-4xl font-black text-white">
+          <h1 className="page-title">
             Danke für dein{' '}
-            <span className="text-[color:var(--color-accent)]">Sponsoring!</span>
+            <span>Sponsoring!</span>
           </h1>
-          <p className="text-gray-400 text-lg">
+          <p className="body-copy-lg">
             Zahlung erfolgreich! Wir freuen uns riesig über deine Unterstützung. Du erhältst in
             Kürze eine Bestätigung per E-Mail.
           </p>

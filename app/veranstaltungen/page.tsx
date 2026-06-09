@@ -139,11 +139,11 @@ export default async function VeranstaltungenPage({
           ) : null}
 
           <LiveResizableBox boxKey="events.intro.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'events.intro.box')} isAdmin={isAdmin} className="copy-center content-flow mb-14">
-            <h1 className="text-4xl font-black text-white sm:text-5xl">
+            <h1 className="page-title">
               <LiveEditableText as="span" className="inline" editorKey="events.titlePrefix" initialHtml={resolveLiveHtml(liveEditor, 'events.titlePrefix', 'Festival')} isAdmin={isAdmin} title="Veranstaltungen Titel Anfang" />{' '}
-              <LiveEditableText as="span" className="inline text-[color:var(--color-accent)]" editorKey="events.titleHighlight" initialHtml={resolveLiveHtml(liveEditor, 'events.titleHighlight', 'Termine 2025')} isAdmin={isAdmin} title="Veranstaltungen Titel Highlight" />
+              <LiveEditableText as="span" className="inline" editorKey="events.titleHighlight" initialHtml={resolveLiveHtml(liveEditor, 'events.titleHighlight', 'Termine 2025')} isAdmin={isAdmin} title="Veranstaltungen Titel Highlight" />
             </h1>
-            <LiveEditableText as="p" className="mx-auto max-w-2xl text-lg text-gray-300" editorKey="events.lead" initialHtml={resolveLiveHtml(liveEditor, 'events.lead', 'Wir sind auf den größten Metal-Festivals Europas vertreten. Hier findet ihr alle aktuellen und geplanten Veranstaltungen.')} isAdmin={isAdmin} title="Veranstaltungen Einleitung" />
+            <LiveEditableText as="p" className="body-copy-lg mx-auto max-w-2xl" editorKey="events.lead" initialHtml={resolveLiveHtml(liveEditor, 'events.lead', 'Wir sind auf den größten Metal-Festivals Europas vertreten. Hier findet ihr alle aktuellen und geplanten Veranstaltungen.')} isAdmin={isAdmin} title="Veranstaltungen Einleitung" />
           </LiveResizableBox>
 
           {renderSection('Bestätigt', 'events.confirmedHeading', 'events.confirmedHeading.box', 'bg-green-500', confirmed)}

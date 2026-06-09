@@ -58,8 +58,8 @@ export function ContactForm() {
     return (
       <div className="rounded-xl border border-green-700/50 bg-green-950/20 p-8 text-center">
         <div className="text-4xl mb-4">✅</div>
-        <h3 className="text-white font-bold text-xl mb-2">Nachricht gesendet!</h3>
-        <p className="text-gray-400 text-sm">
+        <h3 className="section-title mb-2 text-[1.7rem]">Nachricht gesendet!</h3>
+        <p className="body-copy text-sm">
           Danke für deine Anfrage. Wir melden uns innerhalb von 1–2 Werktagen bei dir.
         </p>
       </div>
@@ -70,54 +70,54 @@ export function ContactForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
-          <label className="block text-sm text-gray-400 mb-1.5">Name *</label>
+          <label className="body-copy mb-1.5 block text-sm">Name *</label>
           <input
             required
             type="text"
             value={form.name}
             onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-            className="w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:border-[color:var(--color-accent)] focus:outline-none"
+            className="body-copy w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm transition-colors placeholder:text-[#9b8570] focus:border-[color:var(--color-accent)] focus:outline-none"
             placeholder="Max Mustermann"
           />
         </div>
         <div>
-          <label className="block text-sm text-gray-400 mb-1.5">Unternehmen</label>
+          <label className="body-copy mb-1.5 block text-sm">Unternehmen</label>
           <input
             type="text"
             value={form.company}
             onChange={(e) => setForm((p) => ({ ...p, company: e.target.value }))}
-            className="w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:border-[color:var(--color-accent)] focus:outline-none"
+            className="body-copy w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm transition-colors placeholder:text-[#9b8570] focus:border-[color:var(--color-accent)] focus:outline-none"
             placeholder="Mustermann GmbH"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm text-gray-400 mb-1.5">E-Mail *</label>
+        <label className="body-copy mb-1.5 block text-sm">E-Mail *</label>
         <input
           required
           type="email"
           value={form.email}
           onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-          className="w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:border-[color:var(--color-accent)] focus:outline-none"
+          className="body-copy w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm transition-colors placeholder:text-[#9b8570] focus:border-[color:var(--color-accent)] focus:outline-none"
           placeholder="max@mustermann.de"
         />
       </div>
 
       <div>
-        <label className="block text-sm text-gray-400 mb-1.5">Betreff *</label>
+        <label className="body-copy mb-1.5 block text-sm">Betreff *</label>
         <input
           required
           type="text"
           value={form.subject}
           onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))}
-          className="w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:border-[color:var(--color-accent)] focus:outline-none"
+          className="body-copy w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm transition-colors placeholder:text-[#9b8570] focus:border-[color:var(--color-accent)] focus:outline-none"
           placeholder="Dein Betreff..."
         />
       </div>
 
       <div>
-        <label className="block text-sm text-gray-400 mb-2">Ich interessiere mich für</label>
+        <label className="body-copy mb-2 block text-sm">Ich interessiere mich für</label>
         <div className="flex flex-wrap gap-2">
           {interestOptions.map((option) => (
             <button
@@ -127,8 +127,8 @@ export function ContactForm() {
               className={[
                 'px-3 py-1.5 rounded-full text-xs font-medium border transition-all',
                 form.interests.includes(option)
-                  ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/20 text-[color:var(--color-accent-soft)]'
-                  : 'border-[color:var(--color-border)] text-gray-500 hover:border-[color:var(--color-accent)]/40 hover:text-gray-300',
+                  ? 'border-[color:var(--color-accent)] bg-[color:var(--color-surface)] text-[color:var(--text-link)]'
+                  : 'border-[color:var(--color-border)] text-[color:var(--text-copy)] hover:border-[color:var(--color-accent)]/40',
               ].join(' ')}
             >
               {option}
@@ -138,13 +138,13 @@ export function ContactForm() {
       </div>
 
       <div>
-        <label className="block text-sm text-gray-400 mb-1.5">Nachricht *</label>
+        <label className="body-copy mb-1.5 block text-sm">Nachricht *</label>
         <textarea
           required
           rows={5}
           value={form.message}
           onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
-          className="w-full resize-none rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:border-[color:var(--color-accent)] focus:outline-none"
+          className="body-copy w-full resize-none rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm transition-colors placeholder:text-[#9b8570] focus:border-[color:var(--color-accent)] focus:outline-none"
           placeholder="Deine Nachricht..."
         />
       </div>
