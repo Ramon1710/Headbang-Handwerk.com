@@ -82,8 +82,8 @@ function HomeActionCard({
       className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.9)_0%,rgba(10,7,5,0.82)_100%)] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
     >
       <LiveEditableText
-        as="p"
-        className="text-xl font-black leading-tight text-white"
+        as="div"
+        className="home-action-copy"
         editorKey={titleKey}
         initialHtml={resolveLiveHtml(liveEditor, titleKey, title)}
         isAdmin={isAdmin}
@@ -318,7 +318,7 @@ export default async function HomePage({
               >
                 <LiveEditableText
                   as="h3"
-                  className="text-xl font-black text-white"
+                  className="font-[family-name:var(--font-cinzel)] text-3xl font-black uppercase leading-none text-white"
                   editorKey="home.updateTitle"
                   initialHtml={resolveLiveHtml(liveEditor, 'home.updateTitle', home.updateTitle)}
                   isAdmin={isAdmin}
@@ -344,7 +344,7 @@ export default async function HomePage({
               >
                 <LiveEditableText
                   as="h3"
-                  className="text-xl font-black text-white"
+                  className="font-[family-name:var(--font-cinzel)] text-3xl font-black uppercase leading-none text-white"
                   editorKey="home.closingTitle"
                   initialHtml={resolveLiveHtml(liveEditor, 'home.closingTitle', home.closingTitle)}
                   isAdmin={isAdmin}

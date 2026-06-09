@@ -40,6 +40,8 @@
 
 html {
   scroll-behavior: smooth;
+  width: 100%;
+  overflow-x: clip;
 }
 
 body {
@@ -51,6 +53,9 @@ body {
   color: var(--foreground);
   font-family: var(--font-exo), 'Segoe UI', Tahoma, sans-serif;
   min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: clip;
   position: relative;
 }
 
@@ -202,6 +207,32 @@ h6 {
 .cms-box-body {
   font-family: var(--cms-box-body-font);
   font-size: var(--cms-box-body-size);
+}
+
+.home-action-copy {
+  color: #ead9c3;
+}
+
+.home-action-copy > * + * {
+  margin-top: 0.7rem;
+}
+
+.home-action-copy > :first-child {
+  color: #ffffff;
+  font-family: var(--font-cinzel), Georgia, serif;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.home-action-copy > :not(:first-child) {
+  color: #ead9c3;
+  font-family: var(--font-exo), 'Segoe UI', Tahoma, sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.55;
 }
 
 .live-resizable-box {
