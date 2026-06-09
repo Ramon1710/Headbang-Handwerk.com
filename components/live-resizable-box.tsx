@@ -44,13 +44,14 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
 
   function buildResponsiveStyle(styles: ResolvedLiveBoxStyle | undefined) {
     const mobileStyle = isAdmin ? styles?.mobile : undefined;
+    const desktopStyle = styles?.desktop;
 
     const nextStyle = {
-      '--live-box-width-desktop': styles?.desktop?.width,
-      '--live-box-height-desktop': styles?.desktop?.height,
-      '--live-box-min-height-desktop': styles?.desktop?.minHeight,
-      '--live-box-x-desktop': allowPosition ? styles?.desktop?.x : undefined,
-      '--live-box-y-desktop': allowPosition ? styles?.desktop?.y : undefined,
+      '--live-box-width-desktop': desktopStyle?.width,
+      '--live-box-height-desktop': desktopStyle?.height,
+      '--live-box-min-height-desktop': desktopStyle?.minHeight,
+      '--live-box-x-desktop': isAdmin && allowPosition ? desktopStyle?.x : undefined,
+      '--live-box-y-desktop': isAdmin && allowPosition ? desktopStyle?.y : undefined,
       '--live-box-width-mobile': mobileStyle?.width,
       '--live-box-height-mobile': mobileStyle?.height,
       '--live-box-min-height-mobile': mobileStyle?.minHeight,
@@ -314,7 +315,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   return (
     <div
       ref={ref}
-      className="live-resizable-box relative min-h-0 min-w-0 self-start justify-self-start"
+      className={`live-resizable-box relative min-h-0 min-w-0 self-start ${isAdmin ? 'justify-self-start' : 'mx-auto w-full justify-self-stretch'}`}
       style={{
         ...buildResponsiveStyle(boxStyles),
         transform: mobileOverflowCorrection ? `translateX(${mobileOverflowCorrection}px)` : undefined,
