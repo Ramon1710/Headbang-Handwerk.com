@@ -85,6 +85,14 @@ function stripTypographyStyles(html: string) {
   });
 }
 
+function hasVisibleText(html: string) {
+  return html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .trim().length > 0;
+}
+
 export function LiveEditableText({ as = 'div', className, editorKey, initialHtml, isAdmin, title, normalizeTypography = false }: LiveEditableTextProps) {
   const Component = as;
   const router = useRouter();
@@ -227,12 +235,14 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
   }
 
   const renderedHtml = normalizeTypography ? stripTypographyStyles(html) : html;
+  const showPlaceholder = isAdmin && !hasVisibleText(renderedHtml);
+  const displayHtml = showPlaceholder ? `<span style="opacity:.7">${title || 'Text hinzufügen'}</span>` : renderedHtml;
 
   return (
     <>
       <Component
-        className={`${className || ''}${isAdmin ? ' cursor-pointer rounded-md outline outline-1 outline-dashed outline-transparent transition hover:outline-[#ff9d3c]/45' : ''}`}
-        dangerouslySetInnerHTML={{ __html: renderedHtml }}
+        className={`${className || ''}${isAdmin ? ' cursor-pointer rounded-md outline outline-1 outline-dashed outline-transparent transition hover:outline-[#ff9d3c]/45' : ''}${showPlaceholder ? ' inline-block min-h-[1.5rem] min-w-[8rem] text-[#ffcf98]' : ''}`}
+        dangerouslySetInnerHTML={{ __html: displayHtml }}
         onClick={isAdmin ? () => setIsOpen(true) : undefined}
         title={isAdmin ? title || 'Zum Bearbeiten anklicken' : undefined}
       />
