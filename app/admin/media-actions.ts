@@ -55,8 +55,13 @@ export async function updateHomeMediaAction(formData: FormData) {
   }
 
   const current = await getCmsContent();
+  let logo = current.site.logo;
   let heroImage = current.site.home.heroImage;
   let backgroundImage = current.site.home.backgroundImage;
+
+  if (formData.get('removeLogoAsset') === 'on') {
+    logo = emptyAsset();
+  }
 
   if (formData.get('removeHeroImage') === 'on') {
     heroImage = emptyAsset();
@@ -66,8 +71,22 @@ export async function updateHomeMediaAction(formData: FormData) {
     backgroundImage = emptyAsset();
   }
 
+  const logoAssetFile = formData.get('logoAssetFile');
   const heroImageFile = formData.get('heroImageFile');
   const backgroundImageFile = formData.get('backgroundImageFile');
+
+  if (logoAssetFile instanceof File && logoAssetFile.size > 0) {
+    try {
+      const uploadedAsset = await uploadCmsAsset(logoAssetFile, 'logo', 'hauptlogo');
+      logo = {
+        assetUrl: uploadedAsset.url,
+        assetName: uploadedAsset.name,
+        assetContentType: uploadedAsset.contentType,
+      };
+    } catch (error) {
+      redirectForUploadError('/', 'home-logo-upload', error);
+    }
+  }
 
   if (heroImageFile instanceof File && heroImageFile.size > 0) {
     try {
@@ -99,6 +118,7 @@ export async function updateHomeMediaAction(formData: FormData) {
     ...current,
     site: {
       ...current.site,
+      logo,
       home: {
         ...current.site.home,
         heroImage,

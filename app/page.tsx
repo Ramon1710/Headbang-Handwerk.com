@@ -39,6 +39,22 @@ function getMediaErrorMessage(mediaError?: string) {
   return 'Upload fehlgeschlagen. Bitte Firebase-Storage prüfen.';
 }
 
+function getMediaSavedMessage(mediaSaved?: string) {
+  if (!mediaSaved) {
+    return null;
+  }
+
+  if (mediaSaved === 'home') {
+    return 'Startseiten-Medien gespeichert.';
+  }
+
+  if (mediaSaved === 'logo') {
+    return 'Hauptlogo gespeichert.';
+  }
+
+  return 'Änderungen gespeichert.';
+}
+
 function HomeActionCard({
   boxKey,
   titleKey,
@@ -111,6 +127,7 @@ export default async function HomePage({
   const heroImageSrc = home.heroImage.assetUrl || standBeispielKiImage.src;
   const backgroundImageSrc = home.backgroundImage.assetUrl || wackenBackgroundImage.src;
   const mediaErrorMessage = getMediaErrorMessage(params?.mediaError);
+  const mediaSavedMessage = getMediaSavedMessage(params?.mediaSaved);
 
   return (
     <>
@@ -139,6 +156,34 @@ export default async function HomePage({
                   Admin-Ansicht verlassen
                 </button>
               </form>
+              <section className="fixed left-4 top-24 z-[61] w-[min(22rem,calc(100vw-2rem))] rounded-[1.4rem] border border-[#ff9d3c]/40 bg-[#130d09]/92 p-4 text-[#f4e5d2] shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#ffcf98]">Oben links</p>
+                    <h2 className="mt-1 text-lg font-black text-white">Hauptlogo tauschen</h2>
+                  </div>
+                  {cms.site.logo.assetUrl ? (
+                    <img src={cms.site.logo.assetUrl} alt={cms.site.logo.assetName || 'Aktuelles Logo'} className="h-12 w-20 rounded-lg bg-black/20 object-contain p-1" />
+                  ) : (
+                    <div className="flex h-12 w-20 items-center justify-center rounded-lg border border-white/10 bg-black/20 text-[0.65rem] font-semibold text-[#cdbca7]">
+                      Standard
+                    </div>
+                  )}
+                </div>
+                <form action={updateHomeMediaAction} className="mt-4 grid gap-3">
+                  <label className="block">
+                    <span className="mb-2 block text-sm font-semibold text-white">Logo-Datei</span>
+                    <input type="file" name="logoAssetFile" accept=".png,.jpg,.jpeg,.webp,.svg" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-black" />
+                  </label>
+                  <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-[#d9c8b5]">
+                    <input type="checkbox" name="removeLogoAsset" className="h-4 w-4" />
+                    Hochgeladenes Logo entfernen
+                  </label>
+                  {mediaSavedMessage ? <p className="rounded-xl border border-green-500/30 bg-green-950/40 px-4 py-3 text-sm text-green-200">{mediaSavedMessage}</p> : null}
+                  {mediaErrorMessage ? <p className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">{mediaErrorMessage}</p> : null}
+                  <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">Logo speichern</button>
+                </form>
+              </section>
               <div className="fixed bottom-4 right-4 z-[60] max-w-sm rounded-2xl border border-[#ff9d3c]/50 bg-[#130d09]/92 px-4 py-3 text-sm text-[#f4e5d2] shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-sm">
                 Klick auf Text zum Bearbeiten. Ziehe unten rechts an Kästchen, um ihre Größe zu ändern.
               </div>
@@ -156,7 +201,7 @@ export default async function HomePage({
                     <h2 className="mt-2 text-2xl font-black text-white">Bild und Hintergrund per Firebase pflegen</h2>
                   </div>
                   <div className="text-sm font-semibold">
-                    {params?.mediaSaved ? <p className="rounded-xl border border-green-500/30 bg-green-950/40 px-4 py-3 text-green-200">Medien gespeichert.</p> : null}
+                    {mediaSavedMessage ? <p className="rounded-xl border border-green-500/30 bg-green-950/40 px-4 py-3 text-green-200">{mediaSavedMessage}</p> : null}
                     {mediaErrorMessage ? <p className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-red-200">{mediaErrorMessage}</p> : null}
                   </div>
                 </div>
