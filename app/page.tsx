@@ -62,6 +62,7 @@ function HomeActionCard({
   title,
   href,
   linkLabel,
+  showCta = true,
   isAdmin,
   liveEditor,
 }: {
@@ -71,6 +72,7 @@ function HomeActionCard({
   title: string;
   href: string;
   linkLabel: string;
+  showCta?: boolean;
   isAdmin: boolean;
   liveEditor: LiveEditorState;
 }) {
@@ -90,25 +92,27 @@ function HomeActionCard({
         title={title}
         normalizeTypography
       />
-      {isAdmin ? (
-        <div className="link-copy mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2.5 text-sm font-bold tracking-wide">
-          <LiveEditableText
-            as="span"
-            className="link-copy text-sm font-bold tracking-wide"
-            editorKey={ctaKey}
-            initialHtml={resolveLiveHtml(liveEditor, ctaKey, linkLabel)}
-            isAdmin={isAdmin}
-            title={`${title} Buttontext`}
-            normalizeTypography
-          />
-          <ArrowRight className="h-4 w-4" />
-        </div>
-      ) : (
-        <Button href={href} variant="secondary" className="mt-4 w-full justify-center">
-          {resolveLiveHtml(liveEditor, ctaKey, linkLabel).replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
-          <ArrowRight className="h-4 w-4" />
-        </Button>
-      )}
+      {showCta ? (
+        isAdmin ? (
+          <div className="link-copy mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2.5 text-sm font-bold tracking-wide">
+            <LiveEditableText
+              as="span"
+              className="link-copy text-sm font-bold tracking-wide"
+              editorKey={ctaKey}
+              initialHtml={resolveLiveHtml(liveEditor, ctaKey, linkLabel)}
+              isAdmin={isAdmin}
+              title={`${title} Buttontext`}
+              normalizeTypography
+            />
+            <ArrowRight className="h-4 w-4" />
+          </div>
+        ) : (
+          <Button href={href} variant="secondary" className="mt-4 w-full justify-center">
+            {resolveLiveHtml(liveEditor, ctaKey, linkLabel).replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        )
+      ) : null}
     </LiveResizableBox>
   );
 }
@@ -306,7 +310,7 @@ export default async function HomePage({
                 <HomeActionCard boxKey="home.simple.form.box" titleKey="home.simple.form.title" ctaKey="home.simple.form.cta" title="Mitglied werden" href="/formular" linkLabel="Zum Formular" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
               <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.partner.box" titleKey="home.simple.partner.title" ctaKey="home.simple.partner.cta" title="Partner werden" href="/partner-unterstuetzerinfo" linkLabel="Zum Inforeiter" isAdmin={isAdmin} liveEditor={liveEditor} />
+                <HomeActionCard boxKey="home.simple.partner.box" titleKey="home.simple.partner.title" ctaKey="home.simple.partner.cta" title="Partner werden" href="/partner-unterstuetzerinfo" linkLabel="Zum Inforeiter" showCta={false} isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
               <div className="min-w-0 md:flex-1">
                 <HomeActionCard boxKey="home.simple.sponsor.box" titleKey="home.simple.sponsor.title" ctaKey="home.simple.sponsor.cta" title="Sponsor werden" href="/sponsoren" linkLabel="Zum Sponsoring" isAdmin={isAdmin} liveEditor={liveEditor} />
@@ -315,7 +319,7 @@ export default async function HomePage({
 
             <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-start md:flex-wrap">
               <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.support.box" titleKey="home.simple.support.title" ctaKey="home.simple.support.cta" title="Unterstützer werden" href="/partner-unterstuetzerinfo" linkLabel="Mehr erfahren" isAdmin={isAdmin} liveEditor={liveEditor} />
+                <HomeActionCard boxKey="home.simple.support.box" titleKey="home.simple.support.title" ctaKey="home.simple.support.cta" title="Unterstützer werden" href="/partner-unterstuetzerinfo" linkLabel="Mehr erfahren" showCta={false} isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
 
               <div className="min-w-0 md:flex-1">
