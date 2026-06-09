@@ -46,12 +46,10 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       '--live-box-width-desktop': styles?.desktop?.width,
       '--live-box-height-desktop': styles?.desktop?.height,
       '--live-box-min-height-desktop': styles?.desktop?.minHeight,
-      '--live-box-x-desktop': allowPosition ? styles?.desktop?.x : undefined,
       '--live-box-y-desktop': allowPosition ? styles?.desktop?.y : undefined,
       '--live-box-width-mobile': styles?.mobile?.width,
       '--live-box-height-mobile': styles?.mobile?.height,
       '--live-box-min-height-mobile': styles?.mobile?.minHeight,
-      '--live-box-x-mobile': allowPosition ? styles?.mobile?.x : undefined,
       '--live-box-y-mobile': allowPosition ? styles?.mobile?.y : undefined,
     } as CSSProperties;
 
@@ -145,23 +143,20 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     const startX = event.clientX;
     const startY = event.clientY;
     const activeViewport = viewport;
-    const { x: initialX, y: initialY } = getCurrentOffsets(getViewportStyle(boxStyles, activeViewport));
+    const { y: initialY } = getCurrentOffsets(getViewportStyle(boxStyles, activeViewport));
 
     function handlePointerMove(moveEvent: PointerEvent) {
-      const nextX = initialX + (moveEvent.clientX - startX);
       const nextY = initialY + (moveEvent.clientY - startY);
 
       updateViewportStyle(
         {
-          x: `${Math.round(nextX)}px`,
           y: `${Math.round(nextY)}px`,
         },
         activeViewport
       );
     }
 
-    function finishDrag(endClientX: number, endClientY: number) {
-      const nextX = initialX + (endClientX - startX);
+    function finishDrag(endClientY: number) {
       const nextY = initialY + (endClientY - startY);
       document.body.style.userSelect = '';
 
@@ -169,7 +164,6 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
         width: getViewportStyle(boxStyles, activeViewport)?.width,
         height: getViewportStyle(boxStyles, activeViewport)?.height,
         minHeight: getViewportStyle(boxStyles, activeViewport)?.minHeight,
-        x: `${Math.round(nextX)}px`,
         y: `${Math.round(nextY)}px`,
       }, activeViewport);
 
@@ -179,7 +173,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     }
 
     function handlePointerUp(upEvent: PointerEvent) {
-      finishDrag(upEvent.clientX, upEvent.clientY);
+      finishDrag(upEvent.clientY);
     }
 
     function handlePointerCancel() {
@@ -269,7 +263,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       ref={ref}
       className="live-resizable-box relative min-h-0 min-w-0 self-start justify-self-start"
       style={buildResponsiveStyle(boxStyles)}
-      title={isAdmin ? allowPosition ? 'Klick zum Bearbeiten, unten rechts Größe ändern, oben links verschieben' : 'Klick zum Bearbeiten, unten rechts Größe ändern' : undefined}
+      title={isAdmin ? allowPosition ? 'Klick zum Bearbeiten, unten rechts Größe ändern, oben mittig vertikal verschieben' : 'Klick zum Bearbeiten, unten rechts Größe ändern' : undefined}
     >
       {isAdmin && allowPosition ? (
         <button
@@ -282,7 +276,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
           </span>
         </button>
       ) : null}
-      <div className={`relative h-full w-full overflow-auto ${className}`}>
+      <div className={`relative h-full w-full overflow-y-auto overflow-x-hidden ${className}`}>
         {children}
       </div>
       {isAdmin ? (
