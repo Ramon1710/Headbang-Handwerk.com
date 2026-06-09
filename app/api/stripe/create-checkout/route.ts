@@ -12,15 +12,53 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
     }
 
-    const { packageId, company, email } = await req.json();
+    const { kind = 'sponsoring', packageId, company, email, productId, size, color, quantity } = await req.json();
     const cms = await getCmsContent();
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+    if (kind === 'merchandise') {
+      const product = cms.site.merchandise.products.find((entry) => entry.id === productId);
+      const orderQuantity = Math.max(1, Math.min(10, Number(quantity) || 1));
+
+      if (!product) {
+        return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        customer_email: email || undefined,
+        line_items: [
+          {
+            price_data: {
+              currency: 'eur',
+              unit_amount: Math.round(product.price * 100),
+              product_data: {
+                name: `Headbang Handwerk – ${product.name}`,
+                description: [product.description, size ? `Größe: ${size}` : '', color ? `Farbe: ${color}` : ''].filter(Boolean).join(' · '),
+              },
+            },
+            quantity: orderQuantity,
+          },
+        ],
+        metadata: {
+          orderKind: 'merchandise',
+          productId: product.id,
+          productName: product.name,
+          size: size || '',
+          color: color || '',
+          quantity: String(orderQuantity),
+        },
+        success_url: `${appUrl}/merchandise/danke?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${appUrl}/merchandise`,
+      });
+
+      return NextResponse.json({ url: session.url });
+    }
 
     const pkg = cms.site.sponsorPackages.find((p) => p.id === packageId);
     if (!pkg) {
       return NextResponse.json({ error: 'Package not found' }, { status: 404 });
     }
-
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -39,6 +77,7 @@ export async function POST(req: NextRequest) {
         },
       ],
       metadata: {
+        orderKind: 'sponsoring',
         packageId: pkg.id,
         company: company || '',
       },

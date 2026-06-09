@@ -71,7 +71,7 @@ export default async function UeberUnsPage({
             <LiveEditableText as="h2" className="mb-6 text-2xl font-bold text-white" editorKey="about.teamTitle" initialHtml={resolveLiveHtml(liveEditor, 'about.teamTitle', about.teamTitle)} isAdmin={isAdmin} title="Über uns Team Titel" />
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {about.teamRoles.map((role, index) => (
-                <LiveResizableBox key={role} boxKey={`about.teamRoles.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamRoles.${index}.box`)} isAdmin={isAdmin} className="text-center">
+                <LiveResizableBox key={role} boxKey={`about.teamRoles.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamRoles.${index}.box`)} isAdmin={isAdmin} allowPosition={false} className="flex h-full flex-col items-center text-center">
                   <div className="w-20 h-20 rounded-full bg-[linear-gradient(180deg,rgba(42,31,24,0.95)_0%,rgba(21,15,11,0.86)_100%)] ring-1 ring-white/6 mx-auto mb-3 flex items-center justify-center text-gray-600 text-2xl">
                     👤
                   </div>

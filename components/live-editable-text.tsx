@@ -13,6 +13,7 @@ interface LiveEditableTextProps {
   initialHtml: string;
   isAdmin: boolean;
   title?: string;
+  normalizeTypography?: boolean;
 }
 
 const FONT_FAMILIES = [
@@ -58,7 +59,33 @@ function isSelectionInsideEditor(selection: Selection, editor: HTMLDivElement) {
   return editor.contains(selection.anchorNode);
 }
 
-export function LiveEditableText({ as = 'div', className, editorKey, initialHtml, isAdmin, title }: LiveEditableTextProps) {
+function stripTypographyStyles(html: string) {
+  return html.replace(/style=("([^"]*)"|'([^']*)')/gi, (fullMatch, _styleAttr, doubleQuoted, singleQuoted) => {
+    const rawValue = (doubleQuoted ?? singleQuoted ?? '').trim();
+
+    if (!rawValue) {
+      return '';
+    }
+
+    const filteredDeclarations = rawValue
+      .split(';')
+      .map((declaration) => declaration.trim())
+      .filter(Boolean)
+      .filter((declaration) => {
+        const property = declaration.split(':')[0]?.trim().toLowerCase();
+
+        return property && !['color', 'font-size', 'font-family', 'font-weight', 'line-height'].includes(property);
+      });
+
+    if (filteredDeclarations.length === 0) {
+      return '';
+    }
+
+    return `style="${filteredDeclarations.join('; ')}"`;
+  });
+}
+
+export function LiveEditableText({ as = 'div', className, editorKey, initialHtml, isAdmin, title, normalizeTypography = false }: LiveEditableTextProps) {
   const Component = as;
   const router = useRouter();
   const editorRef = useRef<HTMLDivElement | null>(null);
@@ -199,11 +226,13 @@ export function LiveEditableText({ as = 'div', className, editorKey, initialHtml
     }
   }
 
+  const renderedHtml = normalizeTypography ? stripTypographyStyles(html) : html;
+
   return (
     <>
       <Component
         className={`${className || ''}${isAdmin ? ' cursor-pointer rounded-md outline outline-1 outline-dashed outline-transparent transition hover:outline-[#ff9d3c]/45' : ''}`}
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={{ __html: renderedHtml }}
         onClick={isAdmin ? () => setIsOpen(true) : undefined}
         title={isAdmin ? title || 'Zum Bearbeiten anklicken' : undefined}
       />

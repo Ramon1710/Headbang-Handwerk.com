@@ -1,4 +1,4 @@
-import type { Event, SponsorPackage } from '@/lib/types';
+import type { Event, MerchandiseProduct, SponsorPackage } from '@/lib/types';
 
 export interface ThemeSettings {
   background: string;
@@ -193,6 +193,13 @@ export interface StandPageContent {
   reservedTitle: string;
 }
 
+export interface MerchandisePageContent {
+  eyebrow: string;
+  title: string;
+  lead: string;
+  products: MerchandiseProduct[];
+}
+
 export interface SeoContent {
   title: string;
   description: string;
@@ -213,6 +220,7 @@ export interface SiteContent {
   about: AboutPageContent;
   contact: ContactPageContent;
   stand: StandPageContent;
+  merchandise: MerchandisePageContent;
   footer: FooterContent;
 }
 

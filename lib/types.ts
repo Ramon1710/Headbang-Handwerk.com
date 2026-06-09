@@ -9,6 +9,7 @@ export interface Event {
   ctaText: string;
   ctaUrl?: string;
   imageUrl?: string;
+  stand?: EventStandConfig;
 }
 
 export interface SponsorPackage {
@@ -32,6 +33,25 @@ export interface BannerSlot {
   available: 'available' | 'reserved' | 'sold';
   previewImage?: string;
   description: string;
+}
+
+export interface EventStandConfig {
+  assetUrl: string;
+  assetName: string;
+  assetContentType: string;
+  lead?: string;
+  bannerSlots: BannerSlot[];
+}
+
+export interface MerchandiseProduct {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl?: string;
+  sizes?: string[];
+  colors?: string[];
+  badge?: string;
 }
 
 export interface ContactRequest {

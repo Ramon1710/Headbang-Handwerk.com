@@ -121,34 +121,38 @@ export default async function HomePage({
                     initialHtml={resolveLiveHtml(liveEditor, 'home.heroBadge', home.heroBadge)}
                     isAdmin={isAdmin}
                     title="Hero Badge"
+                    normalizeTypography
                   />
                 </div>
 
                 <LiveEditableText
                   as="h1"
-                  className="mt-8 max-w-4xl text-5xl font-black leading-[0.95] text-[#fbf1e4] sm:text-6xl lg:text-[4.65rem] xl:text-[5.15rem]"
+                  className="mt-8 max-w-4xl text-[3.55rem] font-black leading-[0.92] text-[#fff0da] sm:text-[4.4rem] lg:text-[5.2rem] xl:text-[5.85rem]"
                   editorKey="home.heroTitle"
                   initialHtml={resolveLiveHtml(liveEditor, 'home.heroTitle', home.heroTitle)}
                   isAdmin={isAdmin}
                   title="Hero Titel"
+                  normalizeTypography
                 />
 
                 <LiveEditableText
                   as="p"
-                  className="mt-8 max-w-3xl text-lg leading-8 text-[#e9dac6] sm:text-[1.18rem] sm:leading-9"
+                  className="mt-8 max-w-3xl text-lg leading-8 text-[#ead9c3] sm:text-[1.18rem] sm:leading-9"
                   editorKey="home.heroLead"
                   initialHtml={resolveLiveHtml(liveEditor, 'home.heroLead', home.heroLead)}
                   isAdmin={isAdmin}
                   title="Hero Einleitung"
+                  normalizeTypography
                 />
 
                 <LiveEditableText
                   as="p"
-                  className="mt-6 max-w-3xl text-lg leading-8 text-[#e9dac6] sm:text-[1.08rem] sm:leading-9"
+                  className="mt-6 max-w-3xl text-lg leading-8 text-[#ead9c3] sm:text-[1.08rem] sm:leading-9"
                   editorKey="home.heroBody"
                   initialHtml={resolveLiveHtml(liveEditor, 'home.heroBody', home.heroBody)}
                   isAdmin={isAdmin}
                   title="Hero Fließtext"
+                  normalizeTypography
                 />
 
                 <div aria-hidden="true" className="h-8 sm:h-10 lg:h-14" />
@@ -185,6 +189,7 @@ export default async function HomePage({
                         )}
                         isAdmin={isAdmin}
                         title={`Hero Kennzahl ${index + 1}`}
+                        normalizeTypography
                       />
                     </LiveResizableBox>
                   ))}
@@ -229,6 +234,7 @@ export default async function HomePage({
                         )}
                         isAdmin={isAdmin}
                         title="Projektfokus Box"
+                        normalizeTypography
                       />
                       <Target className="mt-1 h-5 w-5 flex-shrink-0 text-[#ff9d3c]" />
                     </div>
@@ -236,10 +242,10 @@ export default async function HomePage({
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <LiveResizableBox boxKey="home.projectFocusTone.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'home.projectFocusTone.box')} isAdmin={isAdmin} className="rounded-2xl bg-[#120d0a]/22 px-5 py-4 ring-1 ring-white/8 backdrop-blur-[8px]">
-                      <LiveEditableText as="div" className="h-full" editorKey="home.projectFocusTone.content" initialHtml={resolveLiveRichHtml(liveEditor, 'home.projectFocusTone.content', `${textParagraphHtml(home.projectFocusToneLabel, 'cms-box-label font-semibold uppercase tracking-[0.2em] text-[#caa985]')}${textParagraphHtml(home.projectFocusToneValue, 'cms-box-title mt-2 pb-1 font-black leading-[1.2] text-[#ffb14d]')}`)} isAdmin={isAdmin} title="Projektfokus Ansprache Box" />
+                      <LiveEditableText as="div" className="h-full" editorKey="home.projectFocusTone.content" initialHtml={resolveLiveRichHtml(liveEditor, 'home.projectFocusTone.content', `${textParagraphHtml(home.projectFocusToneLabel, 'cms-box-label font-semibold uppercase tracking-[0.2em] text-[#caa985]')}${textParagraphHtml(home.projectFocusToneValue, 'cms-box-title mt-2 pb-1 font-black leading-[1.2] text-[#ffb14d]')}`)} isAdmin={isAdmin} title="Projektfokus Ansprache Box" normalizeTypography />
                     </LiveResizableBox>
                     <LiveResizableBox boxKey="home.projectFocusImpact.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'home.projectFocusImpact.box')} isAdmin={isAdmin} className="rounded-2xl bg-[#120d0a]/22 px-5 py-4 ring-1 ring-white/8 backdrop-blur-[8px]">
-                      <LiveEditableText as="div" className="h-full" editorKey="home.projectFocusImpact.content" initialHtml={resolveLiveRichHtml(liveEditor, 'home.projectFocusImpact.content', `${textParagraphHtml(home.projectFocusImpactLabel, 'cms-box-label font-semibold uppercase tracking-[0.2em] text-[#caa985]')}${textParagraphHtml(home.projectFocusImpactValue, 'cms-box-title mt-2 pb-1 font-black leading-[1.2] text-[#ffb14d]')}`)} isAdmin={isAdmin} title="Projektfokus Wirkung Box" />
+                      <LiveEditableText as="div" className="h-full" editorKey="home.projectFocusImpact.content" initialHtml={resolveLiveRichHtml(liveEditor, 'home.projectFocusImpact.content', `${textParagraphHtml(home.projectFocusImpactLabel, 'cms-box-label font-semibold uppercase tracking-[0.2em] text-[#caa985]')}${textParagraphHtml(home.projectFocusImpactValue, 'cms-box-title mt-2 pb-1 font-black leading-[1.2] text-[#ffb14d]')}`)} isAdmin={isAdmin} title="Projektfokus Wirkung Box" normalizeTypography />
                     </LiveResizableBox>
                   </div>
 
@@ -259,7 +265,7 @@ export default async function HomePage({
               <div className="grid gap-6 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-4 lg:gap-7 lg:px-8">
                 {home.stats.map((item, index) => (
                   <LiveResizableBox key={item.label} boxKey={`home.stats.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `home.stats.${index}.box`)} isAdmin={isAdmin} className="rounded-2xl bg-black/8 px-5 py-5 ring-1 ring-white/8 backdrop-blur-[6px]">
-                    <LiveEditableText as="div" className="h-full" editorKey={`home.stats.${index}.content`} initialHtml={resolveLiveRichHtml(liveEditor, `home.stats.${index}.content`, `${textParagraphHtml(item.value, 'text-3xl font-black text-[#ffd08f]')}${textParagraphHtml(item.label, 'mt-2 text-sm leading-6 text-[#e5d5c0]')}`)} isAdmin={isAdmin} title={`Statistik ${index + 1}`} />
+                    <LiveEditableText as="div" className="h-full" editorKey={`home.stats.${index}.content`} initialHtml={resolveLiveRichHtml(liveEditor, `home.stats.${index}.content`, `${textParagraphHtml(item.value, 'text-3xl font-black text-[#ffd08f]')}${textParagraphHtml(item.label, 'mt-2 text-sm leading-6 text-[#e5d5c0]')}`)} isAdmin={isAdmin} title={`Statistik ${index + 1}`} normalizeTypography />
                   </LiveResizableBox>
                 ))}
               </div>
@@ -276,13 +282,13 @@ export default async function HomePage({
                 isAdmin={isAdmin}
                 className="rounded-[1.75rem] border border-white/8 bg-[linear-gradient(180deg,rgba(18,12,9,0.16)_0%,rgba(18,12,9,0.05)_100%)] px-8 py-8 shadow-[0_16px_40px_rgba(0,0,0,0.1)] backdrop-blur-[10px] sm:px-10 sm:py-10 lg:px-12 lg:py-12"
               >
-                <LiveEditableText as="p" className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]" editorKey="home.focusEyebrow" initialHtml={resolveLiveHtml(liveEditor, 'home.focusEyebrow', home.focusEyebrow)} isAdmin={isAdmin} title="Fokus Eyebrow" />
-                <LiveEditableText as="h2" className="mt-5 text-4xl font-black leading-tight text-[#fff0da] sm:text-[3rem]" editorKey="home.focusTitle" initialHtml={resolveLiveHtml(liveEditor, 'home.focusTitle', home.focusTitle)} isAdmin={isAdmin} title="Fokus Titel" />
+                <LiveEditableText as="p" className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]" editorKey="home.focusEyebrow" initialHtml={resolveLiveHtml(liveEditor, 'home.focusEyebrow', home.focusEyebrow)} isAdmin={isAdmin} title="Fokus Eyebrow" normalizeTypography />
+                <LiveEditableText as="h2" className="mt-5 text-[2.85rem] font-black leading-[0.96] text-[#fff0da] sm:text-[3.3rem]" editorKey="home.focusTitle" initialHtml={resolveLiveHtml(liveEditor, 'home.focusTitle', home.focusTitle)} isAdmin={isAdmin} title="Fokus Titel" normalizeTypography />
                 <ul className="mt-8 space-y-4">
                   {home.focusPoints.map((point, index) => (
                     <li key={point} className="flex items-start gap-3 text-[#eedfcb]">
                       <CheckCircle2 className="mt-1 h-5 w-5 flex-shrink-0 text-[#ffad56]" />
-                      <LiveEditableText as="span" className="leading-7" editorKey={`home.focusPoints.${index}`} initialHtml={resolveLiveHtml(liveEditor, `home.focusPoints.${index}`, point)} isAdmin={isAdmin} title={`Fokus Punkt ${index + 1}`} />
+                      <LiveEditableText as="span" className="leading-7 text-[#ead9c3]" editorKey={`home.focusPoints.${index}`} initialHtml={resolveLiveHtml(liveEditor, `home.focusPoints.${index}`, point)} isAdmin={isAdmin} title={`Fokus Punkt ${index + 1}`} normalizeTypography />
                     </li>
                   ))}
                 </ul>
@@ -303,7 +309,7 @@ export default async function HomePage({
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,rgba(255,155,57,0.09)_0%,rgba(255,155,57,0.02)_100%)] ring-1 ring-[#a76737]/28 backdrop-blur-[6px]">
                       <Icon className="h-5 w-5 text-[#ffab4e]" />
                     </div>
-                    <LiveEditableText as="div" className="mt-5" editorKey={`home.promiseCards.${index}.content`} initialHtml={resolveLiveRichHtml(liveEditor, `home.promiseCards.${index}.content`, `${textParagraphHtml(title, 'text-xl font-black text-[#fff0da]')}${textParagraphHtml(text, 'mt-4 text-sm leading-7 text-[#d9c3a8] sm:text-[0.97rem]')}`)} isAdmin={isAdmin} title={`Versprechen ${index + 1}`} />
+                    <LiveEditableText as="div" className="mt-5" editorKey={`home.promiseCards.${index}.content`} initialHtml={resolveLiveRichHtml(liveEditor, `home.promiseCards.${index}.content`, `${textParagraphHtml(title, 'text-xl font-black text-[#fff0da]')}${textParagraphHtml(text, 'mt-4 text-sm leading-7 text-[#d9c3a8] sm:text-[0.97rem]')}`)} isAdmin={isAdmin} title={`Versprechen ${index + 1}`} normalizeTypography />
                   </LiveResizableBox>
                   );
                 })}
@@ -321,8 +327,8 @@ export default async function HomePage({
                 isAdmin={isAdmin}
                 className="max-w-3xl lg:pt-2"
               >
-                <LiveEditableText as="p" className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]" editorKey="home.processEyebrow" initialHtml={resolveLiveHtml(liveEditor, 'home.processEyebrow', home.processEyebrow)} isAdmin={isAdmin} title="Prozess Eyebrow" />
-                <LiveEditableText as="h2" className="mt-5 text-4xl font-black leading-[0.96] text-[#fff0da] sm:text-[3rem] lg:text-[3.4rem]" editorKey="home.processTitle" initialHtml={resolveLiveHtml(liveEditor, 'home.processTitle', home.processTitle)} isAdmin={isAdmin} title="Prozess Titel" />
+                <LiveEditableText as="p" className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]" editorKey="home.processEyebrow" initialHtml={resolveLiveHtml(liveEditor, 'home.processEyebrow', home.processEyebrow)} isAdmin={isAdmin} title="Prozess Eyebrow" normalizeTypography />
+                <LiveEditableText as="h2" className="mt-5 text-[2.85rem] font-black leading-[0.94] text-[#fff0da] sm:text-[3.3rem] lg:text-[3.75rem]" editorKey="home.processTitle" initialHtml={resolveLiveHtml(liveEditor, 'home.processTitle', home.processTitle)} isAdmin={isAdmin} title="Prozess Titel" normalizeTypography />
               </LiveResizableBox>
               <LiveResizableBox
                 boxKey="home.processLead.box"
@@ -330,14 +336,14 @@ export default async function HomePage({
                 isAdmin={isAdmin}
                 className="max-w-2xl lg:pt-6"
               >
-                <LiveEditableText as="p" className="text-base leading-8 text-[#dcc8b0] sm:text-[1.04rem] sm:leading-9" editorKey="home.processLead" initialHtml={resolveLiveHtml(liveEditor, 'home.processLead', home.processLead)} isAdmin={isAdmin} title="Prozess Einleitung" />
+                <LiveEditableText as="p" className="text-base leading-8 text-[#ead9c3] sm:text-[1.04rem] sm:leading-9" editorKey="home.processLead" initialHtml={resolveLiveHtml(liveEditor, 'home.processLead', home.processLead)} isAdmin={isAdmin} title="Prozess Einleitung" normalizeTypography />
               </LiveResizableBox>
             </div>
 
             <div className="mt-24 grid gap-10 lg:grid-cols-4 lg:gap-x-10 lg:gap-y-16 xl:gap-x-12">
               {home.processSteps.map((step, index) => (
                 <LiveResizableBox key={step.number} boxKey={`home.processSteps.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `home.processSteps.${index}.box`)} isAdmin={isAdmin} className="rounded-[1.75rem] border border-[#734624]/24 bg-[linear-gradient(180deg,rgba(27,17,12,0.14)_0%,rgba(12,8,6,0.05)_100%)] px-7 py-8 shadow-[0_14px_30px_rgba(0,0,0,0.08)] backdrop-blur-[10px]">
-                  <LiveEditableText as="div" className="h-full" editorKey={`home.processSteps.${index}.content`} initialHtml={resolveLiveRichHtml(liveEditor, `home.processSteps.${index}.content`, `${textParagraphHtml(step.number, 'text-sm font-semibold uppercase tracking-[0.24em] text-[#ffbf76]')}${textParagraphHtml(step.title, 'mt-4 text-[1.7rem] font-black leading-tight text-[#fff0da]')}${textParagraphHtml(step.text, 'mt-5 text-base leading-8 text-[#dbc4aa]')}`)} isAdmin={isAdmin} title={`Prozessschritt ${index + 1}`} />
+                  <LiveEditableText as="div" className="h-full" editorKey={`home.processSteps.${index}.content`} initialHtml={resolveLiveRichHtml(liveEditor, `home.processSteps.${index}.content`, `${textParagraphHtml(step.number, 'text-sm font-semibold uppercase tracking-[0.24em] text-[#ffbf76]')}${textParagraphHtml(step.title, 'mt-4 text-[1.7rem] font-black leading-tight text-[#fff0da]')}${textParagraphHtml(step.text, 'mt-5 text-base leading-8 text-[#dbc4aa]')}`)} isAdmin={isAdmin} title={`Prozessschritt ${index + 1}`} normalizeTypography />
                 </LiveResizableBox>
               ))}
             </div>
@@ -365,16 +371,16 @@ export default async function HomePage({
                 </p>
                 <div className="mt-[4.5rem] grid gap-8 sm:grid-cols-2 lg:gap-10">
                   <LiveResizableBox boxKey="home.whyBusiness.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'home.whyBusiness.box')} isAdmin={isAdmin} className="rounded-[1.6rem] bg-black/8 px-7 py-7 ring-1 ring-white/8 backdrop-blur-[6px]">
-                    <LiveEditableText as="div" className="h-full" editorKey="home.whyBusiness.content" initialHtml={resolveLiveRichHtml(liveEditor, 'home.whyBusiness.content', `${textParagraphHtml(home.whyBusinessLabel, 'text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]')}${textParagraphHtml(home.whyBusinessText, 'mt-2 text-base leading-7 text-[#f0e1cf]')}`)} isAdmin={isAdmin} title="Warum Für Betriebe Box" />
+                    <LiveEditableText as="div" className="h-full" editorKey="home.whyBusiness.content" initialHtml={resolveLiveRichHtml(liveEditor, 'home.whyBusiness.content', `${textParagraphHtml(home.whyBusinessLabel, 'text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]')}${textParagraphHtml(home.whyBusinessText, 'mt-2 text-base leading-7 text-[#f0e1cf]')}`)} isAdmin={isAdmin} title="Warum Für Betriebe Box" normalizeTypography />
                   </LiveResizableBox>
                   <LiveResizableBox boxKey="home.whyYouth.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'home.whyYouth.box')} isAdmin={isAdmin} className="rounded-[1.6rem] bg-black/8 px-7 py-7 ring-1 ring-white/8 backdrop-blur-[6px]">
-                    <LiveEditableText as="div" className="h-full" editorKey="home.whyYouth.content" initialHtml={resolveLiveRichHtml(liveEditor, 'home.whyYouth.content', `${textParagraphHtml(home.whyYouthLabel, 'text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]')}${textParagraphHtml(home.whyYouthText, 'mt-2 text-base leading-7 text-[#f0e1cf]')}`)} isAdmin={isAdmin} title="Warum Für Nachwuchs Box" />
+                    <LiveEditableText as="div" className="h-full" editorKey="home.whyYouth.content" initialHtml={resolveLiveRichHtml(liveEditor, 'home.whyYouth.content', `${textParagraphHtml(home.whyYouthLabel, 'text-sm font-semibold uppercase tracking-[0.2em] text-[#caa985]')}${textParagraphHtml(home.whyYouthText, 'mt-2 text-base leading-7 text-[#f0e1cf]')}`)} isAdmin={isAdmin} title="Warum Für Nachwuchs Box" normalizeTypography />
                   </LiveResizableBox>
                 </div>
               </LiveResizableBox>
 
               <LiveResizableBox boxKey="home.update.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'home.update.box')} isAdmin={isAdmin} className="rounded-[2rem] border border-[#704321]/26 bg-[linear-gradient(180deg,rgba(24,16,11,0.16)_0%,rgba(12,8,6,0.05)_100%)] p-9 shadow-[0_14px_34px_rgba(0,0,0,0.08)] backdrop-blur-[10px] sm:p-10 lg:p-12">
-                <LiveEditableText as="div" editorKey="home.update.content" initialHtml={resolveLiveRichHtml(liveEditor, 'home.update.content', `${textParagraphHtml(home.updateEyebrow, 'text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]')}${textParagraphHtml(home.updateTitle, 'mt-4 text-3xl font-black text-[#ffd08f] sm:text-[2.3rem]')}${home.updateParagraphs.map((paragraph) => textParagraphHtml(paragraph, 'mt-6 text-base leading-8 text-[#ead9c3]')).join('')}`)} isAdmin={isAdmin} title="Update Box" />
+                <LiveEditableText as="div" editorKey="home.update.content" initialHtml={resolveLiveRichHtml(liveEditor, 'home.update.content', `${textParagraphHtml(home.updateEyebrow, 'text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]')}${textParagraphHtml(home.updateTitle, 'mt-4 text-3xl font-black text-[#ffd08f] sm:text-[2.3rem]')}${home.updateParagraphs.map((paragraph) => textParagraphHtml(paragraph, 'mt-6 text-base leading-8 text-[#ead9c3]')).join('')}`)} isAdmin={isAdmin} title="Update Box" normalizeTypography />
                 <div className="mt-[4.5rem] flex flex-col items-start gap-5 sm:flex-row sm:gap-6">
                   <LiveResizableBox boxKey="home.updatePrimaryCta.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'home.updatePrimaryCta.box')} isAdmin={isAdmin} className="self-start overflow-visible">
                     <Button href={home.updatePrimaryCtaHref} size="lg" className="justify-center whitespace-nowrap">
@@ -534,10 +540,10 @@ export default async function HomePage({
                   isAdmin={isAdmin}
                   className="max-w-4xl"
                 >
-                  <LiveEditableText as="p" className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]" editorKey="home.closingEyebrow" initialHtml={resolveLiveHtml(liveEditor, 'home.closingEyebrow', home.closingEyebrow)} isAdmin={isAdmin} title="Abschluss Eyebrow" />
-                  <LiveEditableText as="h2" className="mt-5 max-w-4xl text-4xl font-black leading-tight text-[#fff2de] sm:text-[3rem]" editorKey="home.closingTitle" initialHtml={resolveLiveHtml(liveEditor, 'home.closingTitle', home.closingTitle)} isAdmin={isAdmin} title="Abschluss Titel" />
-                  <LiveEditableText as="p" className="mt-6 max-w-4xl text-lg leading-8 text-[#eadbc7] sm:text-xl sm:leading-9" editorKey="home.closingLead" initialHtml={resolveLiveHtml(liveEditor, 'home.closingLead', home.closingLead)} isAdmin={isAdmin} title="Abschluss Lead" />
-                  <LiveEditableText as="p" className="mt-8 max-w-4xl text-2xl font-black leading-tight text-[#fff2de] sm:text-3xl" editorKey="home.closingStatement" initialHtml={resolveLiveHtml(liveEditor, 'home.closingStatement', home.closingStatement)} isAdmin={isAdmin} title="Abschluss Statement" />
+                  <LiveEditableText as="p" className="text-sm font-semibold uppercase tracking-[0.28em] text-[#ffbf76]" editorKey="home.closingEyebrow" initialHtml={resolveLiveHtml(liveEditor, 'home.closingEyebrow', home.closingEyebrow)} isAdmin={isAdmin} title="Abschluss Eyebrow" normalizeTypography />
+                  <LiveEditableText as="h2" className="mt-5 max-w-4xl text-[2.85rem] font-black leading-[0.96] text-[#fff0da] sm:text-[3.3rem]" editorKey="home.closingTitle" initialHtml={resolveLiveHtml(liveEditor, 'home.closingTitle', home.closingTitle)} isAdmin={isAdmin} title="Abschluss Titel" normalizeTypography />
+                  <LiveEditableText as="p" className="mt-6 max-w-4xl text-lg leading-8 text-[#ead9c3] sm:text-xl sm:leading-9" editorKey="home.closingLead" initialHtml={resolveLiveHtml(liveEditor, 'home.closingLead', home.closingLead)} isAdmin={isAdmin} title="Abschluss Lead" normalizeTypography />
+                  <LiveEditableText as="p" className="mt-8 max-w-4xl text-2xl font-black leading-tight text-[#fff0da] sm:text-3xl" editorKey="home.closingStatement" initialHtml={resolveLiveHtml(liveEditor, 'home.closingStatement', home.closingStatement)} isAdmin={isAdmin} title="Abschluss Statement" normalizeTypography />
                 </LiveResizableBox>
 
                 <div className="flex flex-col gap-4 sm:flex-row lg:flex-col xl:flex-row">

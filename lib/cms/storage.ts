@@ -7,6 +7,7 @@ import {
   isInvalidFirebaseConfigError,
   toFirebaseAuthError,
 } from './firebase';
+import { normalizeEvent } from '@/lib/event-stand';
 import { emptyLiveEditorContent } from './live-editor';
 import type { CmsContent } from './schema';
 
@@ -112,7 +113,7 @@ function normalizeContent(content: CmsContent): CmsContent {
       ...defaultCmsContent.site,
       ...content.site,
       seo: { ...defaultCmsContent.site.seo, ...content.site.seo },
-      events: Array.isArray(content.site.events) ? content.site.events : defaultCmsContent.site.events,
+      events: Array.isArray(content.site.events) ? content.site.events.map(normalizeEvent) : defaultCmsContent.site.events.map(normalizeEvent),
       sponsorPackages: Array.isArray(content.site.sponsorPackages)
         ? content.site.sponsorPackages
         : defaultCmsContent.site.sponsorPackages,
@@ -136,6 +137,13 @@ function normalizeContent(content: CmsContent): CmsContent {
       about: { ...defaultCmsContent.site.about, ...content.site.about },
       contact: { ...defaultCmsContent.site.contact, ...content.site.contact },
       stand: { ...defaultCmsContent.site.stand, ...content.site.stand },
+      merchandise: {
+        ...defaultCmsContent.site.merchandise,
+        ...content.site.merchandise,
+        products: Array.isArray(content.site.merchandise?.products)
+          ? content.site.merchandise.products
+          : defaultCmsContent.site.merchandise.products,
+      },
       footer: { ...defaultCmsContent.site.footer, ...content.site.footer },
     },
   };

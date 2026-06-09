@@ -13,9 +13,10 @@ interface LiveResizableBoxProps {
   children: ReactNode;
   initialStyle?: ResolvedLiveBoxStyle;
   isAdmin: boolean;
+  allowPosition?: boolean;
 }
 
-export function LiveResizableBox({ boxKey, className, children, initialStyle, isAdmin }: LiveResizableBoxProps) {
+export function LiveResizableBox({ boxKey, className, children, initialStyle, isAdmin, allowPosition = true }: LiveResizableBoxProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [viewport, setViewport] = useState<LiveViewport>('desktop');
@@ -45,13 +46,13 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       '--live-box-width-desktop': styles?.desktop?.width,
       '--live-box-height-desktop': styles?.desktop?.height,
       '--live-box-min-height-desktop': styles?.desktop?.minHeight,
-      '--live-box-x-desktop': styles?.desktop?.x,
-      '--live-box-y-desktop': styles?.desktop?.y,
+      '--live-box-x-desktop': allowPosition ? styles?.desktop?.x : undefined,
+      '--live-box-y-desktop': allowPosition ? styles?.desktop?.y : undefined,
       '--live-box-width-mobile': styles?.mobile?.width,
       '--live-box-height-mobile': styles?.mobile?.height,
       '--live-box-min-height-mobile': styles?.mobile?.minHeight,
-      '--live-box-x-mobile': styles?.mobile?.x,
-      '--live-box-y-mobile': styles?.mobile?.y,
+      '--live-box-x-mobile': allowPosition ? styles?.mobile?.x : undefined,
+      '--live-box-y-mobile': allowPosition ? styles?.mobile?.y : undefined,
     } as CSSProperties;
 
     return nextStyle;
@@ -132,7 +133,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   }
 
   function handleMoveStart(event: React.PointerEvent<HTMLButtonElement>) {
-    if (!isAdmin || !ref.current) {
+    if (!isAdmin || !ref.current || !allowPosition) {
       return;
     }
 
@@ -268,9 +269,9 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       ref={ref}
       className="live-resizable-box relative min-h-0 min-w-0 self-start justify-self-start"
       style={buildResponsiveStyle(boxStyles)}
-      title={isAdmin ? 'Klick zum Bearbeiten, unten rechts Größe ändern, oben links verschieben' : undefined}
+      title={isAdmin ? allowPosition ? 'Klick zum Bearbeiten, unten rechts Größe ändern, oben links verschieben' : 'Klick zum Bearbeiten, unten rechts Größe ändern' : undefined}
     >
-      {isAdmin ? (
+      {isAdmin && allowPosition ? (
         <button
           type="button"
           onPointerDown={handleMoveStart}

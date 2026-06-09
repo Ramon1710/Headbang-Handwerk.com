@@ -6,6 +6,8 @@ import { LiveResizableBox } from '@/components/live-resizable-box';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { resolveLiveBoxStyle, resolveLiveHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
+import { getEventStandHref } from '@/lib/site';
+import { serializeBannerSlots } from '@/lib/event-stand';
 import { addEventAction, removeEventAction, toggleEventStatusAction, updateEventAction } from './actions';
 
 export const metadata: Metadata = {
@@ -76,13 +78,18 @@ export default async function VeranstaltungenPage({
                 <input name="location" placeholder="Ort" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                 <input name="ctaText" placeholder="Button Text" defaultValue="Mehr erfahren" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                 <input name="ctaUrl" placeholder="Button Link" defaultValue="/kontakt" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                <input name="standAssetUrl" placeholder="3D-Stand Datei URL" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                <input name="standAssetName" placeholder="3D-Stand Dateiname" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                <input name="standAssetContentType" placeholder="3D-Stand Content-Type, z.B. image/png" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                 <select name="status" defaultValue="planned" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]">
                   <option value="planned">Geplant</option>
                   <option value="confirmed">Bestätigt</option>
                   <option value="completed">Abgeschlossen</option>
                 </select>
                 <input name="id" placeholder="Optionale ID" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                <textarea name="standLead" rows={3} placeholder="Optionaler Event-spezifischer Stand-Lead" className="lg:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                 <textarea name="description" rows={4} placeholder="Beschreibung" className="lg:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                <textarea name="standBannerSlots" rows={6} placeholder="Banner-Slots, eine Zeile pro Slot: Name | Position | Größe | Preis | Sichtbarkeit | available/reserved/sold | Beschreibung" className="lg:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                 <div className="lg:col-span-2 flex justify-end">
                   <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">Veranstaltung hinzufügen</button>
                 </div>
@@ -99,13 +106,18 @@ export default async function VeranstaltungenPage({
                       <input name="location" defaultValue={event.location} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                       <input name="ctaText" defaultValue={event.ctaText} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                       <input name="ctaUrl" defaultValue={event.ctaUrl || '/kontakt'} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      <input name="standAssetUrl" defaultValue={event.stand?.assetUrl || ''} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      <input name="standAssetName" defaultValue={event.stand?.assetName || ''} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      <input name="standAssetContentType" defaultValue={event.stand?.assetContentType || ''} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                       <select name="status" defaultValue={event.status} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]">
                         <option value="planned">Geplant</option>
                         <option value="confirmed">Bestätigt</option>
                         <option value="completed">Abgeschlossen</option>
                       </select>
-                      <div className="rounded-xl border border-[color:var(--color-border)]/70 bg-black/15 px-4 py-3 text-sm text-[color:var(--color-muted)]">ID: {event.id}</div>
+                      <a href={getEventStandHref(event.id)} className="rounded-xl border border-[color:var(--color-border)]/70 bg-black/15 px-4 py-3 text-sm text-[color:var(--color-muted)] transition hover:border-[color:var(--color-accent)] hover:text-white">Stand öffnen: {event.id}</a>
                       <textarea name="description" rows={4} defaultValue={event.description} className="md:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      <textarea name="standLead" rows={3} defaultValue={event.stand?.lead || ''} className="md:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      <textarea name="standBannerSlots" rows={6} defaultValue={serializeBannerSlots(event.stand?.bannerSlots || [])} className="md:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                       <div className="md:col-span-2 flex flex-wrap gap-3">
                         <button type="submit" className="rounded-xl border border-[color:var(--color-accent)]/50 px-4 py-3 text-sm font-black text-[color:var(--color-accent-soft)] transition hover:border-[color:var(--color-accent)] hover:text-white">Speichern</button>
                       </div>

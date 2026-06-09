@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { getCmsContent, saveCmsContent } from '@/lib/cms/storage';
+import { createDefaultEventStandConfig, normalizeEvent, parseBannerSlots } from '@/lib/event-stand';
 import type { Event } from '@/lib/types';
 
 function sanitizeText(value: FormDataEntryValue | null) {
@@ -38,7 +39,7 @@ function ensureEventId(events: Event[], requestedId: string, title: string) {
   return nextId;
 }
 
-function parseEventFromFormData(formData: FormData, existingId?: string): Event {
+function parseEventFromFormData(formData: FormData, existingId?: string, existingEvent?: Event): Event {
   const title = sanitizeText(formData.get('title'));
   const date = sanitizeText(formData.get('date'));
   const location = sanitizeText(formData.get('location'));
@@ -48,6 +49,12 @@ function parseEventFromFormData(formData: FormData, existingId?: string): Event 
   const ctaUrl = sanitizeText(formData.get('ctaUrl'));
   const rawStatus = sanitizeText(formData.get('status'));
   const status = rawStatus === 'confirmed' || rawStatus === 'completed' ? rawStatus : 'planned';
+  const standAssetUrl = sanitizeText(formData.get('standAssetUrl'));
+  const standAssetName = sanitizeText(formData.get('standAssetName'));
+  const standAssetContentType = sanitizeText(formData.get('standAssetContentType'));
+  const standLead = sanitizeText(formData.get('standLead'));
+  const standBannerSlots = sanitizeText(formData.get('standBannerSlots'));
+  const fallbackStand = existingEvent?.stand || createDefaultEventStandConfig();
 
   return {
     id: existingId || '',
@@ -59,6 +66,13 @@ function parseEventFromFormData(formData: FormData, existingId?: string): Event 
     status,
     ctaText: ctaText || 'Mehr erfahren',
     ctaUrl: ctaUrl || '/kontakt',
+    stand: {
+      assetUrl: standAssetUrl,
+      assetName: standAssetName,
+      assetContentType: standAssetContentType,
+      lead: standLead,
+      bannerSlots: parseBannerSlots(standBannerSlots, fallbackStand.bannerSlots),
+    },
   };
 }
 
@@ -70,17 +84,22 @@ async function assertAdmin() {
 
 async function persistEvents(events: Event[]) {
   const current = await getCmsContent();
+  const normalizedEvents = events.map(normalizeEvent);
 
   await saveCmsContent({
     ...current,
     site: {
       ...current.site,
-      events,
+      events: normalizedEvents,
     },
   });
 
   revalidatePath('/', 'layout');
   revalidatePath('/veranstaltungen');
+  revalidatePath('/drei-d-stand');
+  for (const event of normalizedEvents) {
+    revalidatePath(`/veranstaltungen/${event.id}/3d-stand`);
+  }
 }
 
 export async function addEventAction(formData: FormData) {
@@ -115,9 +134,9 @@ export async function updateEventAction(formData: FormData) {
     redirect('/veranstaltungen?adminError=missing-event');
   }
 
-  const nextEvent = parseEventFromFormData(formData, eventId);
+  const nextEvent = parseEventFromFormData(formData, eventId, existingEvent);
 
-  await persistEvents(current.site.events.map((event) => (event.id === eventId ? { ...existingEvent, ...nextEvent } : event)));
+  await persistEvents(current.site.events.map((event) => (event.id === eventId ? normalizeEvent({ ...existingEvent, ...nextEvent, stand: nextEvent.stand || existingEvent.stand }) : event)));
   redirect('/veranstaltungen?adminSaved=event-updated');
 }
 

@@ -53,9 +53,72 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 ## Deployment auf Vercel
 
-1. Repository bei Vercel verbinden
-2. Umgebungsvariablen in Vercel setzen
-3. Deploy!
+Ein neues Deployment kannst du direkt im Terminal mit der Vercel CLI auslösen.
+
+### 1. Bei Vercel einloggen
+
+```bash
+npx vercel login
+```
+
+### 2. Projekt mit Vercel verknüpfen
+
+Im Projektordner einmalig ausführen:
+
+```bash
+npx vercel
+```
+
+Dabei fragt Vercel interaktiv nach Team, Projektname und den Projekteinstellungen. Danach ist das Projekt lokal mit Vercel verbunden.
+
+### 3. Neues Preview-Deployment erstellen
+
+```bash
+npx vercel
+```
+
+Das erzeugt ein neues Preview-Deployment und gibt dir danach direkt die Deployment-URL im Terminal aus.
+
+### 4. Neues Production-Deployment erstellen
+
+```bash
+npx vercel --prod
+```
+
+Damit wird sofort ein neues Production-Deployment erstellt.
+
+### 5. Wichtige Umgebungsvariablen in Vercel setzen
+
+Die Variablen kannst du im Vercel-Dashboard setzen oder ebenfalls per Terminal hinzufügen:
+
+```bash
+npx vercel env add STRIPE_SECRET_KEY
+npx vercel env add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+npx vercel env add STRIPE_WEBHOOK_SECRET
+npx vercel env add NEXT_PUBLIC_APP_URL
+npx vercel env add CMS_ADMIN_USERNAME
+npx vercel env add CMS_ADMIN_PASSWORD
+npx vercel env add CMS_SESSION_SECRET
+npx vercel env add FIREBASE_PROJECT_ID
+npx vercel env add FIREBASE_CLIENT_EMAIL
+npx vercel env add FIREBASE_PRIVATE_KEY
+npx vercel env add FIREBASE_STORAGE_BUCKET
+```
+
+Nach neuen oder geänderten Env-Variablen solltest du erneut deployen:
+
+```bash
+npx vercel --prod
+```
+
+### Kurzfassung
+
+```bash
+cd /workspaces/Headbang-Handwerk.com
+npx vercel login
+npx vercel
+npx vercel --prod
+```
 
 ## CMS / Admin-Bereich
 

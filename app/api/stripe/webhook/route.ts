@@ -28,8 +28,13 @@ export async function POST(req: NextRequest) {
       console.log('Payment completed:', {
         sessionId: session.id,
         amount: session.amount_total,
+        orderKind: session.metadata?.orderKind,
         company: session.metadata?.company,
         packageId: session.metadata?.packageId,
+        productId: session.metadata?.productId,
+        size: session.metadata?.size,
+        color: session.metadata?.color,
+        quantity: session.metadata?.quantity,
       });
       // TODO: Save to database, send confirmation email
       break;
