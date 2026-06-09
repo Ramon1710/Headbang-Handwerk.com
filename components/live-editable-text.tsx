@@ -69,9 +69,9 @@ function stripTypographyStyles(html: string) {
 
     const filteredDeclarations = rawValue
       .split(';')
-      .map((declaration) => declaration.trim())
+      .map((declaration: string) => declaration.trim())
       .filter(Boolean)
-      .filter((declaration) => {
+      .filter((declaration: string) => {
         const property = declaration.split(':')[0]?.trim().toLowerCase();
 
         return property && !['color', 'font-size', 'font-family', 'font-weight', 'line-height'].includes(property);
