@@ -138,8 +138,8 @@ export default async function UeberUnsPage({
                       )}
                     </div>
                   </LiveResizableBox>
-                  <LiveResizableBox boxKey={`about.teamRoles.${index}.captionBox`} initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamRoles.${index}.captionBox`)} isAdmin={isAdmin} className="w-full">
-                    <LiveEditableText as="p" className="text-sm text-gray-400" editorKey={`about.teamRoles.${index}`} initialHtml={resolveLiveHtml(liveEditor, `about.teamRoles.${index}`, role)} isAdmin={isAdmin} title={`Über uns Teamrolle ${index + 1}`} />
+                  <LiveResizableBox boxKey={`about.teamRoles.${index}.captionBox`} initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamRoles.${index}.captionBox`)} isAdmin={isAdmin} className="inline-flex w-auto max-w-[12rem] items-center justify-center px-3 py-1 text-center">
+                    <LiveEditableText as="p" className="text-xs leading-tight text-gray-400" editorKey={`about.teamRoles.${index}`} initialHtml={resolveLiveHtml(liveEditor, `about.teamRoles.${index}`, role)} isAdmin={isAdmin} title={`Über uns Teamrolle ${index + 1}`} />
                   </LiveResizableBox>
                 </div>
               ))}
