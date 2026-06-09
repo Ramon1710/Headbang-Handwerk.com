@@ -15,6 +15,30 @@ import wackenBackgroundImage from '../Wacken Hintergrund Bild.png';
 
 type LiveEditorState = Awaited<ReturnType<typeof getCmsContent>>['site']['liveEditor'];
 
+function getMediaErrorMessage(mediaError?: string) {
+  if (!mediaError) {
+    return null;
+  }
+
+  if (mediaError === 'missing-config') {
+    return 'Firebase ist für Uploads noch nicht vollständig gesetzt. Prüfe FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY und FIREBASE_STORAGE_BUCKET.';
+  }
+
+  if (mediaError.endsWith('-invalid-config')) {
+    return 'Firebase ist gesetzt, aber ungültig formatiert. Prüfe besonders FIREBASE_PRIVATE_KEY und FIREBASE_STORAGE_BUCKET.';
+  }
+
+  if (mediaError.endsWith('-bucket')) {
+    return 'Der Firebase-Storage-Bucket wurde nicht gefunden. Prüfe FIREBASE_STORAGE_BUCKET in Vercel.';
+  }
+
+  if (mediaError.endsWith('-permission')) {
+    return 'Der Firebase-Service-Account hat keine Schreibrechte auf den Storage-Bucket.';
+  }
+
+  return 'Upload fehlgeschlagen. Bitte Firebase-Storage prüfen.';
+}
+
 function HomeActionCard({
   boxKey,
   titleKey,
@@ -69,6 +93,7 @@ export default async function HomePage({
   const liveEditor = cms.site.liveEditor;
   const heroImageSrc = home.heroImage.assetUrl || standBeispielKiImage.src;
   const backgroundImageSrc = home.backgroundImage.assetUrl || wackenBackgroundImage.src;
+  const mediaErrorMessage = getMediaErrorMessage(params?.mediaError);
 
   return (
     <>
@@ -115,7 +140,7 @@ export default async function HomePage({
                   </div>
                   <div className="text-sm font-semibold">
                     {params?.mediaSaved ? <p className="rounded-xl border border-green-500/30 bg-green-950/40 px-4 py-3 text-green-200">Medien gespeichert.</p> : null}
-                    {params?.mediaError ? <p className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-red-200">Upload fehlgeschlagen. Bitte Firebase-Storage prüfen.</p> : null}
+                    {mediaErrorMessage ? <p className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-red-200">{mediaErrorMessage}</p> : null}
                   </div>
                 </div>
                 <form action={updateHomeMediaAction} className="mt-5 grid gap-4 md:grid-cols-2">
@@ -210,32 +235,6 @@ export default async function HomePage({
                       <ImageIcon className="h-10 w-10" />
                     </div>
                   )}
-                </LiveResizableBox>
-
-                <LiveResizableBox
-                  boxKey="home.simple.sideinfo.box"
-                  initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.sideinfo.box')}
-                  isAdmin={isAdmin}
-                  className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
-                >
-                  <LiveEditableText
-                    as="h2"
-                    className="text-xl font-black text-white"
-                    editorKey="home.projectFocusTitle"
-                    initialHtml={resolveLiveHtml(liveEditor, 'home.projectFocusTitle', home.projectFocusTitle)}
-                    isAdmin={isAdmin}
-                    title="Seitentext Überschrift"
-                    normalizeTypography
-                  />
-                  <LiveEditableText
-                    as="p"
-                    className="mt-3 text-base leading-7 text-[#ead9c3]"
-                    editorKey="home.projectFocusText"
-                    initialHtml={resolveLiveHtml(liveEditor, 'home.projectFocusText', home.projectFocusText)}
-                    isAdmin={isAdmin}
-                    title="Seitentext Inhalt"
-                    normalizeTypography
-                  />
                 </LiveResizableBox>
               </div>
             </div>

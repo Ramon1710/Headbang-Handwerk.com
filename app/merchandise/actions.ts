@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
-import { getCmsContent, saveCmsContent } from '@/lib/cms/storage';
+import { getCmsContent, isFirebaseAuthSaveError, isInvalidFirebaseSaveError, isReadonlyFallbackError, saveCmsContent } from '@/lib/cms/storage';
 import type { CmsContent } from '@/lib/cms/schema';
 import type { MerchandiseProduct } from '@/lib/types';
 
@@ -72,7 +72,24 @@ async function persistMerchandise(updater: (current: CmsContent) => CmsContent |
   const current = await getCmsContent();
   const next = await updater(current);
 
-  await saveCmsContent(next);
+  try {
+    await saveCmsContent(next);
+  } catch (error) {
+    if (isFirebaseAuthSaveError(error)) {
+      redirect('/merchandise?adminError=firebase-auth');
+    }
+
+    if (isInvalidFirebaseSaveError(error)) {
+      redirect('/merchandise?adminError=invalid-firebase');
+    }
+
+    if (isReadonlyFallbackError(error)) {
+      redirect('/merchandise?adminError=missing-config');
+    }
+
+    throw error;
+  }
+
   revalidatePath('/', 'layout');
   revalidatePath('/merchandise');
 }

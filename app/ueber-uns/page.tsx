@@ -19,6 +19,30 @@ const values = [
   { icon: Rocket, title: 'Vision', desc: 'Headbang Handwerk europaweit auf allen großen Metal-Festivals etablieren.' },
 ];
 
+function getMediaErrorMessage(mediaError?: string) {
+  if (!mediaError) {
+    return null;
+  }
+
+  if (mediaError === 'missing-config') {
+    return 'Firebase ist für Uploads noch nicht vollständig gesetzt. Prüfe FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY und FIREBASE_STORAGE_BUCKET.';
+  }
+
+  if (mediaError.endsWith('-invalid-config')) {
+    return 'Firebase ist gesetzt, aber ungültig formatiert. Prüfe besonders FIREBASE_PRIVATE_KEY und FIREBASE_STORAGE_BUCKET.';
+  }
+
+  if (mediaError.endsWith('-bucket')) {
+    return 'Der Firebase-Storage-Bucket wurde nicht gefunden. Prüfe FIREBASE_STORAGE_BUCKET in Vercel.';
+  }
+
+  if (mediaError.endsWith('-permission')) {
+    return 'Der Firebase-Service-Account hat keine Schreibrechte auf den Storage-Bucket.';
+  }
+
+  return 'Upload fehlgeschlagen. Bitte Firebase-Storage prüfen.';
+}
+
 export default async function UeberUnsPage({
   searchParams,
 }: {
@@ -30,6 +54,7 @@ export default async function UeberUnsPage({
   const isAdmin = isAuthenticatedAdmin && params?.view !== 'user';
   const about = cms.site.about;
   const liveEditor = cms.site.liveEditor;
+  const mediaErrorMessage = getMediaErrorMessage(params?.mediaError);
 
   return (
     <EditablePageShell cms={cms} isAdmin={isAdmin} mainClassName="min-h-screen bg-transparent pt-28 pb-24">
@@ -43,7 +68,7 @@ export default async function UeberUnsPage({
                 </div>
                 <div className="text-sm font-semibold">
                   {params?.adminSaved ? <p className="rounded-xl border border-green-500/30 bg-green-950/40 px-4 py-3 text-green-200">Team-Bilder gespeichert.</p> : null}
-                  {params?.mediaError ? <p className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-red-200">Upload fehlgeschlagen. Bitte Firebase-Storage prüfen.</p> : null}
+                  {mediaErrorMessage ? <p className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-red-200">{mediaErrorMessage}</p> : null}
                 </div>
               </div>
 

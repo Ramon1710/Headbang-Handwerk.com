@@ -33,8 +33,6 @@ export const defaultCmsContent: CmsContent = {
     },
     navigationLinks: [
       { label: 'Startseite', href: '/' },
-      { label: 'Formular', href: '/formular' },
-      { label: 'Partner & Unterstützer', href: '/partner-unterstuetzerinfo' },
       { label: 'Veranstaltungen', href: '/veranstaltungen' },
       { label: 'Sponsoren', href: '/sponsoren' },
       { label: 'Merchandise', href: '/merchandise' },

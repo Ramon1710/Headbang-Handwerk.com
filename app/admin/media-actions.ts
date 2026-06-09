@@ -9,7 +9,7 @@ import {
   isFirebaseStorageUploadError,
   uploadCmsAsset,
 } from '@/lib/cms/file-storage';
-import { isFirebaseAuthError } from '@/lib/cms/firebase';
+import { hasFirebaseConfig, isFirebaseAuthError, isInvalidFirebaseConfigError } from '@/lib/cms/firebase';
 import { getCmsContent, saveCmsContent } from '@/lib/cms/storage';
 import type { MediaAsset } from '@/lib/cms/schema';
 
@@ -28,6 +28,10 @@ async function assertAdmin(nextPath: string) {
 }
 
 function redirectForUploadError(basePath: string, code: string, error: unknown): never {
+  if (isInvalidFirebaseConfigError(error)) {
+    redirect(`${basePath}?mediaError=${code}-invalid-config`);
+  }
+
   if (isFirebaseStorageBucketNotFoundError(error)) {
     redirect(`${basePath}?mediaError=${code}-bucket`);
   }
@@ -45,6 +49,10 @@ function redirectForUploadError(basePath: string, code: string, error: unknown):
 
 export async function updateHomeMediaAction(formData: FormData) {
   await assertAdmin('/');
+
+  if (!hasFirebaseConfig()) {
+    redirect('/?mediaError=missing-config');
+  }
 
   const current = await getCmsContent();
   let heroImage = current.site.home.heroImage;
@@ -106,6 +114,10 @@ export async function updateHomeMediaAction(formData: FormData) {
 
 export async function updateAboutTeamImagesAction(formData: FormData) {
   await assertAdmin('/ueber-uns');
+
+  if (!hasFirebaseConfig()) {
+    redirect('/ueber-uns?mediaError=missing-config');
+  }
 
   const current = await getCmsContent();
   const nextTeamImages = [...current.site.about.teamImages];

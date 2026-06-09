@@ -1,10 +1,8 @@
 import type { NavigationLink } from '@/lib/cms/schema';
 
-const REMOVED_NAV_HREFS = new Set(['/drei-d-stand']);
+const REMOVED_NAV_HREFS = new Set(['/drei-d-stand', '/formular', '/partner-unterstuetzerinfo']);
 const MERCHANDISE_LINK: NavigationLink = { label: 'Merchandise', href: '/merchandise' };
-const FORM_LINK: NavigationLink = { label: 'Formular', href: '/formular' };
-const PARTNER_INFO_LINK: NavigationLink = { label: 'Partner & Unterstützer', href: '/partner-unterstuetzerinfo' };
-const CANONICAL_NAV_ORDER = ['/', '/formular', '/partner-unterstuetzerinfo', '/veranstaltungen', '/sponsoren', '/merchandise', '/ueber-uns', '/kontakt'];
+const CANONICAL_NAV_ORDER = ['/', '/veranstaltungen', '/sponsoren', '/merchandise', '/ueber-uns', '/kontakt'];
 
 function normalizeHref(href: string) {
   if (!href || href === '/') {
@@ -41,17 +39,6 @@ export function normalizeNavigationLinks(links: NavigationLink[]) {
     } else {
       filteredLinks.push(MERCHANDISE_LINK);
     }
-  }
-
-  if (!seenHrefs.has(FORM_LINK.href)) {
-    filteredLinks.splice(1, 0, FORM_LINK);
-    seenHrefs.add(FORM_LINK.href);
-  }
-
-  if (!seenHrefs.has(PARTNER_INFO_LINK.href)) {
-    const formIndex = filteredLinks.findIndex((link) => link.href === FORM_LINK.href);
-    filteredLinks.splice(formIndex >= 0 ? formIndex + 1 : 1, 0, PARTNER_INFO_LINK);
-    seenHrefs.add(PARTNER_INFO_LINK.href);
   }
 
   const orderedLinks: NavigationLink[] = [];

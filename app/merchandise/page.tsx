@@ -20,6 +20,16 @@ export default async function MerchandisePage({
   const isAuthenticatedAdmin = await isAdminAuthenticated();
   const isAdmin = isAuthenticatedAdmin && query?.view !== 'user';
   const merchandise = cms.site.merchandise;
+  const adminErrorMessage =
+    query?.adminError === 'missing-config'
+      ? 'Speichern ist auf Vercel ohne Firebase nicht möglich. Prüfe FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL und FIREBASE_PRIVATE_KEY.'
+      : query?.adminError === 'invalid-firebase'
+        ? 'Firebase ist gesetzt, aber ungültig formatiert. Prüfe besonders FIREBASE_PRIVATE_KEY.'
+        : query?.adminError === 'firebase-auth'
+          ? 'Firebase lehnt das Speichern ab. Prüfe den Service-Account und seine Rechte.'
+          : query?.adminError
+            ? 'Aktion fehlgeschlagen. Bitte Eingaben prüfen.'
+            : null;
 
   return (
     <EditablePageShell cms={cms} isAdmin={isAdmin} mainClassName="min-h-screen bg-transparent pt-28 pb-24">
@@ -33,7 +43,7 @@ export default async function MerchandisePage({
               </div>
               <div className="text-sm font-semibold">
                 {query?.adminSaved ? <p className="rounded-xl border border-green-500/30 bg-green-950/40 px-4 py-3 text-green-200">Änderung gespeichert.</p> : null}
-                {query?.adminError ? <p className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-red-200">Aktion fehlgeschlagen. Bitte Eingaben prüfen.</p> : null}
+                {adminErrorMessage ? <p className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-red-200">{adminErrorMessage}</p> : null}
               </div>
             </div>
 
