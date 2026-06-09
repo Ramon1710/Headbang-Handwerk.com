@@ -34,7 +34,8 @@ export const defaultCmsContent: CmsContent = {
     navigationLinks: [
       { label: 'Startseite', href: '/' },
       { label: 'Veranstaltungen', href: '/veranstaltungen' },
-      { label: 'Sponsoren', href: '/sponsoren' },
+      { label: 'Mitglied werden', href: '/formular' },
+      { label: 'Sponsor werden', href: '/sponsoren' },
       { label: 'Merchandise', href: '/merchandise' },
       { label: 'Über uns', href: '/ueber-uns' },
       { label: 'Kontakt', href: '/kontakt' },

@@ -293,10 +293,10 @@ a {
 .home-action-copy > :first-child {
   color: var(--text-heading);
   font-family: var(--font-cinzel), Georgia, serif;
-  font-size: clamp(1.8rem, 2.2vw, 2.2rem);
+  font-size: clamp(1.45rem, 1.75vw, 1.9rem);
   font-weight: 900;
   letter-spacing: 0.01em;
-  line-height: 1.18;
+  line-height: 1.12;
   padding-top: 0.08em;
   padding-bottom: 0.12em;
   text-transform: uppercase;

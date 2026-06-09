@@ -57,7 +57,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       '--live-box-min-height-mobile': mobileStyle?.minHeight,
       '--live-box-x-mobile': undefined,
       '--live-box-y-mobile': allowPosition ? mobileStyle?.y : undefined,
-      maxWidth: '100%',
+      maxWidth: isAdmin && viewport === 'desktop' ? undefined : '100%',
     } as CSSProperties;
 
     return nextStyle;
@@ -323,36 +323,41 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     event.currentTarget.setPointerCapture(event.pointerId);
 
     const startX = event.clientX;
+    const startY = event.clientY;
     const rect = ref.current.getBoundingClientRect();
     const startWidth = rect.width;
+    const startHeight = rect.height;
     const activeViewport = viewport;
     const minWidth = 180;
+    const minHeight = 120;
     const currentStyle = getViewportStyle(boxStyles, activeViewport);
-    const currentHeight = currentStyle?.height;
-    const currentMinHeight = currentStyle?.minHeight;
     const currentX = currentStyle?.x;
     const currentY = currentStyle?.y;
 
     function handlePointerMove(moveEvent: PointerEvent) {
       const nextWidth = Math.max(minWidth, startWidth + (moveEvent.clientX - startX));
+      const nextHeight = Math.max(minHeight, startHeight + (moveEvent.clientY - startY));
 
       updateViewportStyle(
         {
           width: `${Math.round(nextWidth)}px`,
+          height: `${Math.round(nextHeight)}px`,
+          minHeight: `${Math.round(nextHeight)}px`,
         },
         activeViewport
       );
     }
 
-    function finishResize(endClientX: number) {
+    function finishResize(endClientX: number, endClientY: number) {
       const nextWidth = Math.max(minWidth, startWidth + (endClientX - startX));
+      const nextHeight = Math.max(minHeight, startHeight + (endClientY - startY));
       document.body.style.userSelect = '';
 
       queueSave(
         {
           width: `${Math.round(nextWidth)}px`,
-          height: currentHeight,
-          minHeight: currentMinHeight,
+          height: `${Math.round(nextHeight)}px`,
+          minHeight: `${Math.round(nextHeight)}px`,
           x: currentX,
           y: currentY,
         },
@@ -365,7 +370,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     }
 
     function handlePointerUp(upEvent: PointerEvent) {
-      finishResize(upEvent.clientX);
+      finishResize(upEvent.clientX, upEvent.clientY);
     }
 
     function handlePointerCancel() {
@@ -408,8 +413,8 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
         <button
           type="button"
           onPointerDown={handleWidthResizeStart}
-          aria-label="Breite ändern"
-          className="absolute bottom-2 left-1/2 z-20 hidden h-5 w-12 -translate-x-1/2 cursor-ew-resize rounded-full border border-[#ff9d3c]/60 bg-[#1a110b]/90 md:block"
+          aria-label="Breite und Höhe ändern"
+          className="absolute bottom-2 left-1/2 z-20 hidden h-5 w-12 -translate-x-1/2 cursor-nwse-resize rounded-full border border-[#ff9d3c]/60 bg-[#1a110b]/90 md:block"
         >
           <span aria-hidden="true" className="pointer-events-none absolute inset-x-2 top-1/2 h-0.5 -translate-y-1/2 bg-[#ffcf98]" />
         </button>

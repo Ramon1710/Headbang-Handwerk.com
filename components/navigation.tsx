@@ -66,8 +66,8 @@ export function Navigation({
       )}
     >
       <div className="fire-divider" />
-      <nav className="site-shell px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between py-3 min-h-24">
+      <nav className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8 xl:px-10">
+        <div className="flex min-h-24 items-center justify-between gap-6 py-3 xl:gap-8">
           <a href="/" className="flex items-center gap-3 group" aria-label="Headbang Handwerk">
             <img
               src={resolvedLogoSrc}
@@ -76,19 +76,19 @@ export function Navigation({
             />
           </a>
 
-          <div className="hidden lg:flex items-center gap-2">
+          <div className="hidden lg:flex flex-1 items-center justify-center gap-1 xl:gap-2">
             {links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="link-copy px-3 py-2 text-[0.97rem] font-semibold rounded-md transition-colors"
+                className="link-copy rounded-md px-3 py-2 text-[0.95rem] font-semibold whitespace-nowrap transition-colors xl:px-3.5 xl:text-[0.97rem]"
               >
                 {link.label}
               </a>
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 xl:gap-3">
             {showAdminLink ? (
               <Button href={adminHref} size="sm" variant="secondary" className="hidden sm:inline-flex min-w-32">
                 Admin
@@ -106,7 +106,7 @@ export function Navigation({
                 </Button>
               </form>
             ) : null}
-            <Button href={ctaHref} size="sm" className="hidden sm:inline-flex min-w-44">
+            <Button href={ctaHref} size="sm" className="hidden sm:inline-flex min-w-40 xl:min-w-44 whitespace-nowrap">
               {ctaLabel}
             </Button>
             <button

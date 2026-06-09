@@ -1,8 +1,10 @@
 import type { NavigationLink } from '@/lib/cms/schema';
 
-const REMOVED_NAV_HREFS = new Set(['/drei-d-stand', '/formular', '/partner-unterstuetzerinfo']);
+const REMOVED_NAV_HREFS = new Set(['/drei-d-stand', '/partner-unterstuetzerinfo']);
+const MEMBERSHIP_LINK: NavigationLink = { label: 'Mitglied werden', href: '/formular' };
+const SPONSOR_LINK: NavigationLink = { label: 'Sponsor werden', href: '/sponsoren' };
 const MERCHANDISE_LINK: NavigationLink = { label: 'Merchandise', href: '/merchandise' };
-const CANONICAL_NAV_ORDER = ['/', '/veranstaltungen', '/sponsoren', '/merchandise', '/ueber-uns', '/kontakt'];
+const CANONICAL_NAV_ORDER = ['/', '/veranstaltungen', '/formular', '/sponsoren', '/merchandise', '/ueber-uns', '/kontakt'];
 
 function normalizeHref(href: string) {
   if (!href || href === '/') {
@@ -28,7 +30,37 @@ export function normalizeNavigationLinks(links: NavigationLink[]) {
     }
 
     seenHrefs.add(normalizedHref);
+    if (normalizedHref === SPONSOR_LINK.href) {
+      filteredLinks.push({ ...link, href: normalizedHref, label: SPONSOR_LINK.label });
+      continue;
+    }
+
+    if (normalizedHref === MEMBERSHIP_LINK.href) {
+      filteredLinks.push({ ...link, href: normalizedHref, label: MEMBERSHIP_LINK.label });
+      continue;
+    }
+
     filteredLinks.push({ ...link, href: normalizedHref });
+  }
+
+  if (!seenHrefs.has(MEMBERSHIP_LINK.href)) {
+    const eventsIndex = filteredLinks.findIndex((link) => link.href === '/veranstaltungen');
+
+    if (eventsIndex >= 0) {
+      filteredLinks.splice(eventsIndex + 1, 0, MEMBERSHIP_LINK);
+    } else {
+      filteredLinks.unshift(MEMBERSHIP_LINK);
+    }
+  }
+
+  if (!seenHrefs.has(SPONSOR_LINK.href)) {
+    const membershipIndex = filteredLinks.findIndex((link) => link.href === MEMBERSHIP_LINK.href);
+
+    if (membershipIndex >= 0) {
+      filteredLinks.splice(membershipIndex + 1, 0, SPONSOR_LINK);
+    } else {
+      filteredLinks.push(SPONSOR_LINK);
+    }
   }
 
   if (!seenHrefs.has(MERCHANDISE_LINK.href)) {
