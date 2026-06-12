@@ -310,16 +310,16 @@ export default async function HomePage({
                 <HomeActionCard boxKey="home.simple.form.box" titleKey="home.simple.form.title" ctaKey="home.simple.form.cta" title="Mitglied werden" href="/formular" linkLabel="Zum Formular" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
               <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.partner.box" titleKey="home.simple.partner.title" ctaKey="home.simple.partner.cta" title="Partner werden" href="/partner-unterstuetzerinfo" linkLabel="Zum Inforeiter" showCta={false} isAdmin={isAdmin} liveEditor={liveEditor} />
+                <HomeActionCard boxKey="home.simple.partner.box" titleKey="home.simple.partner.title" ctaKey="home.simple.partner.cta" title="Partner werden" href="/partner-unterstuetzerinfo" linkLabel="Zu den Informationen" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
               <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.sponsor.box" titleKey="home.simple.sponsor.title" ctaKey="home.simple.sponsor.cta" title="Sponsor werden" href="/sponsoren" linkLabel="Zum Sponsoring" isAdmin={isAdmin} liveEditor={liveEditor} />
+                <HomeActionCard boxKey="home.simple.sponsor.box" titleKey="home.simple.sponsor.title" ctaKey="home.simple.sponsor.link" title="Sponsor werden" href="/sponsoren" linkLabel="Zum Sponsoring" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
             </div>
 
             <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-start md:flex-wrap">
               <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.support.box" titleKey="home.simple.support.title" ctaKey="home.simple.support.cta" title="Unterstützer werden" href="/partner-unterstuetzerinfo" linkLabel="Mehr erfahren" showCta={false} isAdmin={isAdmin} liveEditor={liveEditor} />
+                <HomeActionCard boxKey="home.simple.support.box" titleKey="home.simple.support.title" ctaKey="home.simple.support.donation" title="Unterstützer werden" href="/spenden" linkLabel="Zur Spenden-Seite" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
 
               <div className="min-w-0 md:flex-1">
@@ -347,6 +347,17 @@ export default async function HomePage({
                     title="Info Text"
                     normalizeTypography
                   />
+                  {isAdmin ? (
+                    <div className="link-copy mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2.5 text-sm font-bold tracking-wide">
+                      Zu den Informationen
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
+                  ) : (
+                    <Button href="/partner-unterstuetzerinfo" variant="secondary" className="mt-4 w-full justify-center">
+                      Zu den Informationen
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  )}
                 </LiveResizableBox>
               </div>
 
@@ -380,17 +391,17 @@ export default async function HomePage({
                       <LiveEditableText
                         as="span"
                         className="link-copy text-base font-bold tracking-wide"
-                        editorKey="home.closingPrimaryCtaLabel"
-                        initialHtml={resolveLiveHtml(liveEditor, 'home.closingPrimaryCtaLabel', home.closingPrimaryCtaLabel)}
+                        editorKey="home.projectPrimaryCtaLabel"
+                        initialHtml={resolveLiveHtml(liveEditor, 'home.projectPrimaryCtaLabel', 'Zu den Veranstaltungen')}
                         isAdmin={isAdmin}
-                        title="Sponsor Info Buttontext"
+                        title="Projekt Info Buttontext"
                         normalizeTypography
                       />
                       <ArrowRight className="h-4 w-4" />
                     </div>
                   ) : (
-                    <Button href="/sponsoren" className="mt-4 w-full justify-center">
-                      {resolveLiveHtml(liveEditor, 'home.closingPrimaryCtaLabel', home.closingPrimaryCtaLabel).replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
+                    <Button href="/veranstaltungen" className="mt-4 w-full justify-center">
+                      {resolveLiveHtml(liveEditor, 'home.projectPrimaryCtaLabel', 'Zu den Veranstaltungen').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   )}

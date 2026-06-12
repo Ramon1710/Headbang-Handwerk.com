@@ -26,7 +26,7 @@ export function SponsorPackageCard({ pkg }: SponsorPackageCardProps) {
       )}
 
       <div className="mb-6">
-        <h3 className="section-title mb-2 text-[1.85rem]">{pkg.name}</h3>
+        <h3 className="section-title mb-2 text-[clamp(1.45rem,2.1vw,1.85rem)] leading-[1.02] [text-wrap:balance] [hyphens:auto]">{pkg.name}</h3>
         <div className="body-copy mb-1 text-lg font-bold">
           {formatPrice(pkg.price)}
         </div>

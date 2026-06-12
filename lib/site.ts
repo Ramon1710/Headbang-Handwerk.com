@@ -3,8 +3,9 @@ import type { NavigationLink } from '@/lib/cms/schema';
 const REMOVED_NAV_HREFS = new Set(['/drei-d-stand', '/partner-unterstuetzerinfo']);
 const MEMBERSHIP_LINK: NavigationLink = { label: 'Mitglied werden', href: '/formular' };
 const SPONSOR_LINK: NavigationLink = { label: 'Sponsor werden', href: '/sponsoren' };
+const DONATION_LINK: NavigationLink = { label: 'Spenden', href: '/spenden' };
 const MERCHANDISE_LINK: NavigationLink = { label: 'Merchandise', href: '/merchandise' };
-const CANONICAL_NAV_ORDER = ['/', '/veranstaltungen', '/formular', '/sponsoren', '/merchandise', '/ueber-uns', '/kontakt'];
+const CANONICAL_NAV_ORDER = ['/', '/veranstaltungen', '/formular', '/sponsoren', '/spenden', '/merchandise', '/ueber-uns', '/kontakt'];
 
 function normalizeHref(href: string) {
   if (!href || href === '/') {
@@ -63,8 +64,18 @@ export function normalizeNavigationLinks(links: NavigationLink[]) {
     }
   }
 
+  if (!seenHrefs.has(DONATION_LINK.href)) {
+    const sponsorIndex = filteredLinks.findIndex((link) => link.href === SPONSOR_LINK.href);
+
+    if (sponsorIndex >= 0) {
+      filteredLinks.splice(sponsorIndex + 1, 0, DONATION_LINK);
+    } else {
+      filteredLinks.push(DONATION_LINK);
+    }
+  }
+
   if (!seenHrefs.has(MERCHANDISE_LINK.href)) {
-    const sponsorsIndex = filteredLinks.findIndex((link) => link.href === '/sponsoren');
+    const sponsorsIndex = filteredLinks.findIndex((link) => link.href === DONATION_LINK.href);
 
     if (sponsorsIndex >= 0) {
       filteredLinks.splice(sponsorsIndex + 1, 0, MERCHANDISE_LINK);

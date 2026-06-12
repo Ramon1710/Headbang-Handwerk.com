@@ -46,7 +46,7 @@ export default async function SponsorenPage({
               </div>
 
               <form action={addSponsorPackageAction} className="mt-6 grid gap-4 rounded-[1.4rem] border border-white/8 bg-black/15 p-5 lg:grid-cols-2">
-                <input name="name" placeholder="Paketname" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                <input name="name" placeholder="Paketname / Kartenüberschrift" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                 <input name="price" type="number" min="0" step="0.01" placeholder="Preis in EUR" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                 <input name="visibility" placeholder="Sichtbarkeit" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                 <input name="logoSize" placeholder="Logogröße" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
@@ -67,7 +67,10 @@ export default async function SponsorenPage({
                   <div key={pkg.id} className="rounded-[1.4rem] border border-white/8 bg-black/10 p-5">
                     <form action={updateSponsorPackageAction} className="grid gap-3 md:grid-cols-2">
                       <input type="hidden" name="id" value={pkg.id} />
-                      <input name="name" defaultValue={pkg.name} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      <label className="flex flex-col gap-2 text-sm text-[color:var(--color-muted)]">
+                        <span>Paketname / Kartenüberschrift</span>
+                        <input name="name" defaultValue={pkg.name} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
                       <input name="price" type="number" min="0" step="0.01" defaultValue={pkg.price} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                       <input name="visibility" defaultValue={pkg.visibility} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                       <input name="logoSize" defaultValue={pkg.logoSize} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
@@ -124,7 +127,7 @@ export default async function SponsorenPage({
 
           <LiveResizableBox boxKey="sponsors.custom.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'sponsors.custom.box')} isAdmin={isAdmin} className="section-shell content-box content-flow text-center">
             <LiveEditableText as="h3" className="section-title text-[1.8rem]" editorKey="sponsors.customPackageTitle" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.customPackageTitle', sponsors.customPackageTitle)} isAdmin={isAdmin} title="Sponsoren Individuelles Paket Titel" />
-            <LiveEditableText as="p" className="body-copy mx-auto max-w-lg text-sm" editorKey="sponsors.customPackageText" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.customPackageText', sponsors.customPackageText)} isAdmin={isAdmin} title="Sponsoren Individuelles Paket Text" />
+            <LiveEditableText as="p" className="body-copy mx-auto max-w-lg text-center text-sm" editorKey="sponsors.customPackageText" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.customPackageText', sponsors.customPackageText)} isAdmin={isAdmin} title="Sponsoren Individuelles Paket Text" />
             <Button href={sponsors.customPackageCtaHref} size="md">
               <LiveEditableText as="span" className="inline" editorKey="sponsors.customPackageCtaLabel" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.customPackageCtaLabel', sponsors.customPackageCtaLabel)} isAdmin={isAdmin} title="Sponsoren Individuelles Paket CTA" />
             </Button>
