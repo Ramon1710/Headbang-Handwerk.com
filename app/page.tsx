@@ -391,17 +391,17 @@ export default async function HomePage({
                       <LiveEditableText
                         as="span"
                         className="link-copy text-base font-bold tracking-wide"
-                        editorKey="home.projectPrimaryCtaLabel"
-                        initialHtml={resolveLiveHtml(liveEditor, 'home.projectPrimaryCtaLabel', 'Zu den Veranstaltungen')}
+                        editorKey="home.closingSponsorCtaLabel"
+                        initialHtml={resolveLiveHtml(liveEditor, 'home.closingSponsorCtaLabel', 'Zum Sponsoring')}
                         isAdmin={isAdmin}
-                        title="Projekt Info Buttontext"
+                        title="Sponsor Info Buttontext"
                         normalizeTypography
                       />
                       <ArrowRight className="h-4 w-4" />
                     </div>
                   ) : (
-                    <Button href="/veranstaltungen" className="mt-4 w-full justify-center">
-                      {resolveLiveHtml(liveEditor, 'home.projectPrimaryCtaLabel', 'Zu den Veranstaltungen').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
+                    <Button href="/sponsoren" className="mt-4 w-full justify-center">
+                      {resolveLiveHtml(liveEditor, 'home.closingSponsorCtaLabel', 'Zum Sponsoring').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   )}

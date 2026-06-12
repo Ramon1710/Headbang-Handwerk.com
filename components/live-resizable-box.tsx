@@ -43,7 +43,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   }
 
   function buildResponsiveStyle(styles: ResolvedLiveBoxStyle | undefined) {
-    const mobileStyle = isAdmin ? styles?.mobile : undefined;
+    const mobileStyle = styles?.mobile;
     const desktopStyle = styles?.desktop;
 
     const nextStyle = {
@@ -52,13 +52,13 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       '--live-box-min-height-desktop': desktopStyle?.minHeight,
       '--live-box-offset-x-desktop': allowPosition ? desktopStyle?.x : undefined,
       '--live-box-offset-y-desktop': allowPosition ? desktopStyle?.y : undefined,
-      '--live-box-width-mobile': '100%',
+      '--live-box-width-mobile': mobileStyle?.width ?? '100%',
       '--live-box-height-mobile': mobileStyle?.height,
       '--live-box-min-height-mobile': mobileStyle?.minHeight,
-      '--live-box-offset-x-mobile': undefined,
+      '--live-box-offset-x-mobile': allowPosition ? mobileStyle?.x : undefined,
       '--live-box-offset-y-mobile': allowPosition ? mobileStyle?.y : undefined,
       '--live-box-overflow-x-correction': `${mobileOverflowCorrection}px`,
-      maxWidth: isAdmin && viewport === 'desktop' ? undefined : '100%',
+      maxWidth: viewport === 'mobile' ? '100%' : undefined,
     } as CSSProperties;
 
     return nextStyle;

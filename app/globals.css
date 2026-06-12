@@ -314,8 +314,10 @@ a {
   width: var(--live-box-width-mobile, auto);
   height: var(--live-box-height-mobile, auto);
   min-height: var(--live-box-min-height-mobile, auto);
-  margin-top: var(--live-box-offset-y-mobile, 0px);
-  transform: translateX(calc(var(--live-box-offset-x-mobile, 0px) + var(--live-box-overflow-x-correction, 0px)));
+  transform: translate(
+    calc(var(--live-box-offset-x-mobile, 0px) + var(--live-box-overflow-x-correction, 0px)),
+    var(--live-box-offset-y-mobile, 0px)
+  );
 }
 
 @media (min-width: 768px) {
@@ -323,8 +325,7 @@ a {
     width: var(--live-box-width-desktop, auto);
     height: var(--live-box-height-desktop, auto);
     min-height: var(--live-box-min-height-desktop, auto);
-    margin-top: var(--live-box-offset-y-desktop, 0px);
-    transform: translateX(var(--live-box-offset-x-desktop, 0px));
+    transform: translate(var(--live-box-offset-x-desktop, 0px), var(--live-box-offset-y-desktop, 0px));
   }
 }
 

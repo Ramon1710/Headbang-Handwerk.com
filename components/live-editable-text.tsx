@@ -60,7 +60,9 @@ function isSelectionInsideEditor(selection: Selection, editor: HTMLDivElement) {
 }
 
 function stripTypographyStyles(html: string) {
-  return html.replace(/style=("([^"]*)"|'([^']*)')/gi, (fullMatch, _styleAttr, doubleQuoted, singleQuoted) => {
+  return html
+    .replace(/\salign=("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .replace(/style=("([^"]*)"|'([^']*)')/gi, (fullMatch, _styleAttr, doubleQuoted, singleQuoted) => {
     const rawValue = (doubleQuoted ?? singleQuoted ?? '').trim();
 
     if (!rawValue) {
@@ -74,7 +76,7 @@ function stripTypographyStyles(html: string) {
       .filter((declaration: string) => {
         const property = declaration.split(':')[0]?.trim().toLowerCase();
 
-        return property && !['color', 'font-size', 'font-family', 'font-weight', 'line-height'].includes(property);
+        return property && !['color', 'font-size', 'font-family', 'font-weight', 'line-height', 'text-align'].includes(property);
       });
 
     if (filteredDeclarations.length === 0) {
@@ -82,7 +84,7 @@ function stripTypographyStyles(html: string) {
     }
 
     return `style="${filteredDeclarations.join('; ')}"`;
-  });
+    });
 }
 
 function hasVisibleText(html: string) {

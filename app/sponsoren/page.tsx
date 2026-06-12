@@ -127,7 +127,7 @@ export default async function SponsorenPage({
 
           <LiveResizableBox boxKey="sponsors.custom.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'sponsors.custom.box')} isAdmin={isAdmin} className="section-shell content-box content-flow text-center">
             <LiveEditableText as="h3" className="section-title text-[1.8rem]" editorKey="sponsors.customPackageTitle" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.customPackageTitle', sponsors.customPackageTitle)} isAdmin={isAdmin} title="Sponsoren Individuelles Paket Titel" />
-            <LiveEditableText as="div" className="body-copy mx-auto max-w-lg text-center text-sm [&_*]:text-center" editorKey="sponsors.customPackageText" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.customPackageText', sponsors.customPackageText)} isAdmin={isAdmin} title="Sponsoren Individuelles Paket Text" />
+            <LiveEditableText as="div" className="body-copy mx-auto max-w-lg text-center text-sm [&_*]:mx-auto [&_*]:w-full [&_*]:text-center" editorKey="sponsors.customPackageText" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.customPackageText', sponsors.customPackageText)} isAdmin={isAdmin} title="Sponsoren Individuelles Paket Text" normalizeTypography />
             <Button href={sponsors.customPackageCtaHref} size="md">
               <LiveEditableText as="span" className="inline" editorKey="sponsors.customPackageCtaLabel" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.customPackageCtaLabel', sponsors.customPackageCtaLabel)} isAdmin={isAdmin} title="Sponsoren Individuelles Paket CTA" />
             </Button>
