@@ -105,7 +105,7 @@ export default async function SponsorenPage({
             <LiveEditableText as="p" className="body-copy-lg" editorKey="sponsors.lead" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.lead', sponsors.lead)} isAdmin={isAdmin} title="Sponsoren Einleitung" />
           </LiveResizableBox>
 
-          <LiveResizableBox boxKey="sponsors.benefits.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'sponsors.benefits.box')} isAdmin={isAdmin} className="section-shell content-box mb-14 text-center">
+          <LiveResizableBox boxKey="sponsors.benefits.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'sponsors.benefits.box')} isAdmin={isAdmin} applySavedHeight={false} className="section-shell content-box mb-14 text-center">
             <LiveEditableText as="h2" className="section-title mb-6 text-[1.8rem]" editorKey="sponsors.benefitsTitle" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.benefitsTitle', sponsors.benefitsTitle)} isAdmin={isAdmin} title="Sponsoren Vorteile Titel" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {sponsors.benefits.map((b, index) => (
@@ -125,12 +125,16 @@ export default async function SponsorenPage({
             ))}
           </div>
 
-          <LiveResizableBox boxKey="sponsors.custom.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'sponsors.custom.box')} isAdmin={isAdmin} className="section-shell content-box content-flow text-center">
+          <LiveResizableBox boxKey="sponsors.custom.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'sponsors.custom.box')} isAdmin={isAdmin} className="section-shell content-box text-center">
             <LiveEditableText as="h3" className="section-title text-[1.8rem]" editorKey="sponsors.customPackageTitle" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.customPackageTitle', sponsors.customPackageTitle)} isAdmin={isAdmin} title="Sponsoren Individuelles Paket Titel" />
-            <LiveEditableText as="div" className="body-copy mx-auto max-w-lg text-center text-sm [&_*]:mx-auto [&_*]:w-full [&_*]:text-center" editorKey="sponsors.customPackageText" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.customPackageText', sponsors.customPackageText)} isAdmin={isAdmin} title="Sponsoren Individuelles Paket Text" normalizeTypography />
+            <LiveResizableBox boxKey="sponsors.custom.text.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'sponsors.custom.text.box')} isAdmin={isAdmin} className="mx-auto mt-6 max-w-lg">
+              <LiveEditableText as="div" className="body-copy text-center text-sm [&_*]:mx-auto [&_*]:w-full [&_*]:text-center" editorKey="sponsors.customPackageText" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.customPackageText', sponsors.customPackageText)} isAdmin={isAdmin} title="Sponsoren Individuelles Paket Text" normalizeTypography />
+            </LiveResizableBox>
+            <div className="mt-6">
             <Button href={sponsors.customPackageCtaHref} size="md">
               <LiveEditableText as="span" className="inline" editorKey="sponsors.customPackageCtaLabel" initialHtml={resolveLiveHtml(liveEditor, 'sponsors.customPackageCtaLabel', sponsors.customPackageCtaLabel)} isAdmin={isAdmin} title="Sponsoren Individuelles Paket CTA" />
             </Button>
+            </div>
           </LiveResizableBox>
         </div>
     </EditablePageShell>

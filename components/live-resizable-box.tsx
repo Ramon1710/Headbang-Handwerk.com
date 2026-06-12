@@ -14,9 +14,10 @@ interface LiveResizableBoxProps {
   initialStyle?: ResolvedLiveBoxStyle;
   isAdmin: boolean;
   allowPosition?: boolean;
+  applySavedHeight?: boolean;
 }
 
-export function LiveResizableBox({ boxKey, className, children, initialStyle, isAdmin, allowPosition = true }: LiveResizableBoxProps) {
+export function LiveResizableBox({ boxKey, className, children, initialStyle, isAdmin, allowPosition = true, applySavedHeight = true }: LiveResizableBoxProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [viewport, setViewport] = useState<LiveViewport>('desktop');
@@ -48,13 +49,13 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
 
     const nextStyle = {
       '--live-box-width-desktop': desktopStyle?.width,
-      '--live-box-height-desktop': desktopStyle?.height,
-      '--live-box-min-height-desktop': desktopStyle?.minHeight,
+      '--live-box-height-desktop': applySavedHeight ? desktopStyle?.height : undefined,
+      '--live-box-min-height-desktop': applySavedHeight ? desktopStyle?.minHeight : undefined,
       '--live-box-offset-x-desktop': allowPosition ? desktopStyle?.x : undefined,
       '--live-box-offset-y-desktop': allowPosition ? desktopStyle?.y : undefined,
       '--live-box-width-mobile': mobileStyle?.width ?? '100%',
-      '--live-box-height-mobile': mobileStyle?.height,
-      '--live-box-min-height-mobile': mobileStyle?.minHeight,
+      '--live-box-height-mobile': applySavedHeight ? mobileStyle?.height : undefined,
+      '--live-box-min-height-mobile': applySavedHeight ? mobileStyle?.minHeight : undefined,
       '--live-box-offset-x-mobile': allowPosition ? mobileStyle?.x : undefined,
       '--live-box-offset-y-mobile': allowPosition ? mobileStyle?.y : undefined,
       '--live-box-overflow-x-correction': `${mobileOverflowCorrection}px`,
@@ -244,7 +245,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   }
 
   function handleResizeStart(event: React.PointerEvent<HTMLButtonElement>) {
-    if (!isAdmin || !ref.current) {
+    if (!isAdmin || !ref.current || !applySavedHeight) {
       return;
     }
 
@@ -314,7 +315,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   }
 
   function handleWidthResizeStart(event: React.PointerEvent<HTMLButtonElement>) {
-    if (!isAdmin || !ref.current || viewport === 'mobile') {
+    if (!isAdmin || !ref.current || viewport === 'mobile' || !applySavedHeight) {
       return;
     }
 
@@ -407,7 +408,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
       <div className={`relative h-full w-full overflow-x-hidden ${className}`}>
         {children}
       </div>
-      {isAdmin ? (
+      {isAdmin && applySavedHeight ? (
         <button
           type="button"
           onPointerDown={handleWidthResizeStart}
@@ -417,7 +418,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
           <span aria-hidden="true" className="pointer-events-none absolute inset-x-2 top-1/2 h-0.5 -translate-y-1/2 bg-[#ffcf98]" />
         </button>
       ) : null}
-      {isAdmin ? (
+      {isAdmin && applySavedHeight ? (
         <button
           type="button"
           onPointerDown={handleResizeStart}
