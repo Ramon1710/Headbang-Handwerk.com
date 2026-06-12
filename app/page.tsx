@@ -404,8 +404,8 @@ export default async function HomePage({
                       <LiveEditableText
                         as="span"
                         className="link-copy text-base font-bold tracking-wide"
-                        editorKey="home.projectPrimaryCtaLabel"
-                        initialHtml={resolveLiveHtml(liveEditor, 'home.projectPrimaryCtaLabel', 'Zu den Veranstaltungen')}
+                        editorKey="home.projectsBoxCtaLabel"
+                        initialHtml={resolveLiveHtml(liveEditor, 'home.projectsBoxCtaLabel', 'Zu den Veranstaltungen')}
                         isAdmin={isAdmin}
                         title="Projekt Info Buttontext"
                         normalizeTypography
@@ -414,7 +414,7 @@ export default async function HomePage({
                     </div>
                   ) : (
                     <Button href="/veranstaltungen" className="mt-4 w-full justify-center">
-                      {resolveLiveHtml(liveEditor, 'home.projectPrimaryCtaLabel', 'Zu den Veranstaltungen').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
+                      {resolveLiveHtml(liveEditor, 'home.projectsBoxCtaLabel', 'Zu den Veranstaltungen').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   )}
