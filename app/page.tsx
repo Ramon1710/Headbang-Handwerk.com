@@ -326,7 +326,7 @@ export default async function HomePage({
                 <HomeActionCard boxKey="home.simple.partner.box" titleKey="home.simple.partner.title" bodyKey="home.simple.partner.body" ctaKey="home.simple.partner.cta" title="Partner werden" body="Gemeinsam geben wir dem Handwerk die Bühne, die es verdient." href="/partner-unterstuetzerinfo" linkLabel="Zu den Informationen" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
               <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.sponsor.box" titleKey="home.simple.sponsor.title" bodyKey="home.simple.sponsor.body" ctaKey="home.simple.sponsor.link" title="Sponsor werden" body="Gemeinsam schaffen wir Sichtbarkeit für das Handwerk und Ihr Engagement." href="/sponsoren" linkLabel="Zum Sponsoring" isAdmin={isAdmin} liveEditor={liveEditor} />
+                <HomeActionCard boxKey="home.simple.sponsor.box" titleKey="home.simple.sponsor.title" bodyKey="home.simple.sponsor.body" ctaKey="home.simple.sponsor.primaryCtaLabel" title="Sponsor werden" body="Gemeinsam schaffen wir Sichtbarkeit für das Handwerk und Ihr Engagement." href="/sponsoren" linkLabel="Zum Sponsoring" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
             </div>
 
@@ -404,8 +404,8 @@ export default async function HomePage({
                       <LiveEditableText
                         as="span"
                         className="link-copy text-base font-bold tracking-wide"
-                        editorKey="home.projectsBoxCtaLabel"
-                        initialHtml={resolveLiveHtml(liveEditor, 'home.projectsBoxCtaLabel', 'Zu den Veranstaltungen')}
+                        editorKey="home.projectsBoxEventsCtaLabel"
+                        initialHtml={resolveLiveHtml(liveEditor, 'home.projectsBoxEventsCtaLabel', 'Zu den Veranstaltungen')}
                         isAdmin={isAdmin}
                         title="Projekt Info Buttontext"
                         normalizeTypography
@@ -414,7 +414,7 @@ export default async function HomePage({
                     </div>
                   ) : (
                     <Button href="/veranstaltungen" className="mt-4 w-full justify-center">
-                      {resolveLiveHtml(liveEditor, 'home.projectsBoxCtaLabel', 'Zu den Veranstaltungen').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
+                      {resolveLiveHtml(liveEditor, 'home.projectsBoxEventsCtaLabel', 'Zu den Veranstaltungen').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   )}
