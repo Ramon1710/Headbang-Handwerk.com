@@ -58,8 +58,10 @@ function getMediaSavedMessage(mediaSaved?: string) {
 function HomeActionCard({
   boxKey,
   titleKey,
+  bodyKey,
   ctaKey,
   title,
+  body,
   href,
   linkLabel,
   showCta = true,
@@ -68,8 +70,10 @@ function HomeActionCard({
 }: {
   boxKey: string;
   titleKey: string;
+  bodyKey: string;
   ctaKey: string;
   title: string;
+  body: string;
   href: string;
   linkLabel: string;
   showCta?: boolean;
@@ -84,12 +88,21 @@ function HomeActionCard({
       className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.9)_0%,rgba(10,7,5,0.82)_100%)] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)] sm:p-7"
     >
       <LiveEditableText
-        as="div"
-        className="home-action-copy"
+        as="h3"
+        className="section-title uppercase"
         editorKey={titleKey}
         initialHtml={resolveLiveHtml(liveEditor, titleKey, title)}
         isAdmin={isAdmin}
-        title={title}
+        title={`${title} Überschrift`}
+        normalizeTypography
+      />
+      <LiveEditableText
+        as="p"
+        className="body-copy mt-3"
+        editorKey={bodyKey}
+        initialHtml={resolveLiveHtml(liveEditor, bodyKey, body)}
+        isAdmin={isAdmin}
+        title={`${title} Beschreibung`}
         normalizeTypography
       />
       {showCta ? (
@@ -307,19 +320,19 @@ export default async function HomePage({
 
             <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-start md:flex-wrap">
               <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.form.box" titleKey="home.simple.form.title" ctaKey="home.simple.form.cta" title="Mitglied werden" href="/formular" linkLabel="Zum Formular" isAdmin={isAdmin} liveEditor={liveEditor} />
+                <HomeActionCard boxKey="home.simple.form.box" titleKey="home.simple.form.title" bodyKey="home.simple.form.body" ctaKey="home.simple.form.cta" title="Mitglied werden" body="Handwerk. Laut. Sichtbar. Sei dabei." href="/formular" linkLabel="Zum Formular" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
               <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.partner.box" titleKey="home.simple.partner.title" ctaKey="home.simple.partner.cta" title="Partner werden" href="/partner-unterstuetzerinfo" linkLabel="Zu den Informationen" isAdmin={isAdmin} liveEditor={liveEditor} />
+                <HomeActionCard boxKey="home.simple.partner.box" titleKey="home.simple.partner.title" bodyKey="home.simple.partner.body" ctaKey="home.simple.partner.cta" title="Partner werden" body="Gemeinsam geben wir dem Handwerk die Bühne, die es verdient." href="/partner-unterstuetzerinfo" linkLabel="Zu den Informationen" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
               <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.sponsor.box" titleKey="home.simple.sponsor.title" ctaKey="home.simple.sponsor.link" title="Sponsor werden" href="/sponsoren" linkLabel="Zum Sponsoring" isAdmin={isAdmin} liveEditor={liveEditor} />
+                <HomeActionCard boxKey="home.simple.sponsor.box" titleKey="home.simple.sponsor.title" bodyKey="home.simple.sponsor.body" ctaKey="home.simple.sponsor.link" title="Sponsor werden" body="Gemeinsam schaffen wir Sichtbarkeit für das Handwerk und Ihr Engagement." href="/sponsoren" linkLabel="Zum Sponsoring" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
             </div>
 
             <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-start md:flex-wrap">
               <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.support.box" titleKey="home.simple.support.title" ctaKey="home.simple.support.donation" title="Unterstützer werden" href="/spenden" linkLabel="Zur Spenden-Seite" isAdmin={isAdmin} liveEditor={liveEditor} />
+                <HomeActionCard boxKey="home.simple.support.box" titleKey="home.simple.support.title" bodyKey="home.simple.support.body" ctaKey="home.simple.support.donation" title="Unterstützer werden" body="Weil gute Ideen Menschen brauchen, die an sie glauben." href="/spenden" linkLabel="Zur Spenden-Seite" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
 
               <div className="min-w-0 md:flex-1">
