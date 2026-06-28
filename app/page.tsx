@@ -268,6 +268,21 @@ export default async function HomePage({
                   />
                 </LiveResizableBox>
 
+                <div className="lg:hidden">
+                  <HomeActionCard
+                    boxKey="home.simple.instagram.box"
+                    titleKey="home.simple.instagram.title"
+                    bodyKey="home.simple.instagram.body"
+                    ctaKey="home.simple.instagram.cta"
+                    title="Aktuelles auf Instagram"
+                    body="Direkt zum aktuellen Beitrag und Einblicke aus dem Projekt auf Instagram ansehen."
+                    href={instagramPostHref}
+                    linkLabel="Zum Instagram-Post"
+                    isAdmin={isAdmin}
+                    liveEditor={liveEditor}
+                  />
+                </div>
+
                 <LiveResizableBox
                   boxKey="home.simple.greeting.box"
                   initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.greeting.box')}
@@ -424,7 +439,7 @@ export default async function HomePage({
                 </LiveResizableBox>
               </div>
 
-              <div className="min-w-0 md:flex-1">
+              <div className="hidden min-w-0 lg:block lg:flex-1">
                 <HomeActionCard
                   boxKey="home.simple.instagram.box"
                   titleKey="home.simple.instagram.title"
