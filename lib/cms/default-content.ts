@@ -170,6 +170,11 @@ export const defaultCmsContent: CmsContent = {
         assetName: '',
         assetContentType: '',
       },
+      instagramVideo: {
+        assetUrl: '',
+        assetName: '',
+        assetContentType: '',
+      },
     },
     sponsors: {
       title: 'Sponsoring',

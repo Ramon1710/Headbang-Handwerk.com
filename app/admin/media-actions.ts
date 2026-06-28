@@ -58,6 +58,7 @@ export async function updateHomeMediaAction(formData: FormData) {
   let logo = current.site.logo;
   let heroImage = current.site.home.heroImage;
   let backgroundImage = current.site.home.backgroundImage;
+  let instagramVideo = current.site.home.instagramVideo;
 
   if (formData.get('removeLogoAsset') === 'on') {
     logo = emptyAsset();
@@ -71,9 +72,14 @@ export async function updateHomeMediaAction(formData: FormData) {
     backgroundImage = emptyAsset();
   }
 
+  if (formData.get('removeInstagramVideo') === 'on') {
+    instagramVideo = emptyAsset();
+  }
+
   const logoAssetFile = formData.get('logoAssetFile');
   const heroImageFile = formData.get('heroImageFile');
   const backgroundImageFile = formData.get('backgroundImageFile');
+  const instagramVideoFile = formData.get('instagramVideoFile');
 
   if (logoAssetFile instanceof File && logoAssetFile.size > 0) {
     try {
@@ -114,6 +120,19 @@ export async function updateHomeMediaAction(formData: FormData) {
     }
   }
 
+  if (instagramVideoFile instanceof File && instagramVideoFile.size > 0) {
+    try {
+      const uploadedAsset = await uploadCmsAsset(instagramVideoFile, 'home-instagram', 'instagram-video');
+      instagramVideo = {
+        assetUrl: uploadedAsset.url,
+        assetName: uploadedAsset.name,
+        assetContentType: uploadedAsset.contentType,
+      };
+    } catch (error) {
+      redirectForUploadError('/', 'home-instagram-video-upload', error);
+    }
+  }
+
   await saveCmsContent({
     ...current,
     site: {
@@ -123,6 +142,7 @@ export async function updateHomeMediaAction(formData: FormData) {
         ...current.site.home,
         heroImage,
         backgroundImage,
+        instagramVideo,
       },
     },
   });

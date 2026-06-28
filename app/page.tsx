@@ -12,6 +12,7 @@ import { resolveLiveBoxStyle, resolveLiveHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
 import standBeispielKiImage from '../Stand Beispiel KI.png';
 import wackenBackgroundImage from '../Wacken Hintergrund Bild.png';
+import type { MediaAsset } from '@/lib/cms/schema';
 
 type LiveEditorState = Awaited<ReturnType<typeof getCmsContent>>['site']['liveEditor'];
 
@@ -55,6 +56,21 @@ function getMediaSavedMessage(mediaSaved?: string) {
   return 'Änderungen gespeichert.';
 }
 
+function getMediaAssetKind(asset: MediaAsset) {
+  const url = asset.assetUrl.toLowerCase();
+  const contentType = asset.assetContentType.toLowerCase();
+
+  if (contentType.startsWith('video/') || /(\.mp4|\.mov|\.webm)$/i.test(url)) {
+    return 'video';
+  }
+
+  if (contentType.startsWith('image/') || /(\.png|\.jpe?g|\.webp|\.svg)$/i.test(url)) {
+    return 'image';
+  }
+
+  return 'file';
+}
+
 function HomeActionCard({
   boxKey,
   titleKey,
@@ -64,6 +80,7 @@ function HomeActionCard({
   body,
   href,
   linkLabel,
+  mediaAsset,
   showCta = true,
   isAdmin,
   liveEditor,
@@ -76,10 +93,14 @@ function HomeActionCard({
   body: string;
   href: string;
   linkLabel: string;
+  mediaAsset?: MediaAsset;
   showCta?: boolean;
   isAdmin: boolean;
   liveEditor: LiveEditorState;
 }) {
+  const hasMediaAsset = Boolean(mediaAsset?.assetUrl);
+  const mediaAssetKind = mediaAsset ? getMediaAssetKind(mediaAsset) : 'file';
+
   return (
     <LiveResizableBox
       boxKey={boxKey}
@@ -105,6 +126,32 @@ function HomeActionCard({
         title={`${title} Beschreibung`}
         normalizeTypography
       />
+      {hasMediaAsset ? (
+        mediaAssetKind === 'video' ? (
+          <div className="mt-4 overflow-hidden rounded-[1rem] border border-white/10 bg-black/40 shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
+            <video
+              src={mediaAsset?.assetUrl}
+              controls
+              playsInline
+              preload="metadata"
+              className="h-full max-h-[24rem] w-full bg-black object-cover"
+            />
+          </div>
+        ) : mediaAssetKind === 'image' ? (
+          <div className="mt-4 overflow-hidden rounded-[1rem] border border-white/10 bg-black/40 shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
+            <img src={mediaAsset?.assetUrl} alt={mediaAsset?.assetName || title} className="h-full max-h-[24rem] w-full object-cover" />
+          </div>
+        ) : (
+          <a
+            href={mediaAsset?.assetUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-4 inline-flex rounded-[0.8rem] border border-[color:var(--color-border)] bg-black/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-[color:var(--color-accent)]"
+          >
+            Datei öffnen
+          </a>
+        )
+      ) : null}
       {showCta ? (
         isAdmin ? (
           <div className="link-copy mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2.5 text-sm font-bold tracking-wide">
@@ -143,6 +190,7 @@ export default async function HomePage({
   const liveEditor = cms.site.liveEditor;
   const heroImageSrc = home.heroImage.assetUrl || standBeispielKiImage.src;
   const backgroundImageSrc = home.backgroundImage.assetUrl || wackenBackgroundImage.src;
+  const instagramVideo = home.instagramVideo;
   const instagramPostHref =
     cms.site.footer.socialLinks.find((item) => item.platform === 'instagram')?.href ||
     'https://www.instagram.com/headbang.handwerk/';
@@ -234,6 +282,15 @@ export default async function HomePage({
                     <span className="mb-2 block text-sm font-semibold text-white">Hintergrundbild</span>
                     <input type="file" name="backgroundImageFile" accept=".png,.jpg,.jpeg,.webp" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-black" />
                   </label>
+                  <label className="block md:col-span-2">
+                    <span className="mb-2 block text-sm font-semibold text-white">Instagram-Video</span>
+                    <input type="file" name="instagramVideoFile" accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-black" />
+                    {instagramVideo.assetUrl ? (
+                      <span className="mt-2 block text-xs text-[color:var(--color-muted)]">
+                        Aktuell hochgeladen: {instagramVideo.assetName || 'Instagram-Video'}
+                      </span>
+                    ) : null}
+                  </label>
                   <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-[color:var(--color-muted)]">
                     <input type="checkbox" name="removeHeroImage" className="h-4 w-4" />
                     Startseitenbild entfernen
@@ -241,6 +298,10 @@ export default async function HomePage({
                   <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-[color:var(--color-muted)]">
                     <input type="checkbox" name="removeBackgroundImage" className="h-4 w-4" />
                     Hintergrundbild entfernen
+                  </label>
+                  <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-[color:var(--color-muted)] md:col-span-2">
+                    <input type="checkbox" name="removeInstagramVideo" className="h-4 w-4" />
+                    Instagram-Video entfernen
                   </label>
                   <div className="md:col-span-2 flex justify-end">
                     <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">Medien speichern</button>
@@ -278,6 +339,7 @@ export default async function HomePage({
                     body="Direkt zum aktuellen Beitrag und Einblicke aus dem Projekt auf Instagram ansehen."
                     href={instagramPostHref}
                     linkLabel="Zum Instagram-Post"
+                    mediaAsset={instagramVideo}
                     isAdmin={isAdmin}
                     liveEditor={liveEditor}
                   />
@@ -449,6 +511,7 @@ export default async function HomePage({
                   body="Direkt zum aktuellen Beitrag und Einblicke aus dem Projekt auf Instagram ansehen."
                   href={instagramPostHref}
                   linkLabel="Zum Instagram-Post"
+                  mediaAsset={instagramVideo}
                   isAdmin={isAdmin}
                   liveEditor={liveEditor}
                 />

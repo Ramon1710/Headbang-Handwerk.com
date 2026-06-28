@@ -128,6 +128,7 @@ export interface HomePageContent {
   closingSecondaryCtaHref: string;
   heroImage: MediaAsset;
   backgroundImage: MediaAsset;
+  instagramVideo: MediaAsset;
 }
 
 export interface FooterContent {
