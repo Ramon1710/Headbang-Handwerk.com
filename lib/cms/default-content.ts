@@ -270,7 +270,7 @@ export const defaultCmsContent: CmsContent = {
     merchandise: {
       eyebrow: 'Merchandise',
       title: 'Shirts, Hoodies und mehr für Headbang Handwerk.',
-      lead: 'Festival-ready Merch mit Varianten und direktem Checkout. Wähle dein Teil aus und gehe direkt zur sicheren Stripe-Zahlung.',
+      lead: 'Festival-ready Merch mit Varianten, Warenkorb und sicherem Stripe-Checkout. Wähle deine Artikel aus, prüfe deinen Warenkorb und gehe dann gesammelt zur Kasse.',
       products: [
         {
           id: 'festival-shirt-black',
@@ -280,6 +280,7 @@ export const defaultCmsContent: CmsContent = {
           sizes: ['S', 'M', 'L', 'XL', 'XXL'],
           colors: ['Schwarz'],
           badge: 'Bestseller',
+          estimatedDeliveryTime: '7 bis 10 Werktage',
         },
         {
           id: 'crew-hoodie-flame',
@@ -289,6 +290,7 @@ export const defaultCmsContent: CmsContent = {
           sizes: ['M', 'L', 'XL', 'XXL'],
           colors: ['Schwarz', 'Anthrazit'],
           badge: 'Neu',
+          estimatedDeliveryTime: '10 bis 14 Werktage',
         },
         {
           id: 'festival-cap-steel',
@@ -297,6 +299,7 @@ export const defaultCmsContent: CmsContent = {
           price: 24,
           colors: ['Schwarz', 'Dark Sand'],
           badge: 'Limited',
+          estimatedDeliveryTime: '7 bis 10 Werktage',
         },
       ],
     },

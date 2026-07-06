@@ -52,6 +52,26 @@ export interface MerchandiseProduct {
   sizes?: string[];
   colors?: string[];
   badge?: string;
+  estimatedDeliveryTime?: string;
+  stripePriceId?: string;
+}
+
+export interface MerchandiseCartItem {
+  productId: string;
+  quantity: number;
+  size?: string;
+  color?: string;
+}
+
+export interface MerchandiseCheckoutCustomer {
+  firstName: string;
+  lastName: string;
+  street: string;
+  houseNumber: string;
+  postalCode: string;
+  city: string;
+  phone: string;
+  email: string;
 }
 
 export interface ContactRequest {
@@ -100,6 +120,13 @@ export interface Order {
   products: OrderItem[];
   totalAmount: number;
   customerEmail: string;
+  customerFirstName?: string;
+  customerLastName?: string;
+  customerPhone?: string;
+  billingStreet?: string;
+  billingHouseNumber?: string;
+  billingPostalCode?: string;
+  billingCity?: string;
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered';
   createdAt: string;
 }

@@ -3,6 +3,7 @@ import { MerchandiseShop } from '@/components/merchandise-shop';
 import { EditablePageShell } from '@/components/editable-page-shell';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { getCmsContent } from '@/lib/cms/storage';
+import { MERCHANDISE_SUPPORT_TEXT } from '@/lib/merchandise';
 import { addMerchandiseProductAction, removeMerchandiseProductAction, updateMerchandiseIntroAction, updateMerchandiseProductAction } from './actions';
 
 export const metadata: Metadata = {
@@ -79,6 +80,8 @@ export default async function MerchandisePage({
               </label>
               <input name="sizes" placeholder="Größen, kommasepariert" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <input name="colors" placeholder="Farben, kommasepariert" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+              <input name="estimatedDeliveryTime" placeholder="Lieferzeit, z.B. 7 bis 10 Werktage" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+              <input name="stripePriceId" placeholder="Stripe Price ID optional" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <textarea name="description" rows={4} placeholder="Beschreibung" className="lg:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <div className="lg:col-span-2 flex justify-end">
                 <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">Produkt hinzufügen</button>
@@ -92,6 +95,9 @@ export default async function MerchandisePage({
           <h1 className="page-title mt-5">{merchandise.title}</h1>
           <p className="body-copy-lg mx-auto mt-6 max-w-3xl">
             {merchandise.lead}
+          </p>
+          <p className="body-copy mx-auto mt-5 max-w-4xl rounded-[1.2rem] border border-[color:var(--color-border)]/80 bg-black/20 px-5 py-4 text-left text-sm sm:text-center">
+            {MERCHANDISE_SUPPORT_TEXT}
           </p>
           <MerchandiseShop products={merchandise.products} />
         </section>
@@ -118,6 +124,8 @@ export default async function MerchandisePage({
                   </label>
                   <input name="sizes" defaultValue={(product.sizes || []).join(', ')} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                   <input name="colors" defaultValue={(product.colors || []).join(', ')} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                  <input name="estimatedDeliveryTime" defaultValue={product.estimatedDeliveryTime || ''} placeholder="Lieferzeit, z.B. 7 bis 10 Werktage" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                  <input name="stripePriceId" defaultValue={product.stripePriceId || ''} placeholder="Stripe Price ID optional" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                   <textarea name="description" rows={4} defaultValue={product.description} className="md:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                   <div className="md:col-span-2 flex flex-wrap gap-3">
                     <button type="submit" className="rounded-xl border border-[color:var(--color-accent)]/50 px-4 py-3 text-sm font-black text-[color:var(--color-accent-soft)] transition hover:border-[color:var(--color-accent)] hover:text-white">Speichern</button>

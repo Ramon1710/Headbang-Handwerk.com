@@ -86,6 +86,8 @@ function parseProductFromFormData(formData: FormData, existingId?: string): Merc
     imageUrl: sanitizeText(formData.get('imageUrl')) || undefined,
     sizes: splitList(formData.get('sizes')),
     colors: splitList(formData.get('colors')),
+    estimatedDeliveryTime: sanitizeText(formData.get('estimatedDeliveryTime')) || undefined,
+    stripePriceId: sanitizeText(formData.get('stripePriceId')) || undefined,
   };
 }
 
