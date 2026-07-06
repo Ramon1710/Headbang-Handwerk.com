@@ -191,9 +191,6 @@ export default async function HomePage({
   const heroImageSrc = home.heroImage.assetUrl || standBeispielKiImage.src;
   const backgroundImageSrc = home.backgroundImage.assetUrl || wackenBackgroundImage.src;
   const instagramVideo = home.instagramVideo;
-  const instagramPostHref =
-    cms.site.footer.socialLinks.find((item) => item.platform === 'instagram')?.href ||
-    'https://www.instagram.com/headbang.handwerk/';
   const mediaErrorMessage = getMediaErrorMessage(params?.mediaError);
   const mediaSavedMessage = getMediaSavedMessage(params?.mediaSaved);
 
@@ -328,22 +325,6 @@ export default async function HomePage({
                     normalizeTypography
                   />
                 </LiveResizableBox>
-
-                <div className="lg:hidden">
-                  <HomeActionCard
-                    boxKey="home.simple.instagram.box"
-                    titleKey="home.simple.instagram.title"
-                    bodyKey="home.simple.instagram.body"
-                    ctaKey="home.simple.instagram.cta"
-                    title="Aktuelles auf Instagram"
-                    body="Direkt zum aktuellen Beitrag und Einblicke aus dem Projekt auf Instagram ansehen."
-                    href={instagramPostHref}
-                    linkLabel="Zum Instagram-Post"
-                    mediaAsset={instagramVideo}
-                    isAdmin={isAdmin}
-                    liveEditor={liveEditor}
-                  />
-                </div>
 
                 <LiveResizableBox
                   boxKey="home.simple.greeting.box"
@@ -501,21 +482,6 @@ export default async function HomePage({
                 </LiveResizableBox>
               </div>
 
-              <div className="hidden min-w-0 lg:block lg:flex-1">
-                <HomeActionCard
-                  boxKey="home.simple.instagram.box"
-                  titleKey="home.simple.instagram.title"
-                  bodyKey="home.simple.instagram.body"
-                  ctaKey="home.simple.instagram.cta"
-                  title="Aktuelles auf Instagram"
-                  body="Direkt zum aktuellen Beitrag und Einblicke aus dem Projekt auf Instagram ansehen."
-                  href={instagramPostHref}
-                  linkLabel="Zum Instagram-Post"
-                  mediaAsset={instagramVideo}
-                  isAdmin={isAdmin}
-                  liveEditor={liveEditor}
-                />
-              </div>
             </div>
           </div>
         </main>
