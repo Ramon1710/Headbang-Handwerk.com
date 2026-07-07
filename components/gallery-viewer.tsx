@@ -9,9 +9,10 @@ interface GalleryViewerProps {
   isAdmin?: boolean;
   initialFolderId?: string | null;
   addImagesAction?: (formData: FormData) => void | Promise<void>;
+  removeImageAction?: (formData: FormData) => void | Promise<void>;
 }
 
-export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null, addImagesAction }: GalleryViewerProps) {
+export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null, addImagesAction, removeImageAction }: GalleryViewerProps) {
   const [activeFolderId, setActiveFolderId] = useState<string | null>(initialFolderId);
   const [activeImageUrl, setActiveImageUrl] = useState<string | null>(null);
 
@@ -75,6 +76,18 @@ export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null
                   <p className="body-copy line-clamp-1 text-sm">{image.assetName || 'Bild anzeigen'}</p>
                   <ImageIcon className="h-4 w-4 text-[color:var(--color-accent-soft)]" />
                 </div>
+                {isAdmin && removeImageAction ? (
+                  <div className="px-4 pb-4">
+                    <form action={removeImageAction}>
+                      <input type="hidden" name="folderId" value={activeFolder.id} />
+                      <input type="hidden" name="imageId" value={image.id} />
+                      <input type="hidden" name="returnToFolder" value={activeFolder.id} />
+                      <button type="submit" className="w-full rounded-xl bg-red-500/15 px-4 py-3 text-sm font-black text-red-200 transition hover:bg-red-500/25">
+                        Bild entfernen
+                      </button>
+                    </form>
+                  </div>
+                ) : null}
               </button>
             ))}
           </div>

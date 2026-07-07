@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import { EditablePageShell } from '@/components/editable-page-shell';
 import { GalleryViewer } from '@/components/gallery-viewer';
+import { LiveEditableText } from '@/components/live-editable-text';
+import { LiveResizableBox } from '@/components/live-resizable-box';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { resolveLiveBoxStyle, resolveLiveHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
 import {
   addGalleryFolderAction,
@@ -26,6 +29,7 @@ export default async function GalleryPage({
   const isAuthenticatedAdmin = await isAdminAuthenticated();
   const isAdmin = isAuthenticatedAdmin && params?.view !== 'user';
   const gallery = cms.site.gallery;
+  const liveEditor = cms.site.liveEditor;
   const initialFolderId = params?.folder && gallery.folders.some((folder) => folder.id === params.folder) ? params.folder : null;
   const adminErrorMessage =
     params?.adminError === 'missing-config'
@@ -83,7 +87,7 @@ export default async function GalleryPage({
             <div className="mt-6 space-y-5">
               {gallery.folders.map((folder) => (
                 <div key={folder.id} className="rounded-[1.4rem] border border-white/8 bg-black/10 p-5">
-                  <div className="grid gap-5 xl:grid-cols-[1fr_1fr]">
+                  <div className="grid gap-5 xl:grid-cols-[1fr_auto] xl:items-end">
                     <form action={updateGalleryFolderAction} className="grid gap-3 md:grid-cols-2">
                       <input type="hidden" name="id" value={folder.id} />
                       <input name="title" defaultValue={folder.title} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
@@ -105,21 +109,9 @@ export default async function GalleryPage({
                         <button type="submit" className="rounded-xl border border-[color:var(--color-accent)]/50 px-4 py-3 text-sm font-black text-[color:var(--color-accent-soft)] transition hover:border-[color:var(--color-accent)] hover:text-white">Ordner speichern</button>
                       </div>
                     </form>
-
-                    <form action={addGalleryImagesAction} className="grid gap-3">
-                      <input type="hidden" name="folderId" value={folder.id} />
-                      <label className="block">
-                        <span className="mb-2 block text-sm font-semibold text-white">Bilder in diesen Ordner hochladen</span>
-                        <input
-                          type="file"
-                          name="imageFiles"
-                          accept=".png,.jpg,.jpeg,.webp"
-                          multiple
-                          className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-white focus:border-[color:var(--color-accent)]"
-                        />
-                      </label>
-                      <button type="submit" className="w-full rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">Bilder hochladen</button>
-                    </form>
+                    <div className="rounded-xl border border-[color:var(--color-border)]/70 bg-black/15 px-4 py-3 text-sm text-[color:var(--color-muted)] xl:min-w-64">
+                      Bilder verwaltest du direkt unten in der geöffneten Ordneransicht.
+                    </div>
                   </div>
 
                   <div className="mt-5 flex flex-wrap gap-3">
@@ -128,24 +120,6 @@ export default async function GalleryPage({
                       <button type="submit" className="rounded-xl bg-red-500/15 px-4 py-3 text-sm font-black text-red-200 transition hover:bg-red-500/25">Ordner entfernen</button>
                     </form>
                   </div>
-
-                  <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    {folder.images.map((image) => (
-                      <div key={image.id} className="overflow-hidden rounded-[1.2rem] border border-white/10 bg-black/20">
-                        <div className="aspect-square overflow-hidden bg-black/30">
-                          <img src={image.assetUrl} alt={image.assetName || folder.title} className="h-full w-full object-cover" />
-                        </div>
-                        <div className="space-y-3 px-4 py-4">
-                          <p className="line-clamp-2 text-sm text-[color:var(--color-muted)]">{image.assetName || 'Galeriebild'}</p>
-                          <form action={removeGalleryImageAction}>
-                            <input type="hidden" name="folderId" value={folder.id} />
-                            <input type="hidden" name="imageId" value={image.id} />
-                            <button type="submit" className="w-full rounded-xl bg-red-500/15 px-4 py-3 text-sm font-black text-red-200 transition hover:bg-red-500/25">Bild entfernen</button>
-                          </form>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               ))}
             </div>
@@ -153,12 +127,18 @@ export default async function GalleryPage({
         ) : null}
 
         <section className="section-shell content-box text-center sm:p-10 lg:p-12">
-          <p className="body-copy text-sm font-semibold uppercase tracking-[0.28em]">{gallery.eyebrow}</p>
-          <h1 className="page-title mt-5">{gallery.title}</h1>
-          <p className="body-copy-lg mx-auto mt-6 max-w-3xl">{gallery.lead}</p>
+          <LiveResizableBox boxKey="gallery.intro.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'gallery.intro.box')} isAdmin={isAdmin} className="copy-center content-flow mx-auto max-w-5xl">
+            <p className="body-copy text-sm font-semibold uppercase tracking-[0.28em]">
+              <LiveEditableText as="span" className="inline" editorKey="gallery.eyebrow" initialHtml={resolveLiveHtml(liveEditor, 'gallery.eyebrow', gallery.eyebrow)} isAdmin={isAdmin} title="Gallerie Eyebrow" />
+            </p>
+            <h1 className="page-title mt-5">
+              <LiveEditableText as="span" className="inline" editorKey="gallery.title" initialHtml={resolveLiveHtml(liveEditor, 'gallery.title', gallery.title)} isAdmin={isAdmin} title="Gallerie Titel" />
+            </h1>
+            <LiveEditableText as="p" className="body-copy-lg mx-auto mt-6 max-w-3xl" editorKey="gallery.lead" initialHtml={resolveLiveHtml(liveEditor, 'gallery.lead', gallery.lead)} isAdmin={isAdmin} title="Gallerie Einleitung" />
+          </LiveResizableBox>
           <div className="mt-12">
             {gallery.folders.length ? (
-              <GalleryViewer folders={gallery.folders} isAdmin={isAdmin} initialFolderId={initialFolderId} addImagesAction={addGalleryImagesAction} />
+              <GalleryViewer folders={gallery.folders} isAdmin={isAdmin} initialFolderId={initialFolderId} addImagesAction={addGalleryImagesAction} removeImageAction={removeGalleryImageAction} />
             ) : (
               <div className="rounded-[1.4rem] border border-dashed border-[color:var(--color-border)] bg-black/15 px-6 py-10 text-left sm:text-center">
                 <p className="body-copy text-sm">Noch keine Galerie-Ordner vorhanden. {isAdmin ? 'Lege oben den ersten Ordner an und lade anschließend Bilder hoch.' : 'Schau bald wieder vorbei.'}</p>

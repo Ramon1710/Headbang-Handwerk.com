@@ -309,5 +309,5 @@ export async function removeGalleryImageAction(formData: FormData) {
     })
   );
 
-  redirect('/gallerie?adminSaved=image-removed');
+  redirect(buildRedirectPath(formData, 'image-removed'));
 }
