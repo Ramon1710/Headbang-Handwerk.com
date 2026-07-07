@@ -5,7 +5,8 @@ const MEMBERSHIP_LINK: NavigationLink = { label: 'Mitglied werden', href: '/form
 const SPONSOR_LINK: NavigationLink = { label: 'Sponsor werden', href: '/sponsoren' };
 const DONATION_LINK: NavigationLink = { label: 'Spenden', href: '/spenden' };
 const MERCHANDISE_LINK: NavigationLink = { label: 'Merchandise', href: '/merchandise' };
-const CANONICAL_NAV_ORDER = ['/', '/veranstaltungen', '/formular', '/sponsoren', '/spenden', '/merchandise', '/ueber-uns', '/kontakt'];
+const GALLERY_LINK: NavigationLink = { label: 'Gallerie', href: '/gallerie' };
+const CANONICAL_NAV_ORDER = ['/', '/veranstaltungen', '/gallerie', '/formular', '/sponsoren', '/spenden', '/merchandise', '/ueber-uns', '/kontakt'];
 
 function normalizeHref(href: string) {
   if (!href || href === '/') {
@@ -81,6 +82,16 @@ export function normalizeNavigationLinks(links: NavigationLink[]) {
       filteredLinks.splice(sponsorsIndex + 1, 0, MERCHANDISE_LINK);
     } else {
       filteredLinks.push(MERCHANDISE_LINK);
+    }
+  }
+
+  if (!seenHrefs.has(GALLERY_LINK.href)) {
+    const eventsIndex = filteredLinks.findIndex((link) => link.href === '/veranstaltungen');
+
+    if (eventsIndex >= 0) {
+      filteredLinks.splice(eventsIndex + 1, 0, GALLERY_LINK);
+    } else {
+      filteredLinks.push(GALLERY_LINK);
     }
   }
 

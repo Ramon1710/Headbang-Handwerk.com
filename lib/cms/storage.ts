@@ -9,7 +9,7 @@ import {
 } from './firebase';
 import { normalizeEvent } from '@/lib/event-stand';
 import { emptyLiveEditorContent } from './live-editor';
-import type { CmsContent } from './schema';
+import type { CmsContent, GalleryFolder, GalleryImage, MediaAsset } from './schema';
 
 const READONLY_FALLBACK_ERROR = 'CMS_READONLY_FALLBACK';
 const INVALID_FIREBASE_SAVE_ERROR = 'CMS_INVALID_FIREBASE_SAVE';
@@ -94,6 +94,66 @@ function normalizeMerchandiseProduct(product: unknown) {
     ...(imageUrl ? { imageUrl } : {}),
     ...(normalizeStringList(candidate.sizes) ? { sizes: normalizeStringList(candidate.sizes) } : {}),
     ...(normalizeStringList(candidate.colors) ? { colors: normalizeStringList(candidate.colors) } : {}),
+  };
+}
+
+function normalizeMediaAsset(asset: unknown): MediaAsset {
+  if (!asset || typeof asset !== 'object') {
+    return { assetUrl: '', assetName: '', assetContentType: '' };
+  }
+
+  const candidate = asset as Record<string, unknown>;
+
+  return {
+    assetUrl: String(candidate.assetUrl ?? '').trim(),
+    assetName: String(candidate.assetName ?? '').trim(),
+    assetContentType: String(candidate.assetContentType ?? '').trim(),
+  };
+}
+
+function normalizeGalleryImage(image: unknown): GalleryImage | null {
+  if (!image || typeof image !== 'object') {
+    return null;
+  }
+
+  const candidate = image as Record<string, unknown>;
+  const id = String(candidate.id ?? '').trim();
+  const asset = normalizeMediaAsset(candidate);
+
+  if (!id || !asset.assetUrl) {
+    return null;
+  }
+
+  return {
+    id,
+    ...asset,
+  };
+}
+
+function normalizeGalleryFolder(folder: unknown): GalleryFolder | null {
+  if (!folder || typeof folder !== 'object') {
+    return null;
+  }
+
+  const candidate = folder as Record<string, unknown>;
+  const id = String(candidate.id ?? '').trim();
+  const title = String(candidate.title ?? '').trim();
+
+  if (!id || !title) {
+    return null;
+  }
+
+  const images = Array.isArray(candidate.images)
+    ? candidate.images
+        .map(normalizeGalleryImage)
+        .filter((image): image is NonNullable<ReturnType<typeof normalizeGalleryImage>> => Boolean(image))
+    : [];
+
+  return {
+    id,
+    title,
+    coverImage: normalizeMediaAsset(candidate.coverImage),
+    images,
   };
 }
 
@@ -227,6 +287,15 @@ function normalizeContent(content: CmsContent): CmsContent {
               .map(normalizeMerchandiseProduct)
               .filter((product): product is NonNullable<ReturnType<typeof normalizeMerchandiseProduct>> => Boolean(product))
           : defaultCmsContent.site.merchandise.products,
+      },
+      gallery: {
+        ...defaultCmsContent.site.gallery,
+        ...content.site.gallery,
+        folders: Array.isArray(content.site.gallery?.folders)
+          ? content.site.gallery.folders
+              .map(normalizeGalleryFolder)
+              .filter((folder): folder is NonNullable<ReturnType<typeof normalizeGalleryFolder>> => Boolean(folder))
+          : defaultCmsContent.site.gallery.folders,
       },
       footer: {
         ...defaultCmsContent.site.footer,

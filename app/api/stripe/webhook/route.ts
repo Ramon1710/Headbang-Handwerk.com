@@ -60,26 +60,60 @@ export async function POST(req: NextRequest) {
         });
 
         const customerName = [session.metadata?.customerFirstName, session.metadata?.customerLastName].filter(Boolean).join(' ');
-        const text = [
-          'Neue Merchandise-Bestellung eingegangen.',
+        const customerEmail = session.customer_details?.email || session.customer_email || '';
+        const customerPhone = session.metadata?.customerPhone || session.customer_details?.phone || '-';
+        const customerAddress = `${session.metadata?.customerStreet || '-'} ${session.metadata?.customerHouseNumber || ''}, ${session.metadata?.customerPostalCode || '-'} ${session.metadata?.customerCity || '-'}`.trim();
+        const totalAmount = formatPrice((session.amount_total || 0) / 100);
+
+        const internalText = [
+          'Neue Merchandise-Bestellung eingegangen und bezahlt.',
           '',
           `Stripe Session: ${session.id}`,
           `Kunde: ${customerName}`,
-          `E-Mail: ${session.customer_details?.email || session.customer_email || '-'}`,
-          `Telefon: ${session.metadata?.customerPhone || session.customer_details?.phone || '-'}`,
-          `Adresse: ${session.metadata?.customerStreet || '-'} ${session.metadata?.customerHouseNumber || ''}, ${session.metadata?.customerPostalCode || '-'} ${session.metadata?.customerCity || '-'}`,
-          `Gesamtbetrag: ${formatPrice((session.amount_total || 0) / 100)}`,
+          `E-Mail: ${customerEmail || '-'}`,
+          `Telefon: ${customerPhone}`,
+          `Adresse: ${customerAddress}`,
+          `Gesamtbetrag: ${totalAmount}`,
           '',
           'Bestellte Artikel:',
           ...itemLines,
+          '',
+          'Hinweis: Rechnung wird manuell ueber die Vereinssoftware erstellt und anschliessend per E-Mail an den Kunden versandt.',
         ].join('\n');
 
         await sendMail({
           to: 'info@headbang-handwerk.de',
           subject: `Neue Merchandise-Bestellung ${customerName ? `von ${customerName}` : ''}`.trim(),
-          text,
-          html: text.replace(/\n/g, '<br />'),
+          text: internalText,
+          html: internalText.replace(/\n/g, '<br />'),
         });
+
+        if (customerEmail) {
+          const customerText = [
+            `Hallo ${customerName || 'und vielen Dank'},`,
+            '',
+            'wir bestaetigen den Eingang Ihrer Zahlung fuer Ihre Merchandise-Bestellung bei Headbang Handwerk.',
+            'Ihre Bestellung wird nun schnellstmoeglich bearbeitet.',
+            'Die Rechnung wird im naechsten Schritt manuell von uns erstellt und Ihnen per E-Mail zugesandt.',
+            '',
+            `Gesamtbetrag: ${totalAmount}`,
+            '',
+            'Bestellte Artikel:',
+            ...itemLines,
+            '',
+            'Bei Rueckfragen antworten Sie bitte einfach auf diese E-Mail oder schreiben Sie uns an info@headbang-handwerk.de.',
+            '',
+            'Viele Gruesse',
+            'Headbang Handwerk e.V.',
+          ].join('\n');
+
+          await sendMail({
+            to: customerEmail,
+            subject: 'Zahlung eingegangen - Ihre Bestellung bei Headbang Handwerk',
+            text: customerText,
+            html: customerText.replace(/\n/g, '<br />'),
+          });
+        }
       }
 
       console.log('Payment completed:', {

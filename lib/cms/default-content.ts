@@ -34,6 +34,7 @@ export const defaultCmsContent: CmsContent = {
     navigationLinks: [
       { label: 'Startseite', href: '/' },
       { label: 'Veranstaltungen', href: '/veranstaltungen' },
+      { label: 'Gallerie', href: '/gallerie' },
       { label: 'Mitglied werden', href: '/formular' },
       { label: 'Sponsor werden', href: '/sponsoren' },
       { label: 'Spenden', href: '/spenden' },
@@ -302,6 +303,12 @@ export const defaultCmsContent: CmsContent = {
           estimatedDeliveryTime: '7 bis 10 Werktage',
         },
       ],
+    },
+    gallery: {
+      eyebrow: 'Gallerie',
+      title: 'Einblicke in Headbang Handwerk.',
+      lead: 'Bilder aus Projekten, Veranstaltungen und Aktionen. Öffne einen Ordner und sieh dir die Aufnahmen in voller Größe an.',
+      folders: [],
     },
     footer: {
       brandHeadline: 'Headbang Handwerk',

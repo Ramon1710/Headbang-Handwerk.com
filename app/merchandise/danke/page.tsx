@@ -22,7 +22,7 @@ export default async function MerchandiseDankePage() {
             Danke für deine <span>Bestellung!</span>
           </h1>
           <p className="body-copy-lg">
-            Deine Merchandise-Bestellung wurde erfolgreich ausgelöst. Du erhältst in Kürze eine Bestätigung per E-Mail.
+            Deine Zahlung ist erfolgreich eingegangen. Wir bearbeiten deine Bestellung schnellstmöglich und senden dir die Rechnung anschließend separat per E-Mail zu.
           </p>
           <p className="body-copy rounded-[1.2rem] border border-[color:var(--color-border)]/80 bg-black/20 px-5 py-4 text-sm">
             {MERCHANDISE_SUPPORT_TEXT}

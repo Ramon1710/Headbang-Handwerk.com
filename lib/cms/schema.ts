@@ -29,6 +29,17 @@ export interface MediaAsset {
   assetContentType: string;
 }
 
+export interface GalleryImage extends MediaAsset {
+  id: string;
+}
+
+export interface GalleryFolder {
+  id: string;
+  title: string;
+  coverImage: MediaAsset;
+  images: GalleryImage[];
+}
+
 export interface FooterSocialLink {
   platform: 'facebook' | 'instagram' | 'youtube';
   label: string;
@@ -202,6 +213,13 @@ export interface MerchandisePageContent {
   products: MerchandiseProduct[];
 }
 
+export interface GalleryPageContent {
+  eyebrow: string;
+  title: string;
+  lead: string;
+  folders: GalleryFolder[];
+}
+
 export interface SeoContent {
   title: string;
   description: string;
@@ -223,6 +241,7 @@ export interface SiteContent {
   contact: ContactPageContent;
   stand: StandPageContent;
   merchandise: MerchandisePageContent;
+  gallery: GalleryPageContent;
   footer: FooterContent;
 }
 
