@@ -19,13 +19,14 @@ export const metadata: Metadata = {
 export default async function GalleryPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ view?: string; adminSaved?: string; adminError?: string }>;
+  searchParams?: Promise<{ view?: string; adminSaved?: string; adminError?: string; folder?: string }>;
 }) {
   const params = searchParams ? await searchParams : undefined;
   const cms = await getCmsContent();
   const isAuthenticatedAdmin = await isAdminAuthenticated();
   const isAdmin = isAuthenticatedAdmin && params?.view !== 'user';
   const gallery = cms.site.gallery;
+  const initialFolderId = params?.folder && gallery.folders.some((folder) => folder.id === params.folder) ? params.folder : null;
   const adminErrorMessage =
     params?.adminError === 'missing-config'
       ? 'Speichern ist ohne vollständige Firebase-Konfiguration nicht möglich. Prüfe FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY und FIREBASE_STORAGE_BUCKET.'
@@ -157,7 +158,7 @@ export default async function GalleryPage({
           <p className="body-copy-lg mx-auto mt-6 max-w-3xl">{gallery.lead}</p>
           <div className="mt-12">
             {gallery.folders.length ? (
-              <GalleryViewer folders={gallery.folders} />
+              <GalleryViewer folders={gallery.folders} isAdmin={isAdmin} initialFolderId={initialFolderId} addImagesAction={addGalleryImagesAction} />
             ) : (
               <div className="rounded-[1.4rem] border border-dashed border-[color:var(--color-border)] bg-black/15 px-6 py-10 text-left sm:text-center">
                 <p className="body-copy text-sm">Noch keine Galerie-Ordner vorhanden. {isAdmin ? 'Lege oben den ersten Ordner an und lade anschließend Bilder hoch.' : 'Schau bald wieder vorbei.'}</p>

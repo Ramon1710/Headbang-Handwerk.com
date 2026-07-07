@@ -6,10 +6,13 @@ import type { GalleryFolder } from '@/lib/cms/schema';
 
 interface GalleryViewerProps {
   folders: GalleryFolder[];
+  isAdmin?: boolean;
+  initialFolderId?: string | null;
+  addImagesAction?: (formData: FormData) => void | Promise<void>;
 }
 
-export function GalleryViewer({ folders }: GalleryViewerProps) {
-  const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
+export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null, addImagesAction }: GalleryViewerProps) {
+  const [activeFolderId, setActiveFolderId] = useState<string | null>(initialFolderId);
   const [activeImageUrl, setActiveImageUrl] = useState<string | null>(null);
 
   const activeFolder = useMemo(
@@ -35,6 +38,25 @@ export function GalleryViewer({ folders }: GalleryViewerProps) {
             <h2 className="section-title mt-4 text-[2rem]">{activeFolder.title}</h2>
             <p className="body-copy mt-2 text-sm">{activeFolder.images.length} Bilder in diesem Ordner.</p>
           </div>
+          {isAdmin && addImagesAction ? (
+            <form action={addImagesAction} className="w-full max-w-md rounded-[1.2rem] border border-white/10 bg-black/20 p-4 text-left">
+              <input type="hidden" name="folderId" value={activeFolder.id} />
+              <input type="hidden" name="returnToFolder" value={activeFolder.id} />
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-white">Weitere Bilder in diesen Ordner hochladen</span>
+                <input
+                  type="file"
+                  name="imageFiles"
+                  accept=".png,.jpg,.jpeg,.webp"
+                  multiple
+                  className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-white focus:border-[color:var(--color-accent)]"
+                />
+              </label>
+              <button type="submit" className="mt-4 w-full rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">
+                Bilder in Ordner hochladen
+              </button>
+            </form>
+          ) : null}
         </div>
 
         {activeFolder.images.length ? (

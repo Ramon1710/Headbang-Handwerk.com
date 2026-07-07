@@ -18,6 +18,26 @@ function sanitizeText(value: FormDataEntryValue | null) {
   return String(value || '').trim();
 }
 
+function buildRedirectPath(formData: FormData, adminSaved?: string, adminError?: string) {
+  const folder = sanitizeText(formData.get('returnToFolder'));
+  const params = new URLSearchParams();
+
+  if (folder) {
+    params.set('folder', folder);
+  }
+
+  if (adminSaved) {
+    params.set('adminSaved', adminSaved);
+  }
+
+  if (adminError) {
+    params.set('adminError', adminError);
+  }
+
+  const query = params.toString();
+  return query ? `/gallerie?${query}` : '/gallerie';
+}
+
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -223,11 +243,11 @@ export async function addGalleryImagesAction(formData: FormData) {
   const existingFolder = current.site.gallery.folders.find((folder) => folder.id === folderId);
 
   if (!existingFolder) {
-    redirect('/gallerie?adminError=missing-folder');
+    redirect(buildRedirectPath(formData, undefined, 'missing-folder'));
   }
 
   if (!hasFirebaseConfig()) {
-    redirect('/gallerie?adminError=missing-config');
+    redirect(buildRedirectPath(formData, undefined, 'missing-config'));
   }
 
   const nextImages: GalleryImage[] = [...existingFolder.images];
@@ -263,7 +283,7 @@ export async function addGalleryImagesAction(formData: FormData) {
     )
   );
 
-  redirect('/gallerie?adminSaved=images-added');
+  redirect(buildRedirectPath(formData, 'images-added'));
 }
 
 export async function removeGalleryImageAction(formData: FormData) {
