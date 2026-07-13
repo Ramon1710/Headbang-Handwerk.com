@@ -22,6 +22,11 @@ export async function generateMetadata(): Promise<Metadata> {
     title: cms.site.seo.title,
     description: cms.site.seo.description,
     keywords: cms.site.seo.keywords,
+    icons: {
+      icon: '/headbang-favicon.png',
+      shortcut: '/headbang-favicon.png',
+      apple: '/headbang-favicon.png',
+    },
     openGraph: {
       title: cms.site.seo.title,
       description: cms.site.seo.description,

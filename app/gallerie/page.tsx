@@ -15,7 +15,7 @@ import {
 } from './actions';
 
 export const metadata: Metadata = {
-  title: 'Gallerie – Headbang Handwerk',
+  title: 'Galerie – Headbang Handwerk',
   description: 'Bildgallerie von Headbang Handwerk mit Ordnern, Veranstaltungsbildern und Projektfotos.',
 };
 
@@ -132,9 +132,9 @@ export default async function GalleryPage({
               <LiveEditableText as="span" className="inline" editorKey="gallery.eyebrow" initialHtml={resolveLiveHtml(liveEditor, 'gallery.eyebrow', gallery.eyebrow)} isAdmin={isAdmin} title="Gallerie Eyebrow" />
             </p>
             <h1 className="page-title mt-5">
-              <LiveEditableText as="span" className="inline" editorKey="gallery.title" initialHtml={resolveLiveHtml(liveEditor, 'gallery.title', gallery.title)} isAdmin={isAdmin} title="Gallerie Titel" />
+              <LiveEditableText as="span" className="inline" editorKey="gallery.title" initialHtml={resolveLiveHtml(liveEditor, 'gallery.title', gallery.title)} isAdmin={isAdmin} title="Galerie Titel" />
             </h1>
-            <LiveEditableText as="p" className="body-copy-lg mx-auto mt-6 max-w-3xl" editorKey="gallery.lead" initialHtml={resolveLiveHtml(liveEditor, 'gallery.lead', gallery.lead)} isAdmin={isAdmin} title="Gallerie Einleitung" />
+            <LiveEditableText as="p" className="body-copy-lg mx-auto mt-6 max-w-3xl" editorKey="gallery.lead" initialHtml={resolveLiveHtml(liveEditor, 'gallery.lead', gallery.lead)} isAdmin={isAdmin} title="Galerie Einleitung" />
           </LiveResizableBox>
           <div className="mt-12">
             {gallery.folders.length ? (

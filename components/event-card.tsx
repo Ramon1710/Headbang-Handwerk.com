@@ -24,7 +24,7 @@ export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix 
   const { label, variant } = statusMap[event.status];
   const resolvedKeyPrefix = editorKeyPrefix || `events.cards.${event.id}`;
   const standHref = getEventStandHref(event.id);
-  const canOpenStand = event.status === 'confirmed';
+  const canOpenStand = Boolean(event.standEnabled);
   const ctaHref = event.ctaUrl || '/kontakt';
 
   const cardContent = (

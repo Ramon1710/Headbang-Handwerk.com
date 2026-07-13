@@ -29,6 +29,8 @@ export async function generateMetadata({ params }: EventStandPageProps): Promise
 export default async function EventStandPage({ params, searchParams }: EventStandPageProps) {
   const { eventId } = await params;
   const query = searchParams ? await searchParams : undefined;
+  const isAuthenticatedAdmin = await isAdminAuthenticated();
+  const isAdmin = isAuthenticatedAdmin && query?.view !== 'user';
   const cms = await getCmsContent();
   const event = cms.site.events.find((entry) => entry.id === eventId);
 
@@ -36,8 +38,9 @@ export default async function EventStandPage({ params, searchParams }: EventStan
     notFound();
   }
 
-  const isAuthenticatedAdmin = await isAdminAuthenticated();
-  const isAdmin = isAuthenticatedAdmin && query?.view !== 'user';
+  if (!event.standEnabled && !isAdmin) {
+    notFound();
+  }
 
   return <StandPageContent cms={cms} isAdmin={isAdmin} event={event} />;
 }

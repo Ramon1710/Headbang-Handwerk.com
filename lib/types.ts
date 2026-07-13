@@ -6,6 +6,7 @@ export interface Event {
   festivalName: string;
   description: string;
   status: 'planned' | 'confirmed' | 'completed';
+  standEnabled?: boolean;
   ctaText: string;
   ctaUrl?: string;
   imageUrl?: string;

@@ -34,7 +34,7 @@ export const defaultCmsContent: CmsContent = {
     navigationLinks: [
       { label: 'Startseite', href: '/' },
       { label: 'Veranstaltungen', href: '/veranstaltungen' },
-      { label: 'Gallerie', href: '/gallerie' },
+      { label: 'Galerie', href: '/gallerie' },
       { label: 'Mitglied werden', href: '/formular' },
       { label: 'Sponsor werden', href: '/sponsoren' },
       { label: 'Spenden', href: '/spenden' },
@@ -140,6 +140,7 @@ export const defaultCmsContent: CmsContent = {
         'Mit Live-Demos, Mitmach-Aktionen und starken Partnern entsteht ein Format, das Handwerk nicht kleiner erklärt, sondern größer inszeniert.',
         'Gesucht werden Unternehmen, Unterstützer und Branchenpartner, die früh Teil dieses Projekts werden wollen.',
       ],
+      newsImages: [],
       updatePrimaryCtaLabel: 'Sponsoring ansehen',
       updatePrimaryCtaHref: '/sponsoren',
       updateSecondaryCtaLabel: 'Kontakt aufnehmen',
@@ -305,7 +306,7 @@ export const defaultCmsContent: CmsContent = {
       ],
     },
     gallery: {
-      eyebrow: 'Gallerie',
+      eyebrow: 'Galerie',
       title: 'Einblicke in Headbang Handwerk.',
       lead: 'Bilder aus Projekten, Veranstaltungen und Aktionen. Öffne einen Ordner und sieh dir die Aufnahmen in voller Größe an.',
       folders: [],

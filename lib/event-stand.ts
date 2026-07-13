@@ -98,6 +98,7 @@ export function normalizeEventStandConfig(stand?: Partial<EventStandConfig>): Ev
 export function normalizeEvent(event: Event): Event {
   return {
     ...event,
+    standEnabled: event.standEnabled ?? event.status === 'confirmed',
     stand: normalizeEventStandConfig(event.stand),
   };
 }

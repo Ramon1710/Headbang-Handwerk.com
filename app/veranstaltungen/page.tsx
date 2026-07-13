@@ -8,7 +8,7 @@ import { resolveLiveBoxStyle, resolveLiveHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
 import { getEventStandHref } from '@/lib/site';
 import { serializeBannerSlots } from '@/lib/event-stand';
-import { addEventAction, removeEventAction, toggleEventStatusAction, updateEventAction } from './actions';
+import { addEventAction, removeEventAction, toggleEventStandAction, toggleEventStatusAction, updateEventAction } from './actions';
 
 export const metadata: Metadata = {
   title: 'Veranstaltungen – Headbang Handwerk',
@@ -81,6 +81,10 @@ export default async function VeranstaltungenPage({
                 <input name="standAssetUrl" placeholder="3D-Stand Datei URL" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                 <input name="standAssetName" placeholder="3D-Stand Dateiname" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                 <input name="standAssetContentType" placeholder="3D-Stand Content-Type, z.B. image/png" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                <label className="flex items-center gap-3 rounded-xl border border-[color:var(--color-border)]/70 bg-black/10 px-4 py-3 text-sm text-white">
+                  <input type="checkbox" name="standEnabled" className="h-4 w-4 rounded border-[color:var(--color-border)] bg-black/20" />
+                  3D-Stand beim Klick auf diese Veranstaltung aktivieren
+                </label>
                 <select name="status" defaultValue="planned" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]">
                   <option value="planned">Geplant</option>
                   <option value="confirmed">Bestätigt</option>
@@ -109,12 +113,20 @@ export default async function VeranstaltungenPage({
                       <input name="standAssetUrl" defaultValue={event.stand?.assetUrl || ''} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                       <input name="standAssetName" defaultValue={event.stand?.assetName || ''} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                       <input name="standAssetContentType" defaultValue={event.stand?.assetContentType || ''} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      <label className="flex items-center gap-3 rounded-xl border border-[color:var(--color-border)]/70 bg-black/10 px-4 py-3 text-sm text-white">
+                        <input type="checkbox" name="standEnabled" defaultChecked={Boolean(event.standEnabled)} className="h-4 w-4 rounded border-[color:var(--color-border)] bg-black/20" />
+                        3D-Stand beim Klick auf diese Veranstaltung aktivieren
+                      </label>
                       <select name="status" defaultValue={event.status} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]">
                         <option value="planned">Geplant</option>
                         <option value="confirmed">Bestätigt</option>
                         <option value="completed">Abgeschlossen</option>
                       </select>
-                      <a href={getEventStandHref(event.id)} className="rounded-xl border border-[color:var(--color-border)]/70 bg-black/15 px-4 py-3 text-sm text-[color:var(--color-muted)] transition hover:border-[color:var(--color-accent)] hover:text-white">Stand öffnen: {event.id}</a>
+                      {event.standEnabled ? (
+                        <a href={getEventStandHref(event.id)} className="rounded-xl border border-[color:var(--color-border)]/70 bg-black/15 px-4 py-3 text-sm text-[color:var(--color-muted)] transition hover:border-[color:var(--color-accent)] hover:text-white">Stand öffnen: {event.id}</a>
+                      ) : (
+                        <div className="rounded-xl border border-[color:var(--color-border)]/70 bg-black/15 px-4 py-3 text-sm text-[color:var(--color-muted)]">3D-Stand aktuell deaktiviert</div>
+                      )}
                       <textarea name="description" rows={4} defaultValue={event.description} className="md:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                       <textarea name="standLead" rows={3} defaultValue={event.stand?.lead || ''} className="md:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                       <textarea name="standBannerSlots" rows={6} defaultValue={serializeBannerSlots(event.stand?.bannerSlots || [])} className="md:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
@@ -126,6 +138,10 @@ export default async function VeranstaltungenPage({
                       <form action={toggleEventStatusAction}>
                         <input type="hidden" name="id" value={event.id} />
                         <button type="submit" className="rounded-xl bg-amber-500/15 px-4 py-3 text-sm font-black text-amber-200 transition hover:bg-amber-500/25">Auf {event.status === 'confirmed' ? 'Geplant' : 'Bestätigt'} umschalten</button>
+                      </form>
+                      <form action={toggleEventStandAction}>
+                        <input type="hidden" name="id" value={event.id} />
+                        <button type="submit" className="rounded-xl bg-sky-500/15 px-4 py-3 text-sm font-black text-sky-200 transition hover:bg-sky-500/25">3D-Stand {event.standEnabled ? 'deaktivieren' : 'aktivieren'}</button>
                       </form>
                       <form action={removeEventAction}>
                         <input type="hidden" name="id" value={event.id} />

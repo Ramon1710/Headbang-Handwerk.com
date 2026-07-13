@@ -49,6 +49,7 @@ function parseEventFromFormData(formData: FormData, existingId?: string, existin
   const ctaUrl = sanitizeText(formData.get('ctaUrl'));
   const rawStatus = sanitizeText(formData.get('status'));
   const status = rawStatus === 'confirmed' || rawStatus === 'completed' ? rawStatus : 'planned';
+  const standEnabled = String(formData.get('standEnabled') || '') === 'on';
   const standAssetUrl = sanitizeText(formData.get('standAssetUrl'));
   const standAssetName = sanitizeText(formData.get('standAssetName'));
   const standAssetContentType = sanitizeText(formData.get('standAssetContentType'));
@@ -64,6 +65,7 @@ function parseEventFromFormData(formData: FormData, existingId?: string, existin
     festivalName,
     description,
     status,
+    standEnabled,
     ctaText: ctaText || 'Mehr erfahren',
     ctaUrl: ctaUrl || '/kontakt',
     stand: {
@@ -170,4 +172,26 @@ export async function toggleEventStatusAction(formData: FormData) {
   );
 
   redirect('/veranstaltungen?adminSaved=event-status');
+}
+
+export async function toggleEventStandAction(formData: FormData) {
+  await assertAdmin();
+
+  const eventId = sanitizeText(formData.get('id'));
+  const current = await getCmsContent();
+
+  await persistEvents(
+    current.site.events.map((event) => {
+      if (event.id !== eventId) {
+        return event;
+      }
+
+      return {
+        ...event,
+        standEnabled: !event.standEnabled,
+      };
+    })
+  );
+
+  redirect('/veranstaltungen?adminSaved=event-stand');
 }

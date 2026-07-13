@@ -268,7 +268,19 @@ function normalizeContent(content: CmsContent): CmsContent {
           ...(content.site.liveEditor?.boxStyles || {}),
         },
       },
-      home: { ...defaultCmsContent.site.home, ...content.site.home },
+      home: {
+        ...defaultCmsContent.site.home,
+        ...content.site.home,
+        heroImage: normalizeMediaAsset(content.site.home?.heroImage),
+        backgroundImage: normalizeMediaAsset(content.site.home?.backgroundImage),
+        instagramVideo: normalizeMediaAsset(content.site.home?.instagramVideo),
+        newsImages: Array.isArray(content.site.home?.newsImages)
+          ? content.site.home.newsImages
+              .map(normalizeMediaAsset)
+              .filter((asset) => Boolean(asset.assetUrl))
+              .slice(0, 2)
+          : defaultCmsContent.site.home.newsImages,
+      },
       sponsors: { ...defaultCmsContent.site.sponsors, ...content.site.sponsors },
       about: {
         ...defaultCmsContent.site.about,

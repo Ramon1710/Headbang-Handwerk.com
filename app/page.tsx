@@ -5,6 +5,7 @@ import { LiveEditableText } from '@/components/live-editable-text';
 import { LiveLayoutSaveProvider } from '@/components/live-layout-save-context';
 import { LiveResizableBox } from '@/components/live-resizable-box';
 import { Button } from '@/components/ui/button';
+import { HomeNewsEditor } from '@/components/home-news-editor';
 import { logoutAction } from '@/app/admin/actions';
 import { updateHomeMediaAction } from '@/app/admin/media-actions';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
@@ -409,18 +410,26 @@ export default async function HomePage({
                     editorKey="home.updateTitle"
                     initialHtml={resolveLiveHtml(liveEditor, 'home.updateTitle', home.updateTitle)}
                     isAdmin={isAdmin}
-                    title="Info Überschrift"
+                    title="News Überschrift"
                     normalizeTypography
                   />
-                  <LiveEditableText
-                    as="p"
-                    className="body-copy mt-3"
+                  <HomeNewsEditor
                     editorKey="home.updateParagraphs.0"
+                    className="body-copy mt-3"
                     initialHtml={resolveLiveHtml(liveEditor, 'home.updateParagraphs.0', home.updateParagraphs[0] || '')}
                     isAdmin={isAdmin}
-                    title="Info Text"
-                    normalizeTypography
+                    title="News Text"
+                    images={home.newsImages}
                   />
+                  {home.newsImages.length ? (
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      {home.newsImages.slice(0, 2).map((image, index) => (
+                        <div key={`${image.assetUrl}-${index}`} className="overflow-hidden rounded-[1rem] border border-white/10 bg-black/30 shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
+                          <img src={image.assetUrl} alt={image.assetName || `News Bild ${index + 1}`} className="h-40 w-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                   {isAdmin ? (
                     <div className="link-copy mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2.5 text-sm font-bold tracking-wide">
                       Zu den Informationen

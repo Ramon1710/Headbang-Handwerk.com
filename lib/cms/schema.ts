@@ -117,6 +117,7 @@ export interface HomePageContent {
   updateEyebrow: string;
   updateTitle: string;
   updateParagraphs: string[];
+  newsImages: MediaAsset[];
   updatePrimaryCtaLabel: string;
   updatePrimaryCtaHref: string;
   updateSecondaryCtaLabel: string;

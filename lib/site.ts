@@ -5,7 +5,7 @@ const MEMBERSHIP_LINK: NavigationLink = { label: 'Mitglied werden', href: '/form
 const SPONSOR_LINK: NavigationLink = { label: 'Sponsor werden', href: '/sponsoren' };
 const DONATION_LINK: NavigationLink = { label: 'Spenden', href: '/spenden' };
 const MERCHANDISE_LINK: NavigationLink = { label: 'Merchandise', href: '/merchandise' };
-const GALLERY_LINK: NavigationLink = { label: 'Gallerie', href: '/gallerie' };
+const GALLERY_LINK: NavigationLink = { label: 'Galerie', href: '/gallerie' };
 const CANONICAL_NAV_ORDER = ['/', '/veranstaltungen', '/gallerie', '/formular', '/sponsoren', '/spenden', '/merchandise', '/ueber-uns', '/kontakt'];
 
 function normalizeHref(href: string) {

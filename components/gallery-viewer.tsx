@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ArrowLeft, FolderOpen, ImageIcon, X } from 'lucide-react';
+import { ArrowLeft, FolderOpen, X } from 'lucide-react';
 import type { GalleryFolder } from '@/lib/cms/schema';
 
 interface GalleryViewerProps {
@@ -72,12 +72,8 @@ export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null
                 <div className="aspect-square overflow-hidden bg-black/30">
                   <img src={image.assetUrl} alt={image.assetName || activeFolder.title} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
                 </div>
-                <div className="flex items-center justify-between gap-3 px-4 py-3">
-                  <p className="body-copy line-clamp-1 text-sm">{image.assetName || 'Bild anzeigen'}</p>
-                  <ImageIcon className="h-4 w-4 text-[color:var(--color-accent-soft)]" />
-                </div>
                 {isAdmin && removeImageAction ? (
-                  <div className="px-4 pb-4">
+                  <div className="px-4 py-4">
                     <form action={removeImageAction}>
                       <input type="hidden" name="folderId" value={activeFolder.id} />
                       <input type="hidden" name="imageId" value={image.id} />
