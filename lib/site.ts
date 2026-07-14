@@ -20,6 +20,41 @@ export function getEventStandHref(eventId: string) {
   return `/veranstaltungen/${encodeURIComponent(eventId)}/3d-stand`;
 }
 
+export function normalizeExternalUrl(url: string) {
+  const trimmed = url.trim();
+
+  if (!trimmed) {
+    return '';
+  }
+
+  if (trimmed.startsWith('/')) {
+    return trimmed;
+  }
+
+  if (/^(mailto:|tel:|https?:\/\/)/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith('//')) {
+    return `https:${trimmed}`;
+  }
+
+  if (/^[a-z0-9.-]+\.[a-z]{2,}(?:[/:?#].*)?$/i.test(trimmed)) {
+    return `https://${trimmed}`;
+  }
+
+  return trimmed;
+}
+
+export function resolveEventCtaUrl(url?: string) {
+  const normalized = normalizeExternalUrl(url || '');
+  return normalized || '/kontakt';
+}
+
+export function isExternalUrl(url: string) {
+  return /^(mailto:|tel:|https?:\/\/)/i.test(url);
+}
+
 export function normalizeNavigationLinks(links: NavigationLink[]) {
   const filteredLinks: NavigationLink[] = [];
   const seenHrefs = new Set<string>();

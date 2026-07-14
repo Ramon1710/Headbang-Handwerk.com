@@ -2,7 +2,7 @@ import { Calendar, MapPin } from 'lucide-react';
 import { Event } from '@/lib/types';
 import type { LiveEditorContent } from '@/lib/cms/schema';
 import { resolveLiveHtml } from '@/lib/cms/live-editor';
-import { getEventStandHref } from '@/lib/site';
+import { getEventStandHref, isExternalUrl, resolveEventCtaUrl } from '@/lib/site';
 import { LiveEditableText } from './live-editable-text';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -25,7 +25,8 @@ export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix 
   const resolvedKeyPrefix = editorKeyPrefix || `events.cards.${event.id}`;
   const standHref = getEventStandHref(event.id);
   const canOpenStand = Boolean(event.standEnabled);
-  const ctaHref = event.ctaUrl || '/kontakt';
+  const ctaHref = resolveEventCtaUrl(event.ctaUrl);
+  const opensExternalSite = isExternalUrl(ctaHref);
 
   const cardContent = (
     <>
@@ -101,7 +102,7 @@ export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix 
           {cardContent}
         </a>
       )}
-      <Button href={ctaHref} size="sm" variant="secondary" className="w-full">
+      <Button href={ctaHref} target={opensExternalSite ? '_blank' : undefined} rel={opensExternalSite ? 'noreferrer noopener' : undefined} size="sm" variant="secondary" className="w-full">
         <LiveEditableText
           as="span"
           className="inline"

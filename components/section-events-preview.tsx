@@ -1,5 +1,6 @@
 import { ArrowRight, Calendar, MapPin } from 'lucide-react';
 import { events } from '@/lib/data';
+import { isExternalUrl, resolveEventCtaUrl } from '@/lib/site';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 
@@ -30,6 +31,8 @@ export function SectionEventsPreview() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {upcoming.map((event) => {
             const { label, variant } = statusMap[event.status];
+            const ctaHref = resolveEventCtaUrl(event.ctaUrl);
+            const opensExternalSite = isExternalUrl(ctaHref);
             return (
               <div
                 key={event.id}
@@ -52,7 +55,7 @@ export function SectionEventsPreview() {
                 <p className="text-gray-500 text-xs leading-relaxed mb-5 line-clamp-2">
                   {event.description}
                 </p>
-                <Button href={event.ctaUrl || '/kontakt'} size="sm" variant="secondary" className="w-full">
+                <Button href={ctaHref} target={opensExternalSite ? '_blank' : undefined} rel={opensExternalSite ? 'noreferrer noopener' : undefined} size="sm" variant="secondary" className="w-full">
                   {event.ctaText}
                 </Button>
               </div>

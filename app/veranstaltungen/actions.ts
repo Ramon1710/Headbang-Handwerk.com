@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { getCmsContent, saveCmsContent } from '@/lib/cms/storage';
 import { createDefaultEventStandConfig, normalizeEvent, parseBannerSlots } from '@/lib/event-stand';
+import { resolveEventCtaUrl } from '@/lib/site';
 import type { Event } from '@/lib/types';
 
 function sanitizeText(value: FormDataEntryValue | null) {
@@ -67,7 +68,7 @@ function parseEventFromFormData(formData: FormData, existingId?: string, existin
     status,
     standEnabled,
     ctaText: ctaText || 'Mehr erfahren',
-    ctaUrl: ctaUrl || '/kontakt',
+    ctaUrl: resolveEventCtaUrl(ctaUrl),
     stand: {
       assetUrl: standAssetUrl,
       assetName: standAssetName,
