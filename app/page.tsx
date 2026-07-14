@@ -178,6 +178,55 @@ function HomeActionCard({
   );
 }
 
+function HomeNewsCard({
+  home,
+  liveEditor,
+  isAdmin,
+}: {
+  home: Awaited<ReturnType<typeof getCmsContent>>['site']['home'];
+  liveEditor: LiveEditorState;
+  isAdmin: boolean;
+}) {
+  return (
+    <LiveResizableBox
+      boxKey="home.simple.news.box"
+      initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.news.box')}
+      isAdmin={isAdmin}
+      className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
+    >
+      <LiveEditableText
+        as="h3"
+        className="section-title uppercase"
+        editorKey="home.newsTitle"
+        initialHtml={resolveLiveHtml(liveEditor, 'home.newsTitle', home.newsTitle)}
+        isAdmin={isAdmin}
+        title="News Überschrift"
+        normalizeTypography
+      />
+      <HomeNewsEditor
+        editorKey="home.newsParagraphs.0"
+        className="body-copy mt-3"
+        initialHtml={resolveLiveHtml(liveEditor, 'home.newsParagraphs.0', home.newsParagraphs[0] || '')}
+        isAdmin={isAdmin}
+        title="News Text"
+        images={home.newsImages}
+        imagePositionX={home.newsImagePositionX}
+        imagePositionY={home.newsImagePositionY}
+      />
+      {home.newsImages[0]?.assetUrl ? (
+        <div className="mt-4 overflow-hidden rounded-[1rem] border border-white/10 bg-black/30 shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
+          <img
+            src={home.newsImages[0].assetUrl}
+            alt={home.newsImages[0].assetName || 'News Bild'}
+            className="h-52 w-full object-cover"
+            style={{ objectPosition: `${home.newsImagePositionX}% ${home.newsImagePositionY}%` }}
+          />
+        </div>
+      ) : null}
+    </LiveResizableBox>
+  );
+}
+
 export default async function HomePage({
   searchParams,
 }: {
@@ -327,6 +376,10 @@ export default async function HomePage({
                   />
                 </LiveResizableBox>
 
+                <div className="md:hidden">
+                  <HomeNewsCard home={home} liveEditor={liveEditor} isAdmin={isAdmin} />
+                </div>
+
                 <LiveResizableBox
                   boxKey="home.simple.greeting.box"
                   initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.greeting.box')}
@@ -397,6 +450,45 @@ export default async function HomePage({
                 <HomeActionCard boxKey="home.simple.support.box" titleKey="home.simple.support.title" bodyKey="home.simple.support.body" ctaKey="home.simple.support.donation" title="Unterstützer werden" body="Weil gute Ideen Menschen brauchen, die an sie glauben." href="/spenden" linkLabel="Zur Spenden-Seite" isAdmin={isAdmin} liveEditor={liveEditor} />
               </div>
 
+              <div className="min-w-0 md:flex-1">
+                <LiveResizableBox
+                  boxKey="home.simple.smallinfo.box"
+                  initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.smallinfo.box')}
+                  isAdmin={isAdmin}
+                  className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
+                >
+                  <LiveEditableText
+                    as="h3"
+                    className="section-title uppercase"
+                    editorKey="home.updateTitle"
+                    initialHtml={resolveLiveHtml(liveEditor, 'home.updateTitle', home.updateTitle)}
+                    isAdmin={isAdmin}
+                    title="Info Überschrift"
+                    normalizeTypography
+                  />
+                  <LiveEditableText
+                    as="p"
+                    className="body-copy mt-3"
+                    editorKey="home.updateParagraphs.0"
+                    initialHtml={resolveLiveHtml(liveEditor, 'home.updateParagraphs.0', home.updateParagraphs[0] || '')}
+                    isAdmin={isAdmin}
+                    title="Info Text"
+                    normalizeTypography
+                  />
+                  {isAdmin ? (
+                    <div className="link-copy mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2.5 text-sm font-bold tracking-wide">
+                      Zu den Informationen
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
+                  ) : (
+                    <Button href="/partner-unterstuetzerinfo" variant="secondary" className="mt-4 w-full justify-center">
+                      Zu den Informationen
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  )}
+                </LiveResizableBox>
+              </div>
+
               <div className="min-w-0 md:flex-[1.2] md:max-w-[44%]">
                 <div className="flex min-w-0 flex-col gap-4">
                 <LiveResizableBox
@@ -444,42 +536,9 @@ export default async function HomePage({
                   )}
                 </LiveResizableBox>
 
-                <LiveResizableBox
-                  boxKey="home.simple.news.box"
-                  initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.news.box')}
-                  isAdmin={isAdmin}
-                  className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
-                >
-                  <LiveEditableText
-                    as="h3"
-                    className="section-title uppercase"
-                    editorKey="home.updateTitle"
-                    initialHtml={resolveLiveHtml(liveEditor, 'home.updateTitle', home.updateTitle)}
-                    isAdmin={isAdmin}
-                    title="News Überschrift"
-                    normalizeTypography
-                  />
-                  <HomeNewsEditor
-                    editorKey="home.updateParagraphs.0"
-                    className="body-copy mt-3"
-                    initialHtml={resolveLiveHtml(liveEditor, 'home.updateParagraphs.0', home.updateParagraphs[0] || '')}
-                    isAdmin={isAdmin}
-                    title="News Text"
-                    images={home.newsImages}
-                    imagePositionX={home.newsImagePositionX}
-                    imagePositionY={home.newsImagePositionY}
-                  />
-                  {home.newsImages[0]?.assetUrl ? (
-                    <div className="mt-4 overflow-hidden rounded-[1rem] border border-white/10 bg-black/30 shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
-                      <img
-                        src={home.newsImages[0].assetUrl}
-                        alt={home.newsImages[0].assetName || 'News Bild'}
-                        className="h-52 w-full object-cover"
-                        style={{ objectPosition: `${home.newsImagePositionX}% ${home.newsImagePositionY}%` }}
-                      />
-                    </div>
-                  ) : null}
-                </LiveResizableBox>
+                <div className="hidden md:block">
+                  <HomeNewsCard home={home} liveEditor={liveEditor} isAdmin={isAdmin} />
+                </div>
                 </div>
               </div>
 

@@ -117,6 +117,8 @@ export interface HomePageContent {
   updateEyebrow: string;
   updateTitle: string;
   updateParagraphs: string[];
+  newsTitle: string;
+  newsParagraphs: string[];
   newsImages: MediaAsset[];
   newsImagePositionX: number;
   newsImagePositionY: number;

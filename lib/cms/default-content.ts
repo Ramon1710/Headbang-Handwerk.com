@@ -140,6 +140,10 @@ export const defaultCmsContent: CmsContent = {
         'Mit Live-Demos, Mitmach-Aktionen und starken Partnern entsteht ein Format, das Handwerk nicht kleiner erklärt, sondern größer inszeniert.',
         'Gesucht werden Unternehmen, Unterstützer und Branchenpartner, die früh Teil dieses Projekts werden wollen.',
       ],
+      newsTitle: 'News',
+      newsParagraphs: [
+        'Hier könnt ihr aktuelle Neuigkeiten, Ankündigungen und wichtige Updates direkt auf der Startseite veröffentlichen.',
+      ],
       newsImages: [],
       newsImagePositionX: 50,
       newsImagePositionY: 50,

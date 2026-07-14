@@ -284,6 +284,10 @@ function normalizeContent(content: CmsContent): CmsContent {
         heroImage: normalizeMediaAsset(content.site.home?.heroImage),
         backgroundImage: normalizeMediaAsset(content.site.home?.backgroundImage),
         instagramVideo: normalizeMediaAsset(content.site.home?.instagramVideo),
+        newsTitle: String(content.site.home?.newsTitle ?? defaultCmsContent.site.home.newsTitle).trim() || defaultCmsContent.site.home.newsTitle,
+        newsParagraphs: Array.isArray(content.site.home?.newsParagraphs)
+          ? content.site.home.newsParagraphs.map((entry) => String(entry ?? '').trim()).filter(Boolean).slice(0, 1)
+          : defaultCmsContent.site.home.newsParagraphs,
         newsImages: Array.isArray(content.site.home?.newsImages)
           ? content.site.home.newsImages
               .map(normalizeMediaAsset)
