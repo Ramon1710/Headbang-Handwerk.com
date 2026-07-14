@@ -12,6 +12,8 @@ interface HomeNewsEditorProps {
   isAdmin: boolean;
   className?: string;
   images: MediaAsset[];
+  imagePositionX: number;
+  imagePositionY: number;
 }
 
 const FONT_FAMILIES = [
@@ -93,7 +95,7 @@ function hasVisibleText(html: string) {
     .trim().length > 0;
 }
 
-export function HomeNewsEditor({ editorKey, initialHtml, title, isAdmin, className, images }: HomeNewsEditorProps) {
+export function HomeNewsEditor({ editorKey, initialHtml, title, isAdmin, className, images, imagePositionX, imagePositionY }: HomeNewsEditorProps) {
   const router = useRouter();
   const editorRef = useRef<HTMLDivElement | null>(null);
   const selectionRef = useRef<Range | null>(null);
@@ -104,11 +106,18 @@ export function HomeNewsEditor({ editorKey, initialHtml, title, isAdmin, classNa
   const [isMounted, setIsMounted] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [removeIndices, setRemoveIndices] = useState<number[]>([]);
+  const [positionX, setPositionX] = useState(imagePositionX);
+  const [positionY, setPositionY] = useState(imagePositionY);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setHtml(initialHtml);
   }, [initialHtml]);
+
+  useEffect(() => {
+    setPositionX(imagePositionX);
+    setPositionY(imagePositionY);
+  }, [imagePositionX, imagePositionY]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -213,6 +222,8 @@ export function HomeNewsEditor({ editorKey, initialHtml, title, isAdmin, classNa
   function openEditor() {
     setPendingFiles([]);
     setRemoveIndices([]);
+    setPositionX(imagePositionX);
+    setPositionY(imagePositionY);
     setError(null);
     setIsOpen(true);
   }
@@ -222,10 +233,10 @@ export function HomeNewsEditor({ editorKey, initialHtml, title, isAdmin, classNa
       return;
     }
 
-    const remainingSlots = Math.max(0, 2 - (images.length - removeIndices.length));
+    const remainingSlots = Math.max(0, 1 - (images.length - removeIndices.length));
 
     if (pendingFiles.length > remainingSlots) {
-      setError(`Es können maximal 2 Bilder gespeichert werden. Bitte höchstens ${remainingSlots} neues Bild auswählen.`);
+      setError(`Es kann maximal 1 Bild gespeichert werden. Bitte höchstens ${remainingSlots} neues Bild auswählen.`);
       return;
     }
 
@@ -238,6 +249,8 @@ export function HomeNewsEditor({ editorKey, initialHtml, title, isAdmin, classNa
 
       formData.set('editorKey', editorKey);
       formData.set('html', nextHtml);
+      formData.set('imagePositionX', String(positionX));
+      formData.set('imagePositionY', String(positionY));
       removeIndices.forEach((index) => formData.append('removeImageIndices', String(index)));
       pendingFiles.forEach((file) => formData.append('newsImages', file));
 
@@ -263,7 +276,7 @@ export function HomeNewsEditor({ editorKey, initialHtml, title, isAdmin, classNa
       const message = saveError instanceof Error ? saveError.message : 'save-failed';
 
       if (message === 'too-many-images') {
-        setError('Es sind maximal 2 Bilder erlaubt.');
+        setError('Es ist maximal 1 Bild erlaubt.');
       } else if (message === 'missing-config') {
         setError('Firebase ist für Uploads noch nicht vollständig eingerichtet.');
       } else if (message === 'unauthorized') {
@@ -280,7 +293,8 @@ export function HomeNewsEditor({ editorKey, initialHtml, title, isAdmin, classNa
   const showPlaceholder = isAdmin && !hasVisibleText(renderedHtml);
   const displayHtml = showPlaceholder ? `<span style="opacity:.7">${title}</span>` : renderedHtml;
   const visibleImages = images.filter((image, index) => image.assetUrl && !removeIndices.includes(index));
-  const availableUploadSlots = Math.max(0, 2 - visibleImages.length);
+  const availableUploadSlots = Math.max(0, 1 - visibleImages.length);
+  const previewImage = pendingFiles[0] ? URL.createObjectURL(pendingFiles[0]) : visibleImages[0]?.assetUrl;
 
   return (
     <>
@@ -367,19 +381,19 @@ export function HomeNewsEditor({ editorKey, initialHtml, title, isAdmin, classNa
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <h4 className="text-sm font-black uppercase tracking-[0.16em] text-[#fff0da]">News-Bilder</h4>
-                      <p className="mt-1 text-sm text-[#d7c2ab]">Bis zu 2 Bilder. Wenn keine vorhanden sind, bleibt der Kasten bildfrei.</p>
+                      <p className="mt-1 text-sm text-[#d7c2ab]">Ein Bild optional. Wenn keines vorhanden ist, bleibt der Kasten bildfrei.</p>
                     </div>
                     <span className="rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-[#ffcf98]">
-                      {visibleImages.length + pendingFiles.length}/2 belegt
+                      {visibleImages.length + pendingFiles.length}/1 belegt
                     </span>
                   </div>
 
                   {images.length ? (
-                    <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <div className="mt-4 grid gap-4">
                       {images.map((image, index) => (
                         <div key={`${image.assetUrl}-${index}`} className={`rounded-[1rem] border p-3 ${removeIndices.includes(index) ? 'border-red-500/40 bg-red-950/20' : 'border-white/10 bg-black/20'}`}>
                           <div className="overflow-hidden rounded-[0.9rem] border border-white/10 bg-black/30">
-                            <img src={image.assetUrl} alt={image.assetName || `News Bild ${index + 1}`} className="h-40 w-full object-cover" />
+                            <img src={image.assetUrl} alt={image.assetName || `News Bild ${index + 1}`} className="h-48 w-full object-cover" style={{ objectPosition: `${positionX}% ${positionY}%` }} />
                           </div>
                           <label className="mt-3 flex items-center gap-3 text-sm text-[#f3dfc4]">
                             <input type="checkbox" checked={removeIndices.includes(index)} onChange={() => toggleRemoval(index)} className="h-4 w-4" />
@@ -387,6 +401,25 @@ export function HomeNewsEditor({ editorKey, initialHtml, title, isAdmin, classNa
                           </label>
                         </div>
                       ))}
+                    </div>
+                  ) : null}
+
+                  {previewImage && !removeIndices.includes(0) ? (
+                    <div className="mt-4 rounded-[1rem] border border-white/10 bg-black/20 p-3">
+                      <p className="text-sm font-semibold text-white">Vorschau Bildposition</p>
+                      <div className="mt-3 overflow-hidden rounded-[0.9rem] border border-white/10 bg-black/30">
+                        <img src={previewImage} alt="News Vorschau" className="h-52 w-full object-cover" style={{ objectPosition: `${positionX}% ${positionY}%` }} />
+                      </div>
+                      <div className="mt-4 grid gap-3">
+                        <label className="grid gap-2 text-sm text-[#f3dfc4]">
+                          <span>Bild horizontal verschieben: {positionX}%</span>
+                          <input type="range" min="0" max="100" value={positionX} onChange={(event) => setPositionX(Number.parseInt(event.target.value, 10))} />
+                        </label>
+                        <label className="grid gap-2 text-sm text-[#f3dfc4]">
+                          <span>Bild vertikal verschieben: {positionY}%</span>
+                          <input type="range" min="0" max="100" value={positionY} onChange={(event) => setPositionY(Number.parseInt(event.target.value, 10))} />
+                        </label>
+                      </div>
                     </div>
                   ) : null}
 
@@ -404,7 +437,7 @@ export function HomeNewsEditor({ editorKey, initialHtml, title, isAdmin, classNa
                       }}
                       className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[#ff8a28] file:px-4 file:py-2 file:font-semibold file:text-black disabled:opacity-50"
                     />
-                    <p className="text-xs text-[#c8b29a]">Es können aktuell noch {availableUploadSlots} Bild{availableUploadSlots === 1 ? '' : 'er'} ergänzt werden.</p>
+                      <p className="text-xs text-[#c8b29a]">Es kann aktuell noch {availableUploadSlots} Bild ergänzt werden.</p>
                     {pendingFiles.length ? (
                       <p className="text-sm text-[#ffcf98]">Ausgewählt: {pendingFiles.map((file) => file.name).join(', ')}</p>
                     ) : null}

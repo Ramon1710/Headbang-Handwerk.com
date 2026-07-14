@@ -46,6 +46,8 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const editorKey = String(formData.get('editorKey') || '').trim();
   const html = sanitizeLiveEditorHtml(String(formData.get('html') || ''));
+  const imagePositionX = Number.parseInt(String(formData.get('imagePositionX') || currentDefaultPosition(50)), 10);
+  const imagePositionY = Number.parseInt(String(formData.get('imagePositionY') || currentDefaultPosition(50)), 10);
 
   if (!editorKey) {
     return NextResponse.json({ error: 'missing-key' }, { status: 400 });
@@ -60,7 +62,7 @@ export async function POST(request: Request) {
   let newsImages = current.site.home.newsImages.filter((_, index) => !removeIndices.includes(index));
   const files = formData.getAll('newsImages').filter((value): value is File => value instanceof File && value.size > 0);
 
-  if (newsImages.length + files.length > 2) {
+  if (newsImages.length + files.length > 1) {
     return NextResponse.json({ error: 'too-many-images' }, { status: 400 });
   }
 
@@ -94,6 +96,8 @@ export async function POST(request: Request) {
       home: {
         ...current.site.home,
         newsImages,
+        newsImagePositionX: clampPercentage(imagePositionX, current.site.home.newsImagePositionX),
+        newsImagePositionY: clampPercentage(imagePositionY, current.site.home.newsImagePositionY),
       },
     },
   };
@@ -120,4 +124,16 @@ export async function POST(request: Request) {
   revalidatePath('/');
 
   return NextResponse.json({ ok: true });
+}
+
+function clampPercentage(value: number, fallback: number) {
+  if (!Number.isFinite(value)) {
+    return fallback;
+  }
+
+  return Math.min(100, Math.max(0, value));
+}
+
+function currentDefaultPosition(fallback: number) {
+  return String(fallback);
 }

@@ -118,6 +118,8 @@ export interface HomePageContent {
   updateTitle: string;
   updateParagraphs: string[];
   newsImages: MediaAsset[];
+  newsImagePositionX: number;
+  newsImagePositionY: number;
   updatePrimaryCtaLabel: string;
   updatePrimaryCtaHref: string;
   updateSecondaryCtaLabel: string;

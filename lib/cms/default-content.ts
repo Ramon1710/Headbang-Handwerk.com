@@ -141,6 +141,8 @@ export const defaultCmsContent: CmsContent = {
         'Gesucht werden Unternehmen, Unterstützer und Branchenpartner, die früh Teil dieses Projekts werden wollen.',
       ],
       newsImages: [],
+      newsImagePositionX: 50,
+      newsImagePositionY: 50,
       updatePrimaryCtaLabel: 'Sponsoring ansehen',
       updatePrimaryCtaHref: '/sponsoren',
       updateSecondaryCtaLabel: 'Kontakt aufnehmen',

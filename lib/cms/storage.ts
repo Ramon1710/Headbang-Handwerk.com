@@ -59,6 +59,16 @@ function normalizeStringList(value: unknown): string[] | undefined {
   return undefined;
 }
 
+function normalizePercentage(value: unknown, fallback: number) {
+  const parsed = typeof value === 'number' ? value : Number.parseFloat(String(value ?? ''));
+
+  if (!Number.isFinite(parsed)) {
+    return fallback;
+  }
+
+  return Math.min(100, Math.max(0, Math.round(parsed)));
+}
+
 function normalizeMerchandiseProduct(product: unknown) {
   if (!product || typeof product !== 'object') {
     return null;
@@ -278,8 +288,10 @@ function normalizeContent(content: CmsContent): CmsContent {
           ? content.site.home.newsImages
               .map(normalizeMediaAsset)
               .filter((asset) => Boolean(asset.assetUrl))
-              .slice(0, 2)
+              .slice(0, 1)
           : defaultCmsContent.site.home.newsImages,
+        newsImagePositionX: normalizePercentage(content.site.home?.newsImagePositionX, defaultCmsContent.site.home.newsImagePositionX),
+        newsImagePositionY: normalizePercentage(content.site.home?.newsImagePositionY, defaultCmsContent.site.home.newsImagePositionY),
       },
       sponsors: { ...defaultCmsContent.site.sponsors, ...content.site.sponsors },
       about: {
