@@ -25,7 +25,7 @@ export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix 
   const resolvedKeyPrefix = editorKeyPrefix || `events.cards.${event.id}`;
   const standHref = getEventStandHref(event.id);
   const canOpenStand = Boolean(event.standEnabled);
-  const ctaHref = resolveEventCtaUrl(event.ctaUrl);
+  const ctaHref = resolveEventCtaUrl(event.ctaUrl, event.ctaText);
   const opensExternalSite = isExternalUrl(ctaHref);
 
   const cardContent = (

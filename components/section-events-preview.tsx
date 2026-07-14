@@ -31,7 +31,7 @@ export function SectionEventsPreview() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {upcoming.map((event) => {
             const { label, variant } = statusMap[event.status];
-            const ctaHref = resolveEventCtaUrl(event.ctaUrl);
+            const ctaHref = resolveEventCtaUrl(event.ctaUrl, event.ctaText);
             const opensExternalSite = isExternalUrl(ctaHref);
             return (
               <div

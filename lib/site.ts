@@ -46,8 +46,27 @@ export function normalizeExternalUrl(url: string) {
   return trimmed;
 }
 
-export function resolveEventCtaUrl(url?: string) {
+function looksLikeUrl(value: string) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return false;
+  }
+
+  return /^(https?:\/\/|\/\/|www\.|[a-z0-9.-]+\.[a-z]{2,}(?:[/:?#].*)?)$/i.test(trimmed);
+}
+
+export function resolveEventCtaUrl(url?: string, fallbackText?: string) {
   const normalized = normalizeExternalUrl(url || '');
+
+  if (normalized && normalized !== '/kontakt' && normalized !== '/info@headbang-handwerk.de') {
+    return normalized;
+  }
+
+  if (looksLikeUrl(fallbackText || '')) {
+    return normalizeExternalUrl(fallbackText || '');
+  }
+
   return normalized || '/kontakt';
 }
 
