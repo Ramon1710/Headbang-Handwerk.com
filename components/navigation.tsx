@@ -106,7 +106,7 @@ export function Navigation({
       <div className="fire-divider" />
       <nav className="site-shell">
         <div className="flex min-h-24 items-center justify-between gap-3 py-3 sm:gap-4 xl:gap-6">
-          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+          <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4 xl:gap-5">
             <div className="relative shrink-0">
               <button
                 type="button"
@@ -144,18 +144,8 @@ export function Navigation({
               ) : null}
             </div>
 
-            <a href="/" className="flex min-w-0 items-center gap-3 group" aria-label="Headbang Handwerk">
-              <img
-                src={resolvedLogoSrc}
-                alt="Headbang Handwerk Logo"
-                className="h-auto max-h-[62px] w-28 object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.65)] sm:max-h-[82px] sm:w-40 lg:max-h-[92px] lg:w-48"
-              />
-            </a>
-          </div>
-
-          <div className="flex min-w-0 flex-1 items-center justify-end gap-2 xl:gap-3">
-            <div className="flex min-w-0 flex-1 items-center justify-end overflow-x-auto">
-              <div className="flex min-w-max items-center gap-1 pl-2 sm:gap-2">
+            <div className="flex min-w-0 flex-1 items-center overflow-x-auto">
+              <div className="flex min-w-max items-center gap-1 sm:gap-2">
                 {primaryLinks.map((link) => (
                   <a
                     key={link.href}
@@ -193,6 +183,14 @@ export function Navigation({
               ) : null}
             </div>
           </div>
+
+          <a href="/" className="flex shrink-0 items-center justify-end gap-3 group" aria-label="Headbang Handwerk">
+            <img
+              src={resolvedLogoSrc}
+              alt="Headbang Handwerk Logo"
+              className="h-auto max-h-[62px] w-28 object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.65)] sm:max-h-[82px] sm:w-40 lg:max-h-[92px] lg:w-48"
+            />
+          </a>
         </div>
       </nav>
     </header>
