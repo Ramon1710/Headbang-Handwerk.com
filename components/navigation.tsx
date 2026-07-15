@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 import headbangLogo from '../Headbang Handwerk e.V. Logo Final PNG.png';
 
-const PRIMARY_NAV_ORDER = ['/', '/formular', '/sponsoren', '/spenden', '/unsere-partner'];
-const DROPDOWN_NAV_ORDER = ['/veranstaltungen', '/gallerie', '/merchandise', '/ueber-uns', '/kontakt'];
+const PRIMARY_NAV_ORDER = ['/', '/formular', '/sponsoren', '/spenden', '/unsere-partner', '/merchandise'];
+const DROPDOWN_NAV_ORDER = ['/veranstaltungen', '/gallerie', '/ueber-uns', '/kontakt'];
 
 const FALLBACK_NAV_LABELS: Record<string, string> = {
   '/': 'Startseite',
