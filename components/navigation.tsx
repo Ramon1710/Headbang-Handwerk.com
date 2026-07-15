@@ -11,6 +11,7 @@ import headbangLogo from '../Headbang Handwerk e.V. Logo Final PNG.png';
 
 const PRIMARY_NAV_ORDER = ['/', '/formular', '/sponsoren', '/spenden', '/unsere-partner', '/merchandise'];
 const DROPDOWN_NAV_ORDER = ['/veranstaltungen', '/gallerie', '/ueber-uns', '/kontakt'];
+const MOBILE_DROPDOWN_NAV_ORDER = ['/', '/veranstaltungen', '/formular', '/sponsoren', '/spenden', '/unsere-partner', '/gallerie', '/ueber-uns', '/kontakt'];
 
 const FALLBACK_NAV_LABELS: Record<string, string> = {
   '/': 'Startseite',
@@ -59,6 +60,10 @@ export function Navigation({
     label: linksByHref.get(href)?.label || FALLBACK_NAV_LABELS[href],
   }));
   const dropdownLinks = DROPDOWN_NAV_ORDER.map((href) => ({
+    href,
+    label: linksByHref.get(href)?.label || FALLBACK_NAV_LABELS[href],
+  }));
+  const mobileDropdownLinks = MOBILE_DROPDOWN_NAV_ORDER.map((href) => ({
     href,
     label: linksByHref.get(href)?.label || FALLBACK_NAV_LABELS[href],
   }));
@@ -125,7 +130,23 @@ export function Navigation({
                   id="site-dropdown-menu"
                   className="absolute left-0 top-[calc(100%+0.85rem)] z-[70] w-64 rounded-[1.1rem] border border-[color:var(--color-border)] bg-[linear-gradient(180deg,rgba(24,16,12,0.98)_0%,rgba(10,7,5,0.96)_100%)] p-3 shadow-[0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-md"
                 >
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1 md:hidden">
+                    {mobileDropdownLinks.map((link) => (
+                      <a
+                        key={link.href}
+                        href={link.href}
+                        className={cn(
+                          'rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors',
+                          isLinkActive(link.href)
+                            ? 'bg-[color:var(--color-accent)]/16 text-[color:var(--color-accent-soft)]'
+                            : 'link-copy hover:bg-white/5'
+                        )}
+                      >
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                  <div className="hidden md:flex md:flex-col md:gap-1">
                     {dropdownLinks.map((link) => (
                       <a
                         key={link.href}
@@ -145,7 +166,7 @@ export function Navigation({
               ) : null}
             </div>
 
-            <div className="flex min-w-0 flex-1 items-center overflow-x-auto">
+            <div className="hidden min-w-0 flex-1 items-center overflow-x-auto md:flex">
               <div className="flex min-w-max items-center gap-3 sm:gap-4">
                 {primaryLinks.map((link) => (
                   <a
