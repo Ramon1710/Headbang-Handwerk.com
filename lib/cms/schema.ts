@@ -225,6 +225,14 @@ export interface GalleryPageContent {
   folders: GalleryFolder[];
 }
 
+export interface PartnerEntry {
+  id: string;
+  name: string;
+  website: string;
+  description: string;
+  logo: MediaAsset;
+}
+
 export interface SeoContent {
   title: string;
   description: string;
@@ -239,6 +247,7 @@ export interface SiteContent {
   navigationCtaHref: string;
   events: Event[];
   sponsorPackages: SponsorPackage[];
+  partners: PartnerEntry[];
   liveEditor: LiveEditorContent;
   home: HomePageContent;
   sponsors: SponsorsPageContent;

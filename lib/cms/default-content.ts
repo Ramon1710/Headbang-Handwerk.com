@@ -38,6 +38,7 @@ export const defaultCmsContent: CmsContent = {
       { label: 'Mitglied werden', href: '/formular' },
       { label: 'Sponsor werden', href: '/sponsoren' },
       { label: 'Spenden', href: '/spenden' },
+      { label: 'Unsere Partner', href: '/unsere-partner' },
       { label: 'Merchandise', href: '/merchandise' },
       { label: 'Über uns', href: '/ueber-uns' },
       { label: 'Kontakt', href: '/kontakt' },
@@ -46,6 +47,7 @@ export const defaultCmsContent: CmsContent = {
     navigationCtaHref: '/sponsoren',
     events,
     sponsorPackages,
+    partners: [],
     liveEditor: {
       richText: {},
       boxStyles: {},

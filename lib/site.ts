@@ -4,9 +4,10 @@ const REMOVED_NAV_HREFS = new Set(['/drei-d-stand', '/partner-unterstuetzerinfo'
 const MEMBERSHIP_LINK: NavigationLink = { label: 'Mitglied werden', href: '/formular' };
 const SPONSOR_LINK: NavigationLink = { label: 'Sponsor werden', href: '/sponsoren' };
 const DONATION_LINK: NavigationLink = { label: 'Spenden', href: '/spenden' };
+const PARTNERS_LINK: NavigationLink = { label: 'Unsere Partner', href: '/unsere-partner' };
 const MERCHANDISE_LINK: NavigationLink = { label: 'Merchandise', href: '/merchandise' };
 const GALLERY_LINK: NavigationLink = { label: 'Galerie', href: '/gallerie' };
-const CANONICAL_NAV_ORDER = ['/', '/veranstaltungen', '/gallerie', '/formular', '/sponsoren', '/spenden', '/merchandise', '/ueber-uns', '/kontakt'];
+const CANONICAL_NAV_ORDER = ['/', '/veranstaltungen', '/gallerie', '/formular', '/sponsoren', '/spenden', '/unsere-partner', '/merchandise', '/ueber-uns', '/kontakt'];
 
 function normalizeHref(href: string) {
   if (!href || href === '/') {
@@ -129,8 +130,18 @@ export function normalizeNavigationLinks(links: NavigationLink[]) {
     }
   }
 
+  if (!seenHrefs.has(PARTNERS_LINK.href)) {
+    const donationIndex = filteredLinks.findIndex((link) => link.href === DONATION_LINK.href);
+
+    if (donationIndex >= 0) {
+      filteredLinks.splice(donationIndex + 1, 0, PARTNERS_LINK);
+    } else {
+      filteredLinks.push(PARTNERS_LINK);
+    }
+  }
+
   if (!seenHrefs.has(MERCHANDISE_LINK.href)) {
-    const sponsorsIndex = filteredLinks.findIndex((link) => link.href === DONATION_LINK.href);
+    const sponsorsIndex = filteredLinks.findIndex((link) => link.href === PARTNERS_LINK.href || link.href === DONATION_LINK.href);
 
     if (sponsorsIndex >= 0) {
       filteredLinks.splice(sponsorsIndex + 1, 0, MERCHANDISE_LINK);
