@@ -3,9 +3,8 @@ import { ArrowDown, ArrowUp, Globe2 } from 'lucide-react';
 import { EditablePageShell } from '@/components/editable-page-shell';
 import { LiveEditableText } from '@/components/live-editable-text';
 import { LiveResizableBox } from '@/components/live-resizable-box';
-import { Button } from '@/components/ui/button';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
-import { resolveLiveBoxStyle, resolveLiveHtml, resolveLiveRichHtml, textParagraphHtml } from '@/lib/cms/live-editor';
+import { resolveLiveBoxStyle, resolveLiveHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
 import { isExternalUrl } from '@/lib/site';
 import { addPartnerAction, movePartnerAction, removePartnerAction, updatePartnerAction } from './actions';
@@ -108,22 +107,6 @@ export default async function UnserePartnerPage({
           <LiveEditableText as="p" className="body-copy-lg" editorKey="partners.lead" initialHtml={resolveLiveHtml(liveEditor, 'partners.lead', 'Diese Unternehmen, Betriebe und Unterstützer begleiten Headbang Handwerk bereits auf dem Weg zu mehr Sichtbarkeit für das Handwerk.')} isAdmin={isAdmin} title="Partner Einleitung" />
         </LiveResizableBox>
 
-        <LiveResizableBox boxKey="partners.body.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'partners.body.box')} isAdmin={isAdmin} className="section-shell content-box mb-10 sm:p-10">
-          <LiveEditableText
-            as="div"
-            className="body-copy-lg space-y-4"
-            editorKey="partners.body"
-            initialHtml={resolveLiveRichHtml(
-              liveEditor,
-              'partners.body',
-              `${textParagraphHtml('Hier findet ihr eine laufend gepflegte Übersicht aller Partner, die unser Projekt unterstützen.', 'body-copy-lg')}${textParagraphHtml('In der Adminansicht könnt ihr neue Partner anlegen, Logos hochladen und die Reihenfolge direkt verändern.', 'body-copy')}`
-            )}
-            isAdmin={isAdmin}
-            title="Partner Fließtext"
-            normalizeTypography
-          />
-        </LiveResizableBox>
-
         <LiveResizableBox boxKey="partners.list.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'partners.list.box')} isAdmin={isAdmin} className="space-y-6">
           {partners.length ? (
             partners.map((partner, index) => (
@@ -209,20 +192,7 @@ export default async function UnserePartnerPage({
                 </div>
               </div>
             ))
-          ) : (
-            <div className="section-shell content-box text-center sm:p-10">
-              <h2 className="section-title text-[1.9rem]">Partner folgen in Kürze</h2>
-              <p className="body-copy mt-4 max-w-2xl mx-auto">Sobald Partner eingetragen werden, erscheinen sie hier automatisch untereinander aufgelistet.</p>
-            </div>
-          )}
-        </LiveResizableBox>
-
-        <LiveResizableBox boxKey="partners.closing.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'partners.closing.box')} isAdmin={isAdmin} className="section-shell content-box mt-10 text-center sm:p-10">
-          <LiveEditableText as="h2" className="section-title" editorKey="partners.closingTitle" initialHtml={resolveLiveHtml(liveEditor, 'partners.closingTitle', 'Ihr möchtet ebenfalls Partner werden?')} isAdmin={isAdmin} title="Partner Abschluss Titel" />
-          <LiveEditableText as="p" className="body-copy mx-auto mt-5 max-w-3xl" editorKey="partners.closingLead" initialHtml={resolveLiveHtml(liveEditor, 'partners.closingLead', 'Dann meldet euch bei uns. Gemeinsam entwickeln wir einen Auftritt, der zum Projekt und zu eurem Unternehmen passt.')} isAdmin={isAdmin} title="Partner Abschluss Text" />
-          <div className="mt-6">
-            <Button href="/kontakt">Kontakt aufnehmen</Button>
-          </div>
+          ) : null}
         </LiveResizableBox>
       </div>
     </EditablePageShell>
