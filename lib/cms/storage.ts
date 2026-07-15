@@ -94,6 +94,11 @@ function normalizeMerchandiseProduct(product: unknown) {
 
   const badge = String(candidate.badge ?? '').trim();
   const imageUrl = String(candidate.imageUrl ?? '').trim();
+  const galleryImageUrls = Array.isArray(candidate.galleryImageUrls)
+    ? candidate.galleryImageUrls.map((entry) => String(entry ?? '').trim()).filter(Boolean).slice(0, 5)
+    : [];
+  const estimatedDeliveryTime = String(candidate.estimatedDeliveryTime ?? '').trim();
+  const stripePriceId = String(candidate.stripePriceId ?? '').trim();
 
   return {
     id,
@@ -102,8 +107,11 @@ function normalizeMerchandiseProduct(product: unknown) {
     price: parsedPrice,
     ...(badge ? { badge } : {}),
     ...(imageUrl ? { imageUrl } : {}),
+    ...(galleryImageUrls.length ? { galleryImageUrls } : {}),
     ...(normalizeStringList(candidate.sizes) ? { sizes: normalizeStringList(candidate.sizes) } : {}),
     ...(normalizeStringList(candidate.colors) ? { colors: normalizeStringList(candidate.colors) } : {}),
+    ...(estimatedDeliveryTime ? { estimatedDeliveryTime } : {}),
+    ...(stripePriceId ? { stripePriceId } : {}),
   };
 }
 

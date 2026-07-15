@@ -50,6 +50,7 @@ export interface MerchandiseProduct {
   description: string;
   price: number;
   imageUrl?: string;
+  galleryImageUrls?: string[];
   sizes?: string[];
   colors?: string[];
   badge?: string;

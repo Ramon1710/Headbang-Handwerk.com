@@ -35,6 +35,14 @@ function splitList(value: FormDataEntryValue | null) {
     .filter(Boolean);
 }
 
+function splitUrlList(value: FormDataEntryValue | null) {
+  return String(value || '')
+    .split(/\r?\n|,/) 
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .slice(0, 5);
+}
+
 function ensureProductId(products: MerchandiseProduct[], requestedId: string, name: string) {
   const base = slugify(requestedId || name || `product-${Date.now()}`) || `product-${Date.now()}`;
 
@@ -84,11 +92,23 @@ function parseProductFromFormData(formData: FormData, existingId?: string): Merc
     price: Number.isFinite(price) ? price : 0,
     badge: sanitizeText(formData.get('badge')) || undefined,
     imageUrl: sanitizeText(formData.get('imageUrl')) || undefined,
+    galleryImageUrls: splitUrlList(formData.get('galleryImageUrls')),
     sizes: splitList(formData.get('sizes')),
     colors: splitList(formData.get('colors')),
     estimatedDeliveryTime: sanitizeText(formData.get('estimatedDeliveryTime')) || undefined,
     stripePriceId: sanitizeText(formData.get('stripePriceId')) || undefined,
   };
+}
+
+async function uploadMerchandiseGalleryImages(files: File[]) {
+  const uploadedUrls: string[] = [];
+
+  for (const [index, file] of files.entries()) {
+    const uploadedAsset = await uploadCmsAsset(file, 'merchandise', `merchandise-galerie-${index + 1}`);
+    uploadedUrls.push(uploadedAsset.url);
+  }
+
+  return uploadedUrls;
 }
 
 async function assertAdmin() {
@@ -153,15 +173,27 @@ export async function addMerchandiseProductAction(formData: FormData) {
   }
 
   const imageFile = formData.get('imageFile');
+  const galleryImageFiles = formData.getAll('galleryImageFiles').filter((value): value is File => value instanceof File && value.size > 0).slice(0, 5);
 
-  if (imageFile instanceof File && imageFile.size > 0) {
+  if ((imageFile instanceof File && imageFile.size > 0) || galleryImageFiles.length > 0) {
     if (!hasFirebaseConfig()) {
       redirect('/merchandise?adminError=missing-config');
     }
+  }
 
+  if (imageFile instanceof File && imageFile.size > 0) {
     try {
-      const uploadedAsset = await uploadCmsAsset(imageFile, 'merchandise', 'merchandise-bild');
+      const uploadedAsset = await uploadCmsAsset(imageFile, 'merchandise', 'merchandise-hauptbild');
       product.imageUrl = uploadedAsset.url;
+    } catch (error) {
+      redirectForMerchandiseUploadError(error);
+    }
+  }
+
+  if (galleryImageFiles.length > 0) {
+    try {
+      const uploadedGalleryUrls = await uploadMerchandiseGalleryImages(galleryImageFiles);
+      product.galleryImageUrls = [...(product.galleryImageUrls || []), ...uploadedGalleryUrls].slice(0, 5);
     } catch (error) {
       redirectForMerchandiseUploadError(error);
     }
@@ -197,15 +229,27 @@ export async function updateMerchandiseProductAction(formData: FormData) {
   const nextProduct = parseProductFromFormData(formData, productId);
 
   const imageFile = formData.get('imageFile');
+  const galleryImageFiles = formData.getAll('galleryImageFiles').filter((value): value is File => value instanceof File && value.size > 0).slice(0, 5);
 
-  if (imageFile instanceof File && imageFile.size > 0) {
+  if ((imageFile instanceof File && imageFile.size > 0) || galleryImageFiles.length > 0) {
     if (!hasFirebaseConfig()) {
       redirect('/merchandise?adminError=missing-config');
     }
+  }
 
+  if (imageFile instanceof File && imageFile.size > 0) {
     try {
-      const uploadedAsset = await uploadCmsAsset(imageFile, 'merchandise', 'merchandise-bild');
+      const uploadedAsset = await uploadCmsAsset(imageFile, 'merchandise', 'merchandise-hauptbild');
       nextProduct.imageUrl = uploadedAsset.url;
+    } catch (error) {
+      redirectForMerchandiseUploadError(error);
+    }
+  }
+
+  if (galleryImageFiles.length > 0) {
+    try {
+      const uploadedGalleryUrls = await uploadMerchandiseGalleryImages(galleryImageFiles);
+      nextProduct.galleryImageUrls = [...(nextProduct.galleryImageUrls || []), ...uploadedGalleryUrls].slice(0, 5);
     } catch (error) {
       redirectForMerchandiseUploadError(error);
     }

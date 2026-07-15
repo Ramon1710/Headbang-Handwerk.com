@@ -26,6 +26,11 @@ export function MerchandiseShop({ products }: MerchandiseShopProps) {
     )
   );
   const [cartItems, setCartItems] = useState<MerchandiseCartItem[]>([]);
+  const [selectedImages, setSelectedImages] = useState<Record<string, string>>(
+    Object.fromEntries(
+      products.map((product) => [product.id, product.imageUrl || product.galleryImageUrls?.[0] || ''])
+    )
+  );
 
   useEffect(() => {
     try {
@@ -158,12 +163,31 @@ export function MerchandiseShop({ products }: MerchandiseShopProps) {
       <div className="grid gap-8 lg:grid-cols-3">
         {products.map((product) => {
           const selection = selectedOptions[product.id];
+          const productImages = [product.imageUrl, ...(product.galleryImageUrls || [])].filter((image): image is string => Boolean(image));
+          const activeImage = selectedImages[product.id] || productImages[0] || '';
 
           return (
             <article key={product.id} className="section-shell content-box text-left">
-              {product.imageUrl ? (
-                <div className="mb-6 overflow-hidden rounded-[1.2rem] border border-white/10 bg-black/20">
-                  <img src={product.imageUrl} alt={product.name} className="h-64 w-full object-cover" />
+              {activeImage ? (
+                <div className="mb-6">
+                  <div className="overflow-hidden rounded-[1.2rem] border border-white/10 bg-black/20">
+                    <img src={activeImage} alt={product.name} className="h-64 w-full object-cover" />
+                  </div>
+                  {productImages.length > 1 ? (
+                    <div className="mt-3 grid grid-cols-4 gap-2">
+                      {productImages.map((image, index) => (
+                        <button
+                          key={`${product.id}-image-${index}`}
+                          type="button"
+                          onClick={() => setSelectedImages((current) => ({ ...current, [product.id]: image }))}
+                          className={`overflow-hidden rounded-lg border bg-black/20 ${activeImage === image ? 'border-[color:var(--color-accent)]' : 'border-white/10'}`}
+                          aria-label={`${product.name} Bild ${index + 1} anzeigen`}
+                        >
+                          <img src={image} alt={`${product.name} Vorschau ${index + 1}`} className="h-16 w-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
 
@@ -189,10 +213,10 @@ export function MerchandiseShop({ products }: MerchandiseShopProps) {
                     <select
                       value={selection?.size || ''}
                       onChange={(event) => setSelectedOptions((current) => ({ ...current, [product.id]: { ...current[product.id], size: event.target.value } }))}
-                      className="body-copy w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 outline-none focus:border-[color:var(--color-accent)]"
+                      className="body-copy w-full rounded-xl border border-[color:var(--color-border)] bg-black px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]"
                     >
                       {product.sizes.map((size) => (
-                        <option key={size} value={size}>{size}</option>
+                        <option key={size} value={size} className="bg-black text-white">{size}</option>
                       ))}
                     </select>
                   </label>
@@ -204,10 +228,10 @@ export function MerchandiseShop({ products }: MerchandiseShopProps) {
                     <select
                       value={selection?.color || ''}
                       onChange={(event) => setSelectedOptions((current) => ({ ...current, [product.id]: { ...current[product.id], color: event.target.value } }))}
-                      className="body-copy w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 outline-none focus:border-[color:var(--color-accent)]"
+                      className="body-copy w-full rounded-xl border border-[color:var(--color-border)] bg-black px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]"
                     >
                       {product.colors.map((color) => (
-                        <option key={color} value={color}>{color}</option>
+                        <option key={color} value={color} className="bg-black text-white">{color}</option>
                       ))}
                     </select>
                   </label>

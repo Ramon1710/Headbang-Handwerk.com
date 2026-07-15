@@ -67,16 +67,28 @@ export default async function MerchandisePage({
               <input name="name" placeholder="Produktname" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <input name="price" placeholder="Preis, z.B. 29" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <input name="badge" placeholder="Badge, z.B. Neu" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
-              <input name="imageUrl" placeholder="Bild-URL optional" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+              <input name="imageUrl" placeholder="Hauptbild-URL optional" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <label className="block lg:col-span-2">
-                <span className="mb-2 block text-sm font-semibold text-white">Produktbild hochladen</span>
+                <span className="mb-2 block text-sm font-semibold text-white">Hauptbild hochladen</span>
                 <input
                   type="file"
                   name="imageFile"
                   accept=".png,.jpg,.jpeg,.webp"
                   className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-white focus:border-[color:var(--color-accent)]"
                 />
-                <span className="mt-2 block text-xs text-[color:var(--color-muted)]">Alternativ kannst du weiterhin eine direkte Bild-URL eintragen.</span>
+                <span className="mt-2 block text-xs text-[color:var(--color-muted)]">Dieses Bild wird immer zuerst angezeigt.</span>
+              </label>
+              <textarea name="galleryImageUrls" rows={3} placeholder="Weitere Bild-URLs, getrennt durch Komma oder Zeilenumbruch, max. 5" className="lg:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+              <label className="block lg:col-span-2">
+                <span className="mb-2 block text-sm font-semibold text-white">Weitere Bilder hochladen (max. 5)</span>
+                <input
+                  type="file"
+                  name="galleryImageFiles"
+                  accept=".png,.jpg,.jpeg,.webp"
+                  multiple
+                  className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-white focus:border-[color:var(--color-accent)]"
+                />
+                <span className="mt-2 block text-xs text-[color:var(--color-muted)]">Zusätzlich zum Hauptbild können bis zu fünf weitere Produktbilder hinterlegt werden.</span>
               </label>
               <input name="sizes" placeholder="Größen, kommasepariert" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <input name="colors" placeholder="Farben, kommasepariert" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
@@ -111,16 +123,28 @@ export default async function MerchandisePage({
                   <input name="name" defaultValue={product.name} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                   <input name="price" defaultValue={String(product.price)} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                   <input name="badge" defaultValue={product.badge || ''} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
-                  <input name="imageUrl" defaultValue={product.imageUrl || ''} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                  <input name="imageUrl" defaultValue={product.imageUrl || ''} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" placeholder="Hauptbild-URL" />
                   <label className="block md:col-span-2">
-                    <span className="mb-2 block text-sm font-semibold text-white">Neues Produktbild hochladen</span>
+                    <span className="mb-2 block text-sm font-semibold text-white">Neues Hauptbild hochladen</span>
                     <input
                       type="file"
                       name="imageFile"
                       accept=".png,.jpg,.jpeg,.webp"
                       className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-white focus:border-[color:var(--color-accent)]"
                     />
-                    {product.imageUrl ? <span className="mt-2 block text-xs text-[color:var(--color-muted)]">Aktuell ist bereits ein Produktbild hinterlegt.</span> : null}
+                    {product.imageUrl ? <span className="mt-2 block text-xs text-[color:var(--color-muted)]">Aktuell ist bereits ein Hauptbild hinterlegt.</span> : null}
+                  </label>
+                  <textarea name="galleryImageUrls" rows={3} defaultValue={(product.galleryImageUrls || []).join(', ')} placeholder="Weitere Bild-URLs, getrennt durch Komma oder Zeilenumbruch, max. 5" className="md:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                  <label className="block md:col-span-2">
+                    <span className="mb-2 block text-sm font-semibold text-white">Weitere Bilder hochladen (max. 5)</span>
+                    <input
+                      type="file"
+                      name="galleryImageFiles"
+                      accept=".png,.jpg,.jpeg,.webp"
+                      multiple
+                      className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-white focus:border-[color:var(--color-accent)]"
+                    />
+                    {(product.galleryImageUrls || []).length ? <span className="mt-2 block text-xs text-[color:var(--color-muted)]">Aktuell sind {(product.galleryImageUrls || []).length} zusätzliche Bilder hinterlegt.</span> : null}
                   </label>
                   <input name="sizes" defaultValue={(product.sizes || []).join(', ')} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                   <input name="colors" defaultValue={(product.colors || []).join(', ')} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
