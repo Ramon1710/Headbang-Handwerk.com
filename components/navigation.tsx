@@ -11,7 +11,7 @@ import headbangLogo from '../Headbang Handwerk e.V. Logo Final PNG.png';
 
 const PRIMARY_NAV_ORDER = ['/', '/formular', '/sponsoren', '/spenden', '/unsere-partner', '/merchandise'];
 const DROPDOWN_NAV_ORDER = ['/veranstaltungen', '/gallerie', '/ueber-uns', '/kontakt'];
-const MOBILE_DROPDOWN_NAV_ORDER = ['/', '/veranstaltungen', '/formular', '/sponsoren', '/spenden', '/unsere-partner', '/gallerie', '/ueber-uns', '/kontakt'];
+const MOBILE_DROPDOWN_NAV_ORDER = ['/', '/veranstaltungen', '/formular', '/sponsoren', '/spenden', '/unsere-partner', '/merchandise', '/gallerie', '/ueber-uns', '/kontakt'];
 
 const FALLBACK_NAV_LABELS: Record<string, string> = {
   '/': 'Startseite',
