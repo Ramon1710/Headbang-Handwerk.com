@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import { MerchandiseShop } from '@/components/merchandise-shop';
 import { EditablePageShell } from '@/components/editable-page-shell';
+import { LiveEditableText } from '@/components/live-editable-text';
+import { LiveResizableBox } from '@/components/live-resizable-box';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { resolveLiveBoxStyle, resolveLiveHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
 import { MERCHANDISE_SUPPORT_TEXT } from '@/lib/merchandise';
 import { addMerchandiseProductAction, removeMerchandiseProductAction, updateMerchandiseIntroAction, updateMerchandiseProductAction } from './actions';
@@ -21,6 +24,7 @@ export default async function MerchandisePage({
   const isAuthenticatedAdmin = await isAdminAuthenticated();
   const isAdmin = isAuthenticatedAdmin && query?.view !== 'user';
   const merchandise = cms.site.merchandise;
+  const liveEditor = cms.site.liveEditor;
   const adminErrorMessage =
     query?.adminError === 'missing-config'
       ? 'Speichern ist auf Vercel ohne Firebase nicht möglich. Prüfe FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY und für Datei-Uploads auch FIREBASE_STORAGE_BUCKET.'
@@ -103,14 +107,46 @@ export default async function MerchandisePage({
         ) : null}
 
         <section className="section-shell content-box text-center sm:p-10 lg:p-12">
-          <p className="body-copy text-sm font-semibold uppercase tracking-[0.28em]">{merchandise.eyebrow}</p>
-          <h1 className="page-title mt-5">{merchandise.title}</h1>
-          <p className="body-copy-lg mx-auto mt-6 max-w-3xl">
-            {merchandise.lead}
-          </p>
-          <p className="body-copy mx-auto mt-5 max-w-4xl rounded-[1.2rem] border border-[color:var(--color-border)]/80 bg-black/20 px-5 py-4 text-left text-sm sm:text-center">
-            {MERCHANDISE_SUPPORT_TEXT}
-          </p>
+          <LiveResizableBox boxKey="merchandise.intro.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'merchandise.intro.box')} isAdmin={isAdmin} applySavedHeight={false} className="mx-auto max-w-4xl">
+            <LiveEditableText
+              as="p"
+              className="body-copy text-sm font-semibold uppercase tracking-[0.28em]"
+              editorKey="merchandise.eyebrow"
+              initialHtml={resolveLiveHtml(liveEditor, 'merchandise.eyebrow', merchandise.eyebrow)}
+              isAdmin={isAdmin}
+              title="Merchandise Eyebrow"
+              normalizeTypography
+            />
+            <LiveEditableText
+              as="h1"
+              className="page-title mt-5"
+              editorKey="merchandise.title"
+              initialHtml={resolveLiveHtml(liveEditor, 'merchandise.title', merchandise.title)}
+              isAdmin={isAdmin}
+              title="Merchandise Titel"
+              normalizeTypography
+            />
+            <LiveEditableText
+              as="p"
+              className="body-copy-lg mx-auto mt-6 max-w-3xl"
+              editorKey="merchandise.lead"
+              initialHtml={resolveLiveHtml(liveEditor, 'merchandise.lead', merchandise.lead)}
+              isAdmin={isAdmin}
+              title="Merchandise Einleitung"
+              normalizeTypography
+            />
+          </LiveResizableBox>
+          <LiveResizableBox boxKey="merchandise.support.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'merchandise.support.box')} isAdmin={isAdmin} applySavedHeight={false} className="mx-auto mt-5 max-w-4xl rounded-[1.2rem] border border-[color:var(--color-border)]/80 bg-black/20 px-5 py-4 text-left text-sm sm:text-center">
+            <LiveEditableText
+              as="p"
+              className="body-copy"
+              editorKey="merchandise.supportText"
+              initialHtml={resolveLiveHtml(liveEditor, 'merchandise.supportText', MERCHANDISE_SUPPORT_TEXT)}
+              isAdmin={isAdmin}
+              title="Merchandise Hinweistext"
+              normalizeTypography
+            />
+          </LiveResizableBox>
           <MerchandiseShop products={merchandise.products} />
         </section>
 
