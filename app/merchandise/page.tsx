@@ -61,7 +61,7 @@ export default async function MerchandisePage({
             <form action={updateMerchandiseIntroAction} className="mt-6 grid gap-4 rounded-[1.4rem] border border-white/8 bg-black/15 p-5 lg:grid-cols-2">
               <input name="eyebrow" defaultValue={merchandise.eyebrow} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <input name="title" defaultValue={merchandise.title} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
-              <textarea name="lead" rows={3} defaultValue={merchandise.lead} className="lg:col-span-2 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+              <textarea name="lead" rows={3} defaultValue={merchandise.lead} className="lg:col-span-2 hidden w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <div className="lg:col-span-2 flex justify-end">
                 <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">Shop-Texte speichern</button>
               </div>
@@ -126,15 +126,6 @@ export default async function MerchandisePage({
               title="Merchandise Titel"
               normalizeTypography
             />
-            <LiveEditableText
-              as="p"
-              className="body-copy-lg mx-auto mt-6 max-w-3xl"
-              editorKey="merchandise.lead"
-              initialHtml={resolveLiveHtml(liveEditor, 'merchandise.lead', merchandise.lead)}
-              isAdmin={isAdmin}
-              title="Merchandise Einleitung"
-              normalizeTypography
-            />
           </LiveResizableBox>
           <LiveResizableBox boxKey="merchandise.support.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'merchandise.support.box')} isAdmin={isAdmin} applySavedHeight={false} className="mx-auto mt-5 max-w-4xl rounded-[1.2rem] border border-[color:var(--color-border)]/80 bg-black/20 px-5 py-4 text-left text-sm sm:text-center">
             <LiveEditableText
@@ -147,7 +138,7 @@ export default async function MerchandisePage({
               normalizeTypography
             />
           </LiveResizableBox>
-          <MerchandiseShop products={merchandise.products} />
+          <MerchandiseShop products={merchandise.products} isAdmin={isAdmin} liveEditor={liveEditor} />
         </section>
 
         {isAdmin ? (

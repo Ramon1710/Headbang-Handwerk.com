@@ -3,16 +3,22 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
+import type { LiveEditorContent } from '@/lib/cms/schema';
+import { resolveLiveBoxStyle, resolveLiveHtml } from '@/lib/cms/live-editor';
 import type { MerchandiseCartItem, MerchandiseProduct } from '@/lib/types';
 import { calculateCartTotal, formatVariantLabel, getCartItemKey, MERCHANDISE_CART_STORAGE_KEY, MERCHANDISE_SUPPORT_TEXT } from '@/lib/merchandise';
 import { formatPrice } from '@/lib/utils';
+import { LiveEditableText } from './live-editable-text';
+import { LiveResizableBox } from './live-resizable-box';
 import { Button } from './ui/button';
 
 interface MerchandiseShopProps {
   products: MerchandiseProduct[];
+  isAdmin: boolean;
+  liveEditor: LiveEditorContent;
 }
 
-export function MerchandiseShop({ products }: MerchandiseShopProps) {
+export function MerchandiseShop({ products, isAdmin, liveEditor }: MerchandiseShopProps) {
   const [selectedOptions, setSelectedOptions] = useState<Record<string, { size?: string; color?: string; quantity: number }>>(
     Object.fromEntries(
       products.map((product) => [
@@ -99,7 +105,23 @@ export function MerchandiseShop({ products }: MerchandiseShopProps) {
           <div>
             <p className="body-copy text-sm font-semibold uppercase tracking-[0.24em]">Warenkorb</p>
             <h2 className="section-title mt-3 text-[1.9rem]">Artikel sammeln und gesammelt zur Kasse gehen</h2>
-            <p className="body-copy mt-3 max-w-3xl text-sm">{MERCHANDISE_SUPPORT_TEXT}</p>
+            <LiveResizableBox
+              boxKey="merchandise.cartSupport.box"
+              initialStyle={resolveLiveBoxStyle(liveEditor, 'merchandise.cartSupport.box')}
+              isAdmin={isAdmin}
+              applySavedHeight={false}
+              className="mt-3 max-w-3xl"
+            >
+              <LiveEditableText
+                as="p"
+                className="body-copy text-sm"
+                editorKey="merchandise.cartSupportText"
+                initialHtml={resolveLiveHtml(liveEditor, 'merchandise.cartSupportText', MERCHANDISE_SUPPORT_TEXT)}
+                isAdmin={isAdmin}
+                title="Warenkorb Hinweistext"
+                normalizeTypography
+              />
+            </LiveResizableBox>
           </div>
           <div className="rounded-[1.2rem] border border-[color:var(--color-border)] bg-black/20 px-5 py-4 text-left lg:min-w-72">
             <p className="body-copy text-xs uppercase tracking-[0.2em]">Zwischensumme</p>
