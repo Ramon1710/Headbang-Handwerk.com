@@ -14,6 +14,23 @@ export const metadata: Metadata = {
   description: 'Partner und Unterstützer von Headbang Handwerk im Überblick.',
 };
 
+function hexToRgba(hex: string, opacityPercent: number) {
+  const normalized = hex.replace('#', '').trim();
+  const expanded = normalized.length === 3
+    ? normalized.split('').map((part) => `${part}${part}`).join('')
+    : normalized;
+
+  if (!/^[0-9a-fA-F]{6}$/.test(expanded)) {
+    return `rgba(58, 39, 24, ${Math.min(1, Math.max(0, opacityPercent / 100))})`;
+  }
+
+  const red = Number.parseInt(expanded.slice(0, 2), 16);
+  const green = Number.parseInt(expanded.slice(2, 4), 16);
+  const blue = Number.parseInt(expanded.slice(4, 6), 16);
+
+  return `rgba(${red}, ${green}, ${blue}, ${Math.min(1, Math.max(0, opacityPercent / 100))})`;
+}
+
 function getAdminErrorMessage(adminError?: string) {
   if (!adminError) {
     return null;
@@ -83,6 +100,14 @@ export default async function UnserePartnerPage({
             <form action={addPartnerAction} className="mt-6 grid gap-4 rounded-[1.4rem] border border-white/8 bg-black/15 p-5 lg:grid-cols-2">
               <input name="name" placeholder="Name des Partners" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               <input name="website" placeholder="Website des Partners" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-white">Logo-Kasten Hintergrund</span>
+                <input name="logoBoxBackground" type="color" defaultValue="#3a2718" className="h-12 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-2 py-2 text-white outline-none focus:border-[color:var(--color-accent)]" />
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-white">Logo-Kasten Transparenz in %</span>
+                <input name="logoBoxOpacity" type="number" min="0" max="100" defaultValue="55" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+              </label>
               <label className="block lg:col-span-2">
                 <span className="mb-2 block text-sm font-semibold text-white">Logo hochladen</span>
                 <input
@@ -113,7 +138,10 @@ export default async function UnserePartnerPage({
               <div key={partner.id} className="section-shell content-box overflow-hidden sm:p-8">
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                   <div className="flex flex-1 flex-col gap-5 sm:flex-row sm:items-start">
-                    <div className="flex h-28 w-full max-w-[12rem] items-center justify-center overflow-hidden rounded-[1.3rem] border border-[color:var(--color-border)]/70 bg-black/15 p-4">
+                      <div
+                        className="flex h-28 w-full max-w-[12rem] items-center justify-center overflow-hidden rounded-[1.3rem] border border-[color:var(--color-accent)]/25 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                        style={{ backgroundColor: hexToRgba(partner.logoBoxBackground || '#3a2718', partner.logoBoxOpacity ?? 55) }}
+                      >
                       {partner.logo.assetUrl ? (
                         <img src={partner.logo.assetUrl} alt={`${partner.name} Logo`} className="max-h-full w-auto object-contain" />
                       ) : (
@@ -146,6 +174,14 @@ export default async function UnserePartnerPage({
                         <input type="hidden" name="id" value={partner.id} />
                         <input name="name" defaultValue={partner.name} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                         <input name="website" defaultValue={partner.website} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                        <label className="block">
+                          <span className="mb-2 block text-sm font-semibold text-white">Logo-Kasten Hintergrund</span>
+                          <input name="logoBoxBackground" type="color" defaultValue={partner.logoBoxBackground || '#3a2718'} className="h-12 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-2 py-2 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                        </label>
+                        <label className="block">
+                          <span className="mb-2 block text-sm font-semibold text-white">Logo-Kasten Transparenz in %</span>
+                          <input name="logoBoxOpacity" type="number" min="0" max="100" defaultValue={String(partner.logoBoxOpacity ?? 55)} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                        </label>
                         <textarea name="description" rows={4} defaultValue={partner.description} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                         <label className="block">
                           <span className="mb-2 block text-sm font-semibold text-white">Neues Logo hochladen</span>

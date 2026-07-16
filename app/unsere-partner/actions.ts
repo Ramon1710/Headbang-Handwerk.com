@@ -18,6 +18,16 @@ function sanitizeText(value: FormDataEntryValue | null) {
   return String(value || '').trim();
 }
 
+function sanitizeOpacity(value: FormDataEntryValue | null, fallback = 55) {
+  const parsed = Number.parseInt(String(value || ''), 10);
+
+  if (!Number.isFinite(parsed)) {
+    return fallback;
+  }
+
+  return Math.min(100, Math.max(0, parsed));
+}
+
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -52,6 +62,8 @@ function parsePartnerFromFormData(formData: FormData, existing?: PartnerEntry): 
     name: sanitizeText(formData.get('name')),
     website: normalizeExternalUrl(sanitizeText(formData.get('website'))),
     description: sanitizeText(formData.get('description')),
+    logoBoxBackground: sanitizeText(formData.get('logoBoxBackground')) || existing?.logoBoxBackground || '#3a2718',
+    logoBoxOpacity: sanitizeOpacity(formData.get('logoBoxOpacity'), existing?.logoBoxOpacity ?? 55),
     logo: existing?.logo || {
       assetUrl: '',
       assetName: '',

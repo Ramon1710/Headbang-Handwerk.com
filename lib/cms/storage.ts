@@ -175,6 +175,37 @@ function normalizeGalleryFolder(folder: unknown): GalleryFolder | null {
   };
 }
 
+function normalizePartnerEntry(partner: unknown) {
+  if (!partner || typeof partner !== 'object') {
+    return null;
+  }
+
+  const candidate = partner as Record<string, unknown>;
+  const id = String(candidate.id ?? '').trim();
+  const name = String(candidate.name ?? '').trim();
+  const website = String(candidate.website ?? '').trim();
+  const description = String(candidate.description ?? '').trim();
+  const logoBoxBackground = String(candidate.logoBoxBackground ?? '').trim();
+  const rawOpacity =
+    typeof candidate.logoBoxOpacity === 'number'
+      ? candidate.logoBoxOpacity
+      : Number.parseFloat(String(candidate.logoBoxOpacity ?? ''));
+
+  if (!id || !name || !description) {
+    return null;
+  }
+
+  return {
+    id,
+    name,
+    website,
+    description,
+    logo: normalizeMediaAsset(candidate.logo),
+    ...(logoBoxBackground ? { logoBoxBackground } : {}),
+    ...(Number.isFinite(rawOpacity) ? { logoBoxOpacity: Math.min(100, Math.max(0, Math.round(rawOpacity))) } : {}),
+  };
+}
+
 async function readFromFirebase(): Promise<CmsContent | null> {
   try {
     const db = getFirebaseDb();
@@ -324,6 +355,11 @@ function normalizeContent(content: CmsContent): CmsContent {
               .filter((product): product is NonNullable<ReturnType<typeof normalizeMerchandiseProduct>> => Boolean(product))
           : defaultCmsContent.site.merchandise.products,
       },
+      partners: Array.isArray(content.site.partners)
+        ? content.site.partners
+            .map(normalizePartnerEntry)
+            .filter((partner): partner is NonNullable<ReturnType<typeof normalizePartnerEntry>> => Boolean(partner))
+        : defaultCmsContent.site.partners,
       gallery: {
         ...defaultCmsContent.site.gallery,
         ...content.site.gallery,

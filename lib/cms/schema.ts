@@ -231,6 +231,8 @@ export interface PartnerEntry {
   website: string;
   description: string;
   logo: MediaAsset;
+  logoBoxBackground?: string;
+  logoBoxOpacity?: number;
 }
 
 export interface SeoContent {
