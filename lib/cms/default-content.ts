@@ -35,6 +35,7 @@ export const defaultCmsContent: CmsContent = {
       { label: 'Startseite', href: '/' },
       { label: 'Veranstaltungen', href: '/veranstaltungen' },
       { label: 'Galerie', href: '/gallerie' },
+      { label: 'Game', href: '/game' },
       { label: 'Mitglied werden', href: '/formular' },
       { label: 'Sponsor werden', href: '/sponsoren' },
       { label: 'Spenden', href: '/spenden' },

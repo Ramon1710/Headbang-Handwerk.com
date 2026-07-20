@@ -10,8 +10,8 @@ import { Button } from './ui/button';
 import headbangLogo from '../Headbang Handwerk e.V. Logo Final PNG.png';
 
 const PRIMARY_NAV_ORDER = ['/', '/formular', '/sponsoren', '/spenden', '/unsere-partner', '/merchandise'];
-const DROPDOWN_NAV_ORDER = ['/veranstaltungen', '/gallerie', '/ueber-uns', '/kontakt'];
-const MOBILE_DROPDOWN_NAV_ORDER = ['/', '/veranstaltungen', '/formular', '/sponsoren', '/spenden', '/unsere-partner', '/merchandise', '/gallerie', '/ueber-uns', '/kontakt'];
+const DROPDOWN_NAV_ORDER = ['/veranstaltungen', '/gallerie', '/game', '/ueber-uns', '/kontakt'];
+const MOBILE_DROPDOWN_NAV_ORDER = ['/', '/veranstaltungen', '/formular', '/sponsoren', '/spenden', '/unsere-partner', '/merchandise', '/gallerie', '/game', '/ueber-uns', '/kontakt'];
 
 const FALLBACK_NAV_LABELS: Record<string, string> = {
   '/': 'Startseite',
@@ -21,6 +21,7 @@ const FALLBACK_NAV_LABELS: Record<string, string> = {
   '/unsere-partner': 'Unsere Partner',
   '/veranstaltungen': 'Veranstaltungen',
   '/gallerie': 'Galerie',
+  '/game': 'Game',
   '/merchandise': 'Merchandise',
   '/ueber-uns': 'Über uns',
   '/kontakt': 'Kontakt',
