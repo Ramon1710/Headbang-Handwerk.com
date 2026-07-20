@@ -132,3 +132,22 @@ export interface Order {
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered';
   createdAt: string;
 }
+
+export interface GameHighScoreRecord {
+  name: string;
+  score: number;
+}
+
+export interface GameLeaderboardEntry {
+  id: string;
+  name: string;
+  score: number;
+  level: number;
+  timeUp: boolean;
+  createdAt: string;
+}
+
+export interface GameLeaderboardResponse {
+  highScore: GameHighScoreRecord | null;
+  topEntries: GameLeaderboardEntry[];
+}

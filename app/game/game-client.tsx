@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import type { GameHighScoreRecord, GameLeaderboardEntry, GameLeaderboardResponse } from '@/lib/types';
 
 type HudState = {
   score: number;
@@ -12,21 +13,6 @@ type HudState = {
 type OverlayState =
   | { mode: 'start' }
   | { mode: 'gameover'; timeUp: boolean; score: number; level: number; isNewHighScore: boolean };
-
-type HighScoreRecord = {
-  name: string;
-  score: number;
-};
-
-type RoundEntry = {
-  id: string;
-  name: string;
-  score: number;
-  level: number;
-  timeUp: boolean;
-  playedAt: string;
-  isHighScore: boolean;
-};
 
 type Player = {
   x: number;
@@ -40,6 +26,8 @@ type ItemType = {
   type: 'tool' | 'beer' | 'nail';
   emoji: string;
   points: number;
+  badgeColor: string;
+  rimColor: string;
 };
 
 type Item = ItemType & {
@@ -54,21 +42,18 @@ type Item = ItemType & {
 const WIDTH = 640;
 const HEIGHT = 480;
 const FRAME_UNIT = 16.6667;
-const HIGHSCORE_STORAGE_KEY = 'headbang-handwerk-game-highscore';
 const PLAYER_NAME_STORAGE_KEY = 'headbang-handwerk-game-player-name';
-const HISTORY_STORAGE_KEY = 'headbang-handwerk-game-history';
-const MAX_HISTORY_ITEMS = 6;
 const INITIAL_HUD: HudState = { score: 0, level: 1, lives: 3, timeLeft: 60 };
 const INITIAL_OVERLAY: OverlayState = { mode: 'start' };
 const DEFAULT_PLAYER_NAME = 'Headbanger';
 const ITEM_TYPES: ItemType[] = [
-  { type: 'tool', emoji: '🔨', points: 10 },
-  { type: 'tool', emoji: '🔧', points: 10 },
-  { type: 'tool', emoji: '🪚', points: 15 },
-  { type: 'beer', emoji: '🍺', points: 20 },
-  { type: 'beer', emoji: '🍻', points: 25 },
-  { type: 'nail', emoji: '🔩', points: -1 },
-  { type: 'nail', emoji: '⚡', points: -1 },
+  { type: 'tool', emoji: '🔨', points: 10, badgeColor: '#f4ede3', rimColor: '#8e7963' },
+  { type: 'tool', emoji: '🔧', points: 10, badgeColor: '#f4ede3', rimColor: '#8e7963' },
+  { type: 'tool', emoji: '🪚', points: 15, badgeColor: '#f4ede3', rimColor: '#8e7963' },
+  { type: 'beer', emoji: '🍺', points: 20, badgeColor: '#f6b94f', rimColor: '#8a4b00' },
+  { type: 'beer', emoji: '🍻', points: 25, badgeColor: '#f6b94f', rimColor: '#8a4b00' },
+  { type: 'nail', emoji: '🔩', points: -1, badgeColor: '#d94841', rimColor: '#5f1313' },
+  { type: 'nail', emoji: '⚡', points: -1, badgeColor: '#d94841', rimColor: '#5f1313' },
 ];
 
 function createInitialPlayer(): Player {
@@ -91,62 +76,23 @@ function normalizePlayerName(value: string) {
   return trimmed.slice(0, 24);
 }
 
-function readStoredHighScore(): HighScoreRecord {
-  const rawValue = window.localStorage.getItem(HIGHSCORE_STORAGE_KEY);
-
-  if (!rawValue) {
-    return { name: DEFAULT_PLAYER_NAME, score: 0 };
+function formatLeaderboardDate(value: string) {
+  if (!value) {
+    return 'ohne Zeit';
   }
 
-  try {
-    const parsed = JSON.parse(rawValue) as Partial<HighScoreRecord>;
+  const parsed = Date.parse(value);
 
-    if (typeof parsed?.score === 'number' && Number.isFinite(parsed.score)) {
-      return {
-        name: normalizePlayerName(typeof parsed.name === 'string' ? parsed.name : DEFAULT_PLAYER_NAME),
-        score: Math.max(0, Math.floor(parsed.score)),
-      };
-    }
-  } catch {
-    const legacyScore = Number.parseInt(rawValue, 10);
-
-    if (Number.isFinite(legacyScore) && legacyScore > 0) {
-      return { name: DEFAULT_PLAYER_NAME, score: legacyScore };
-    }
+  if (Number.isNaN(parsed)) {
+    return value;
   }
 
-  return { name: DEFAULT_PLAYER_NAME, score: 0 };
-}
-
-function readStoredHistory(): RoundEntry[] {
-  const rawValue = window.localStorage.getItem(HISTORY_STORAGE_KEY);
-
-  if (!rawValue) {
-    return [];
-  }
-
-  try {
-    const parsed = JSON.parse(rawValue);
-
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-
-    return parsed
-      .filter((entry): entry is Partial<RoundEntry> => Boolean(entry && typeof entry === 'object'))
-      .map((entry, index) => ({
-        id: typeof entry.id === 'string' ? entry.id : `runde-${index}`,
-        name: normalizePlayerName(typeof entry.name === 'string' ? entry.name : DEFAULT_PLAYER_NAME),
-        score: typeof entry.score === 'number' && Number.isFinite(entry.score) ? Math.max(0, Math.floor(entry.score)) : 0,
-        level: typeof entry.level === 'number' && Number.isFinite(entry.level) ? Math.max(1, Math.floor(entry.level)) : 1,
-        timeUp: Boolean(entry.timeUp),
-        playedAt: typeof entry.playedAt === 'string' ? entry.playedAt : '',
-        isHighScore: Boolean(entry.isHighScore),
-      }))
-      .slice(0, MAX_HISTORY_ITEMS);
-  } catch {
-    return [];
-  }
+  return new Intl.DateTimeFormat('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(parsed));
 }
 
 export function GameClient() {
@@ -166,9 +112,8 @@ export function GameClient() {
   const keysRef = useRef<Record<string, boolean>>({});
   const touchRef = useRef({ left: false, right: false });
   const draggingRef = useRef(false);
-  const highScoreRef = useRef<HighScoreRecord>({ name: DEFAULT_PLAYER_NAME, score: 0 });
+  const highScoreRef = useRef<GameHighScoreRecord | null>(null);
   const playerNameRef = useRef(DEFAULT_PLAYER_NAME);
-  const historyRef = useRef<RoundEntry[]>([]);
   const recordTimeoutRef = useRef<number | null>(null);
   const hasCelebratedRecordRef = useRef(false);
 
@@ -176,9 +121,10 @@ export function GameClient() {
   const [overlay, setOverlay] = useState<OverlayState>(INITIAL_OVERLAY);
   const [paused, setPaused] = useState(false);
   const [running, setRunning] = useState(false);
-  const [highScore, setHighScore] = useState<HighScoreRecord>({ name: DEFAULT_PLAYER_NAME, score: 0 });
+  const [highScore, setHighScore] = useState<GameHighScoreRecord | null>(null);
   const [playerName, setPlayerName] = useState(DEFAULT_PLAYER_NAME);
-  const [history, setHistory] = useState<RoundEntry[]>([]);
+  const [leaderboardEntries, setLeaderboardEntries] = useState<GameLeaderboardEntry[]>([]);
+  const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
   const [showNewRecordEffect, setShowNewRecordEffect] = useState(false);
 
   const syncHud = (nextHud: HudState) => {
@@ -200,7 +146,7 @@ export function GameClient() {
     flashRef.current = { color, alpha: 0.35 };
   };
 
-  const syncHighScore = (nextHighScore: HighScoreRecord) => {
+  const syncHighScore = (nextHighScore: GameHighScoreRecord | null) => {
     highScoreRef.current = nextHighScore;
     setHighScore(nextHighScore);
   };
@@ -210,9 +156,10 @@ export function GameClient() {
     setPlayerName(nextPlayerName);
   };
 
-  const syncHistory = (nextHistory: RoundEntry[]) => {
-    historyRef.current = nextHistory;
-    setHistory(nextHistory);
+  const applyLeaderboard = (payload: GameLeaderboardResponse) => {
+    syncHighScore(payload.highScore);
+    setLeaderboardEntries(payload.topEntries);
+    setLeaderboardError(null);
   };
 
   const triggerNewRecordEffect = () => {
@@ -229,28 +176,40 @@ export function GameClient() {
     }, 1800);
   };
 
-  const persistHighScore = (score: number, name: string) => {
-    const normalizedName = normalizePlayerName(name);
-    const isNewHighScore = score > highScoreRef.current.score;
+  const loadGlobalLeaderboard = async () => {
+    try {
+      const response = await fetch('/api/game/leaderboard', { cache: 'no-store' });
 
-    if (!isNewHighScore) {
-      return false;
+      if (!response.ok) {
+        throw new Error('leaderboard-load-failed');
+      }
+
+      const payload = (await response.json()) as GameLeaderboardResponse;
+      applyLeaderboard(payload);
+    } catch {
+      setLeaderboardError('Globale Bestenliste aktuell nicht verfuegbar.');
     }
-
-    const nextHighScore = {
-      name: normalizedName,
-      score,
-    };
-
-    syncHighScore(nextHighScore);
-    window.localStorage.setItem(HIGHSCORE_STORAGE_KEY, JSON.stringify(nextHighScore));
-    return true;
   };
 
-  const persistRound = (entry: RoundEntry) => {
-    const nextHistory = [entry, ...historyRef.current].slice(0, MAX_HISTORY_ITEMS);
-    syncHistory(nextHistory);
-    window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(nextHistory));
+  const submitGlobalScore = async (payload: { name: string; score: number; level: number; timeUp: boolean }) => {
+    try {
+      const response = await fetch('/api/game/leaderboard', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('leaderboard-save-failed');
+      }
+
+      const nextLeaderboard = (await response.json()) as GameLeaderboardResponse;
+      applyLeaderboard(nextLeaderboard);
+    } catch {
+      setLeaderboardError('Score konnte nicht global gespeichert werden.');
+    }
   };
 
   const spawnItem = () => {
@@ -283,21 +242,13 @@ export function GameClient() {
     const finalScore = hudRef.current.score;
     const finalLevel = hudRef.current.level;
     const normalizedName = normalizePlayerName(playerNameRef.current);
-    const isNewHighScore = persistHighScore(finalScore, normalizedName);
+    const isNewHighScore = finalScore > (highScoreRef.current?.score ?? 0);
 
-    persistRound({
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    void submitGlobalScore({
       name: normalizedName,
       score: finalScore,
       level: finalLevel,
       timeUp,
-      playedAt: new Intl.DateTimeFormat('de-DE', {
-        day: '2-digit',
-        month: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-      }).format(new Date()),
-      isHighScore: isNewHighScore,
     });
 
     syncRunning(false);
@@ -393,7 +344,22 @@ export function GameClient() {
     ctx.save();
     ctx.translate(item.x, item.y);
     ctx.rotate(item.rot);
-    ctx.font = '28px sans-serif';
+
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = item.badgeColor;
+    ctx.beginPath();
+    ctx.arc(0, 0, item.r + 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = item.rimColor;
+    ctx.beginPath();
+    ctx.arc(0, 0, item.r + 8, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.font = '30px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(item.emoji, 0, 0);
@@ -418,7 +384,7 @@ export function GameClient() {
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
     ctx.save();
-    ctx.globalAlpha = 0.12;
+    ctx.globalAlpha = 0.08;
     for (let index = 0; index < 5; index += 1) {
       const offset = (timestamp / 50) % 130;
       ctx.fillStyle = index % 2 === 0 ? '#ffb14d' : '#f7efe5';
@@ -514,7 +480,7 @@ export function GameClient() {
         }
 
         nextHud.score += item.points;
-        if (nextHud.score > highScoreRef.current.score && !hasCelebratedRecordRef.current) {
+        if (nextHud.score > (highScoreRef.current?.score ?? 0) && !hasCelebratedRecordRef.current) {
           triggerNewRecordEffect();
         }
 
@@ -634,8 +600,7 @@ export function GameClient() {
     const storedPlayerName = window.localStorage.getItem(PLAYER_NAME_STORAGE_KEY);
     const nextPlayerName = normalizePlayerName(storedPlayerName || DEFAULT_PLAYER_NAME);
     syncPlayerName(nextPlayerName);
-    syncHighScore(readStoredHighScore());
-    syncHistory(readStoredHistory());
+    void loadGlobalLeaderboard();
 
     drawScene(performance.now());
 
@@ -683,17 +648,7 @@ export function GameClient() {
   const overlayVisible = !running;
 
   return (
-    <section className="mx-auto flex w-full max-w-6xl flex-col items-center px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-28 sm:px-6 lg:px-8">
-      <div className="mb-6 text-center">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.38em] text-[color:var(--color-accent-soft)]">Game</p>
-        <h1 className="page-title text-center">
-          Der <span className="text-[color:var(--color-accent)]">Baustellen-Rocker</span>
-        </h1>
-        <p className="mx-auto mt-4 max-w-3xl body-copy-lg">
-          Fang Werkzeuge und Biere mit deinem Helm, weiche rostigen Nägeln aus und halte bis zum Feierabend durch.
-        </p>
-      </div>
-
+    <section className="mx-auto flex w-full max-w-[760px] flex-col items-center px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-6">
       <div className="mb-4 flex w-full max-w-[640px] flex-col gap-2 rounded-2xl border border-[color:var(--color-border)] bg-[linear-gradient(180deg,rgba(21,17,14,0.84)_0%,rgba(11,8,7,0.9)_100%)] px-4 py-4 shadow-[0_18px_40px_rgba(0,0,0,0.25)]">
         <label htmlFor="game-player-name" className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--color-accent-soft)]">
           Dein Name fuer Highscore und Verlauf
@@ -721,7 +676,7 @@ export function GameClient() {
 
       <div className="mb-4 flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-[color:var(--color-border)] bg-[linear-gradient(180deg,rgba(21,17,14,0.92)_0%,rgba(11,8,7,0.94)_100%)] px-4 py-3 text-sm shadow-[0_18px_40px_rgba(0,0,0,0.32)]">
         <div className="rounded-xl border border-white/8 bg-black/15 px-3 py-2">Bier: <span className="font-black text-white">{hud.score}</span></div>
-        <div className="rounded-xl border border-white/8 bg-black/15 px-3 py-2">Highscore: <span className="font-black text-white">{highScore.score}</span> <span className="text-[color:var(--color-muted)]">von {highScore.name}</span></div>
+        <div className="rounded-xl border border-white/8 bg-black/15 px-3 py-2">Highscore: <span className="font-black text-white">{highScore?.score ?? 0}</span> <span className="text-[color:var(--color-muted)]">von {highScore?.name ?? 'noch niemandem'}</span></div>
         <div className="rounded-xl border border-white/8 bg-black/15 px-3 py-2">Level: <span className="font-black text-white">{hud.level}</span></div>
         <div className="rounded-xl border border-white/8 bg-black/15 px-3 py-2">Leben: <span className="font-black text-white">{hud.lives}</span></div>
         <div className="rounded-xl border border-white/8 bg-black/15 px-3 py-2">Zeit: <span className="font-black text-white">{hud.timeLeft}</span></div>
@@ -786,7 +741,7 @@ export function GameClient() {
                     : ' Ein rostiger Nagel hat dich ausser Gefecht gesetzt.'}
                 </p>
                 <p className="mt-3 text-sm font-semibold uppercase tracking-[0.18em] text-[color:var(--color-accent-soft)]">
-                  Highscore: <span className="text-white">{highScore.score}</span> von {highScore.name}
+                  Highscore: <span className="text-white">{highScore?.score ?? 0}</span> von {highScore?.name ?? 'noch niemandem'}
                 </p>
                 <button
                   type="button"
@@ -803,21 +758,23 @@ export function GameClient() {
 
       <div className="mt-6 w-full max-w-[640px] rounded-[1.35rem] border border-[color:var(--color-border)] bg-[linear-gradient(180deg,rgba(21,17,14,0.82)_0%,rgba(11,8,7,0.9)_100%)] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 className="text-lg font-black text-white">Letzte Runden</h2>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--color-muted)]">Zuletzt gespielt</p>
+          <h2 className="text-lg font-black text-white">Globale Top 10</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--color-muted)]">Alle Spieler</p>
         </div>
 
-        {history.length > 0 ? (
+        {leaderboardError ? (
+          <p className="body-copy text-sm text-[#ffcf98]">{leaderboardError}</p>
+        ) : leaderboardEntries.length > 0 ? (
           <div className="grid gap-2">
-            {history.map((entry, index) => (
+            {leaderboardEntries.map((entry, index) => (
               <div key={entry.id} className="grid grid-cols-[2.5rem,minmax(0,1fr),auto] items-center gap-3 rounded-xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
                 <div className="text-center font-black text-[color:var(--color-accent-soft)]">#{index + 1}</div>
                 <div>
                   <p className="font-semibold text-white">
-                    {entry.name} <span className="text-[color:var(--color-muted)]">am {entry.playedAt}</span>
+                    {entry.name} <span className="text-[color:var(--color-muted)]">am {formatLeaderboardDate(entry.createdAt)}</span>
                   </p>
                   <p className="text-[color:var(--color-muted)]">
-                    Level {entry.level} · {entry.timeUp ? 'Feierabend' : 'Unfall'}{entry.isHighScore ? ' · Rekordlauf' : ''}
+                    Level {entry.level} · {entry.timeUp ? 'Feierabend' : 'Unfall'}{index === 0 ? ' · Aktueller Rekord' : ''}
                   </p>
                 </div>
                 <div className="text-right font-black text-white">{entry.score}</div>
@@ -825,7 +782,7 @@ export function GameClient() {
             ))}
           </div>
         ) : (
-          <p className="body-copy text-sm text-[color:var(--color-muted)]">Noch keine Runden gespeichert. Starte das Spiel und setze den ersten Eintrag.</p>
+          <p className="body-copy text-sm text-[color:var(--color-muted)]">Noch keine globalen Scores gespeichert. Starte das Spiel und setze den ersten Eintrag.</p>
         )}
       </div>
 
