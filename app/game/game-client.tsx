@@ -95,6 +95,15 @@ function formatLeaderboardDate(value: string) {
   }).format(new Date(parsed));
 }
 
+function isTypingTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  const tagName = target.tagName.toLowerCase();
+  return target.isContentEditable || tagName === 'input' || tagName === 'textarea' || tagName === 'select';
+}
+
 export function GameClient() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -606,6 +615,10 @@ export function GameClient() {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       keysRef.current[event.key] = true;
+
+      if (isTypingTarget(event.target)) {
+        return;
+      }
 
       if (event.code === 'Space') {
         event.preventDefault();
