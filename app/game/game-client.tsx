@@ -836,7 +836,7 @@ export function GameClient() {
       </div>
 
       <p className="mt-4 text-center text-sm text-[color:var(--color-muted)] lg:block">Steuerung: ← → oder A / D, Leertaste fuer Pause</p>
-      <p className="mt-2 max-w-2xl text-center text-xs uppercase tracking-[0.2em] text-[#6f6258]">Ein Fan-Spiel fuer den Verein Headbang Handwerk e.V.</p>
+      <p className="mt-2 max-w-2xl text-center text-xs uppercase tracking-[0.2em] text-[#6f6258]">Ein Fan-Spiel fuer den Verein Headbang Handwerk</p>
     </section>
   );
 }
