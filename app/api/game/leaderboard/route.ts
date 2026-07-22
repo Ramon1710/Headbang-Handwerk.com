@@ -1,14 +1,20 @@
 import { NextResponse } from 'next/server';
 import { hasFirebaseConfig, isFirebaseAuthError, isInvalidFirebaseConfigError } from '@/lib/cms/firebase';
-import { getGlobalGameLeaderboard, sanitizeGameScoreSubmission, submitGlobalGameScore } from '@/lib/game-leaderboard';
+import {
+  getGlobalGameLeaderboard,
+  normalizeLeaderboardGame,
+  sanitizeGameScoreSubmission,
+  submitGlobalGameScore,
+} from '@/lib/game-leaderboard';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     if (!hasFirebaseConfig()) {
       return NextResponse.json({ error: 'missing-config' }, { status: 503 });
     }
 
-    const leaderboard = await getGlobalGameLeaderboard();
+    const game = normalizeLeaderboardGame(new URL(request.url).searchParams.get('game'));
+    const leaderboard = await getGlobalGameLeaderboard(game);
     return NextResponse.json(leaderboard);
   } catch (error) {
     if (isFirebaseAuthError(error)) {
@@ -35,6 +41,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'missing-config' }, { status: 503 });
     }
 
+    const game = normalizeLeaderboardGame(new URL(request.url).searchParams.get('game'));
     const body = await request.json();
     const payload = sanitizeGameScoreSubmission(body);
 
@@ -42,7 +49,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'invalid-body' }, { status: 400 });
     }
 
-    const leaderboard = await submitGlobalGameScore(payload);
+    const leaderboard = await submitGlobalGameScore(payload, game);
     return NextResponse.json(leaderboard);
   } catch (error) {
     if (isFirebaseAuthError(error)) {

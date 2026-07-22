@@ -6,10 +6,29 @@ import {
 } from '@/lib/cms/firebase';
 import type { GameHighScoreRecord, GameLeaderboardEntry, GameLeaderboardResponse } from '@/lib/types';
 
-const GAME_LEADERBOARD_COLLECTION = 'gameLeaderboard';
+const GAME_LEADERBOARD_COLLECTIONS = {
+  'baustellen-rocker': 'gameLeaderboard',
+  huehnerjagt: 'huehnerjagtLeaderboard',
+} as const;
+
+export type LeaderboardGame = keyof typeof GAME_LEADERBOARD_COLLECTIONS;
 const MAX_PLAYER_NAME_LENGTH = 24;
 const MAX_SCORE = 999999;
 const MAX_LEVEL = 999;
+
+export function normalizeLeaderboardGame(value: unknown): LeaderboardGame {
+  const normalized = String(value ?? '').trim().toLowerCase();
+
+  if (normalized === 'huehnerjagt' || normalized === 'hühnerjagt' || normalized === 'headbang-huehnerjagd') {
+    return 'huehnerjagt';
+  }
+
+  return 'baustellen-rocker';
+}
+
+function getLeaderboardCollection(game: LeaderboardGame) {
+  return GAME_LEADERBOARD_COLLECTIONS[game];
+}
 
 export function normalizeGamePlayerName(value: string) {
   const trimmed = value.trim();
@@ -100,14 +119,14 @@ export function sanitizeGameScoreSubmission(input: unknown) {
   };
 }
 
-export async function getGlobalGameLeaderboard() {
+export async function getGlobalGameLeaderboard(game: LeaderboardGame = 'baustellen-rocker') {
   if (!hasFirebaseConfig()) {
     return { highScore: null, topEntries: [] } satisfies GameLeaderboardResponse;
   }
 
   try {
     const db = getFirebaseDb();
-    const snapshot = await db.collection(GAME_LEADERBOARD_COLLECTION).orderBy('score', 'desc').limit(10).get();
+    const snapshot = await db.collection(getLeaderboardCollection(game)).orderBy('score', 'desc').limit(10).get();
     const entries = snapshot.docs.map((doc) => normalizeLeaderboardEntry(doc.id, doc.data() as Record<string, unknown>));
 
     return buildLeaderboardResponse(entries);
@@ -120,7 +139,10 @@ export async function getGlobalGameLeaderboard() {
   }
 }
 
-export async function submitGlobalGameScore(input: { name: string; score: number; level: number; timeUp: boolean }) {
+export async function submitGlobalGameScore(
+  input: { name: string; score: number; level: number; timeUp: boolean },
+  game: LeaderboardGame = 'baustellen-rocker'
+) {
   if (!hasFirebaseConfig()) {
     return { highScore: null, topEntries: [] } satisfies GameLeaderboardResponse;
   }
@@ -129,7 +151,7 @@ export async function submitGlobalGameScore(input: { name: string; score: number
     const db = getFirebaseDb();
 
     if (input.score > 0) {
-      await db.collection(GAME_LEADERBOARD_COLLECTION).add({
+      await db.collection(getLeaderboardCollection(game)).add({
         name: normalizeGamePlayerName(input.name),
         score: normalizeScore(input.score),
         level: normalizeLevel(input.level),
@@ -138,7 +160,7 @@ export async function submitGlobalGameScore(input: { name: string; score: number
       });
     }
 
-    return getGlobalGameLeaderboard();
+    return getGlobalGameLeaderboard(game);
   } catch (error) {
     if (isFirebaseAuthError(error)) {
       throw toFirebaseAuthError();
