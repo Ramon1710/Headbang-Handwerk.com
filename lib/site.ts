@@ -1,6 +1,6 @@
 import type { NavigationLink } from '@/lib/cms/schema';
 
-const REMOVED_NAV_HREFS = new Set(['/drei-d-stand', '/partner-unterstuetzerinfo']);
+const REMOVED_NAV_HREFS = new Set(['/drei-d-stand', '/partner-unterstuetzerinfo', '/hühnerjagt']);
 const MEMBERSHIP_LINK: NavigationLink = { label: 'Mitglied werden', href: '/formular' };
 const SPONSOR_LINK: NavigationLink = { label: 'Sponsor werden', href: '/sponsoren' };
 const DONATION_LINK: NavigationLink = { label: 'Spenden', href: '/spenden' };
