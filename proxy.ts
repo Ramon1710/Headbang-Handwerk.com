@@ -86,12 +86,6 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(`/hühnerjagt${search}`, request.url));
   }
 
-  if (decodedPathname === '/hühnerjagt') {
-    const rewriteUrl = request.nextUrl.clone();
-    rewriteUrl.pathname = '/huehnerjagt';
-    return NextResponse.rewrite(rewriteUrl);
-  }
-
   if (isBypassedPath(pathname)) {
     return NextResponse.next();
   }
