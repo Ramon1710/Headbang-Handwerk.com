@@ -3,6 +3,14 @@ import { NextResponse } from 'next/server';
 
 const SESSION_COOKIE = 'hh_admin_session';
 
+function decodePathname(pathname: string) {
+  try {
+    return decodeURIComponent(pathname);
+  } catch {
+    return pathname;
+  }
+}
+
 function getSecret() {
   return process.env.CMS_SESSION_SECRET || process.env.NEXTAUTH_SECRET || 'local-dev-secret';
 }
@@ -72,6 +80,17 @@ function isProtectedAdminPath(pathname: string) {
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+  const decodedPathname = decodePathname(pathname);
+
+  if (pathname === '/huehnerjagt') {
+    return NextResponse.redirect(new URL(`/hühnerjagt${search}`, request.url));
+  }
+
+  if (decodedPathname === '/hühnerjagt') {
+    const rewriteUrl = request.nextUrl.clone();
+    rewriteUrl.pathname = '/huehnerjagt';
+    return NextResponse.rewrite(rewriteUrl);
+  }
 
   if (isBypassedPath(pathname)) {
     return NextResponse.next();
