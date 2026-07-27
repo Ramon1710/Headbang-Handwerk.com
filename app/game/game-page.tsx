@@ -5,6 +5,7 @@ import { LiveResizableBox } from '@/components/live-resizable-box';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { resolveLiveBoxStyle, resolveLiveHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
+import { redirect } from 'next/navigation';
 import { GameClient } from './game-client';
 
 export const metadata: Metadata = {
@@ -32,7 +33,7 @@ const GAME_OPTIONS = {
 type GameMode = keyof typeof GAME_OPTIONS;
 
 function resolveGameMode(value: string | undefined): GameMode {
-  return value === 'huehnerjagt' ? 'huehnerjagt' : 'baustellen-rocker';
+  return value === 'huehnerjagt' || value === 'huenerjagd' ? 'huehnerjagt' : 'baustellen-rocker';
 }
 
 export default async function GamePage({
@@ -44,6 +45,11 @@ export default async function GamePage({
   const cms = await getCmsContent();
   const isAuthenticatedAdmin = await isAdminAuthenticated();
   const isAdmin = isAuthenticatedAdmin && params?.view !== 'user';
+
+  if (params?.game === 'huehnerjagt') {
+    redirect(`/game?game=huenerjagd${params?.view === 'user' ? '&view=user' : ''}`);
+  }
+
   const selectedGame = resolveGameMode(params?.game);
   const selectedOption = GAME_OPTIONS[selectedGame];
   const viewSuffix = params?.view === 'user' ? '&view=user' : '';
@@ -110,7 +116,7 @@ export default async function GamePage({
               {GAME_OPTIONS['baustellen-rocker'].label}
             </a>
             <a
-              href={`/game?game=huehnerjagt${viewSuffix}`}
+              href={`/game?game=huenerjagd${viewSuffix}`}
               className={`rounded-2xl border px-5 py-3 text-sm font-black uppercase tracking-[0.18em] transition ${
                 selectedGame === 'huehnerjagt'
                   ? 'border-[color:var(--color-accent-soft)] bg-[linear-gradient(180deg,rgba(255,122,0,0.96)_0%,rgba(134,56,0,0.98)_100%)] text-black'

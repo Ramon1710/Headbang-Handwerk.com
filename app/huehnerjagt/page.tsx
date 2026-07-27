@@ -6,5 +6,5 @@ export default async function HuehnerjagdPage({
 	searchParams?: Promise<{ view?: string }>
 }) {
 	const params = searchParams ? await searchParams : undefined
-	redirect(`/game?game=huehnerjagt${params?.view === 'user' ? '&view=user' : ''}`)
+	redirect(`/game?game=huenerjagd${params?.view === 'user' ? '&view=user' : ''}`)
 }
