@@ -122,16 +122,18 @@ export default async function GamePage({
           </div>
         </LiveResizableBox>
 
-        <LiveResizableBox
-          boxKey="game.canvas.box"
-          initialStyle={resolveLiveBoxStyle(cms.site.liveEditor, 'game.canvas.box')}
-          isAdmin={isAdmin}
-          className="mx-auto w-full max-w-[760px]"
-        >
-          {selectedGame === 'baustellen-rocker' ? (
+        {selectedGame === 'baustellen-rocker' ? (
+          <LiveResizableBox
+            boxKey="game.canvas.box"
+            initialStyle={resolveLiveBoxStyle(cms.site.liveEditor, 'game.canvas.box')}
+            isAdmin={isAdmin}
+            className="mx-auto w-full max-w-[760px]"
+          >
             <GameClient />
-          ) : (
-            <section className="w-full px-4 sm:px-6">
+          </LiveResizableBox>
+        ) : (
+          <div className="mx-auto w-full max-w-[860px] px-4 sm:px-6">
+            <section className="w-full">
               <div className="mb-4 rounded-2xl border border-[color:var(--color-border)] bg-[linear-gradient(180deg,rgba(21,17,14,0.84)_0%,rgba(11,8,7,0.9)_100%)] px-4 py-4 text-center shadow-[0_18px_40px_rgba(0,0,0,0.25)]">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--color-accent-soft)]">Steuerung</p>
                 <p className="mt-2 body-copy text-[color:var(--color-muted)]">
@@ -143,7 +145,7 @@ export default async function GamePage({
                 <iframe
                   src="/huehnerjagt/embed"
                   title="Headbang Hühnerjagd"
-                  className="block h-[72svh] min-h-[520px] w-full border-0 bg-black sm:h-[760px]"
+                  className="block h-[84svh] min-h-[720px] w-full border-0 bg-black sm:h-[980px]"
                   loading="eager"
                 />
               </div>
@@ -152,8 +154,8 @@ export default async function GamePage({
                 Beide Spiele liegen jetzt gesammelt auf der Game-Seite und lassen sich hier direkt umschalten.
               </p>
             </section>
-          )}
-        </LiveResizableBox>
+          </div>
+        )}
       </div>
     </EditablePageShell>
   );
