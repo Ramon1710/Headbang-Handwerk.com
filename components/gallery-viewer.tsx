@@ -63,15 +63,15 @@ export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null
         {activeFolder.images.length ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {activeFolder.images.map((image) => (
-              <button
+              <div
                 key={image.id}
-                type="button"
-                onClick={() => setActiveImageUrl(image.assetUrl)}
-                className="group overflow-hidden rounded-[1.25rem] border border-white/10 bg-black/20 text-left shadow-[0_18px_36px_rgba(0,0,0,0.18)] transition hover:-translate-y-1 hover:border-[color:var(--color-accent)]"
+                className="overflow-hidden rounded-[1.25rem] border border-white/10 bg-black/20 text-left shadow-[0_18px_36px_rgba(0,0,0,0.18)] transition hover:-translate-y-1 hover:border-[color:var(--color-accent)]"
               >
-                <div className="aspect-square overflow-hidden bg-black/30">
-                  <img src={image.assetUrl} alt={image.assetName || activeFolder.title} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
-                </div>
+                <button type="button" onClick={() => setActiveImageUrl(image.assetUrl)} className="group block w-full text-left">
+                  <div className="aspect-square overflow-hidden bg-black/30">
+                    <img src={image.assetUrl} alt={image.assetName || activeFolder.title} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
+                  </div>
+                </button>
                 {isAdmin && removeImageAction ? (
                   <div className="px-4 py-4">
                     <form action={removeImageAction}>
@@ -84,7 +84,7 @@ export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null
                     </form>
                   </div>
                 ) : null}
-              </button>
+              </div>
             ))}
           </div>
         ) : (
