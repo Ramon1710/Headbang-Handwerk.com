@@ -138,7 +138,7 @@ export default async function GalleryPage({
           </LiveResizableBox>
           <div className="mt-12">
             {gallery.folders.length ? (
-              <GalleryViewer folders={gallery.folders} isAdmin={isAdmin} initialFolderId={initialFolderId} addImagesAction={addGalleryImagesAction} removeImageAction={removeGalleryImageAction} />
+              <GalleryViewer folders={gallery.folders} isAdmin={isAdmin} initialFolderId={initialFolderId} />
             ) : (
               <div className="rounded-[1.4rem] border border-dashed border-[color:var(--color-border)] bg-black/15 px-6 py-10 text-left sm:text-center">
                 <p className="body-copy text-sm">Noch keine Galerie-Ordner vorhanden. {isAdmin ? 'Lege oben den ersten Ordner an und lade anschließend Bilder hoch.' : 'Schau bald wieder vorbei.'}</p>

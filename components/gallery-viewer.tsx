@@ -8,11 +8,9 @@ interface GalleryViewerProps {
   folders: GalleryFolder[];
   isAdmin?: boolean;
   initialFolderId?: string | null;
-  addImagesAction?: (formData: FormData) => void | Promise<void>;
-  removeImageAction?: (formData: FormData) => void | Promise<void>;
 }
 
-export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null, addImagesAction, removeImageAction }: GalleryViewerProps) {
+export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null }: GalleryViewerProps) {
   const [activeFolderId, setActiveFolderId] = useState<string | null>(initialFolderId);
   const [activeImageUrl, setActiveImageUrl] = useState<string | null>(null);
 
@@ -39,8 +37,8 @@ export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null
             <h2 className="section-title mt-4 text-[2rem]">{activeFolder.title}</h2>
             <p className="body-copy mt-2 text-sm">{activeFolder.images.length} Bilder in diesem Ordner.</p>
           </div>
-          {isAdmin && addImagesAction ? (
-            <form action={addImagesAction} encType="multipart/form-data" className="w-full max-w-md rounded-[1.2rem] border border-white/10 bg-black/20 p-4 text-left">
+          {isAdmin ? (
+            <form action="/api/cms/gallery/add-images" method="post" encType="multipart/form-data" className="w-full max-w-md rounded-[1.2rem] border border-white/10 bg-black/20 p-4 text-left">
               <input type="hidden" name="folderId" value={activeFolder.id} />
               <input type="hidden" name="returnToFolder" value={activeFolder.id} />
               <label className="block">
@@ -72,9 +70,9 @@ export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null
                     <img src={image.assetUrl} alt={image.assetName || activeFolder.title} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
                   </div>
                 </button>
-                {isAdmin && removeImageAction ? (
+                {isAdmin ? (
                   <div className="px-4 py-4">
-                    <form action={removeImageAction}>
+                    <form action="/api/cms/gallery/remove-image" method="post">
                       <input type="hidden" name="folderId" value={activeFolder.id} />
                       <input type="hidden" name="imageId" value={image.id} />
                       <input type="hidden" name="returnToFolder" value={activeFolder.id} />
