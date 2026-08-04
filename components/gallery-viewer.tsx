@@ -40,7 +40,7 @@ export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null
             <p className="body-copy mt-2 text-sm">{activeFolder.images.length} Bilder in diesem Ordner.</p>
           </div>
           {isAdmin && addImagesAction ? (
-            <form action={addImagesAction} className="w-full max-w-md rounded-[1.2rem] border border-white/10 bg-black/20 p-4 text-left">
+            <form action={addImagesAction} encType="multipart/form-data" className="w-full max-w-md rounded-[1.2rem] border border-white/10 bg-black/20 p-4 text-left">
               <input type="hidden" name="folderId" value={activeFolder.id} />
               <input type="hidden" name="returnToFolder" value={activeFolder.id} />
               <label className="block">
