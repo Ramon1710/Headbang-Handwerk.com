@@ -1,14 +1,7 @@
-import { randomUUID } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
-import {
-  isFirebaseStorageBucketNotFoundError,
-  isFirebaseStoragePermissionError,
-  isFirebaseStorageUploadError,
-  uploadCmsAsset,
-} from '@/lib/cms/file-storage';
-import { hasFirebaseConfig, isFirebaseAuthError, isInvalidFirebaseConfigError } from '@/lib/cms/firebase';
+import type { CmsAssetUploadTarget } from '@/lib/cms/file-storage';
 import { getCmsContent, isFirebaseAuthSaveError, isInvalidFirebaseSaveError, isReadonlyFallbackError, saveCmsContent } from '@/lib/cms/storage';
 import type { GalleryFolder, GalleryImage, MediaAsset } from '@/lib/cms/schema';
 
@@ -45,26 +38,6 @@ function redirectToLogin(request: Request) {
   return NextResponse.redirect(url, { status: 303 });
 }
 
-function redirectForGalleryUploadError(request: Request, formData: FormData, error: unknown) {
-  if (isInvalidFirebaseConfigError(error)) {
-    return NextResponse.redirect(buildRedirectUrl(request, formData, undefined, 'invalid-firebase'), { status: 303 });
-  }
-
-  if (isFirebaseStorageBucketNotFoundError(error)) {
-    return NextResponse.redirect(buildRedirectUrl(request, formData, undefined, 'image-upload-bucket'), { status: 303 });
-  }
-
-  if (isFirebaseStoragePermissionError(error)) {
-    return NextResponse.redirect(buildRedirectUrl(request, formData, undefined, 'image-upload-permission'), { status: 303 });
-  }
-
-  if (isFirebaseStorageUploadError(error) || isFirebaseAuthError(error)) {
-    return NextResponse.redirect(buildRedirectUrl(request, formData, undefined, 'image-upload'), { status: 303 });
-  }
-
-  throw error;
-}
-
 async function persistGallery(updater: (folders: GalleryFolder[]) => GalleryFolder[] | Promise<GalleryFolder[]>) {
   const current = await getCmsContent();
   const nextFolders = await updater(current.site.gallery.folders);
@@ -86,41 +59,38 @@ async function persistGallery(updater: (folders: GalleryFolder[]) => GalleryFold
 
 export async function POST(request: Request) {
   if (!(await isAdminAuthenticated())) {
-    return redirectToLogin(request);
+    return NextResponse.json({ redirectTo: '/admin-login?next=/gallerie' }, { status: 401 });
   }
 
-  const formData = await request.formData();
-  const folderId = sanitizeText(formData.get('folderId'));
+  const payload = (await request.json()) as {
+    folderId?: string;
+    returnToFolder?: string;
+    uploadedImages?: CmsAssetUploadTarget[];
+  };
+  const folderId = sanitizeText(payload.folderId || null);
   const current = await getCmsContent();
   const existingFolder = current.site.gallery.folders.find((folder) => folder.id === folderId);
+  const uploadedImages = Array.isArray(payload.uploadedImages) ? payload.uploadedImages : [];
 
   if (!existingFolder) {
-    return NextResponse.redirect(buildRedirectUrl(request, formData, undefined, 'missing-folder'), { status: 303 });
-  }
-
-  if (!hasFirebaseConfig()) {
-    return NextResponse.redirect(buildRedirectUrl(request, formData, undefined, 'missing-config'), { status: 303 });
+    const formData = new FormData();
+    formData.set('returnToFolder', sanitizeText(payload.returnToFolder || null));
+    return NextResponse.json({ redirectTo: buildRedirectUrl(request, formData, undefined, 'missing-folder').toString() }, { status: 404 });
   }
 
   const nextImages: GalleryImage[] = [...existingFolder.images];
-  const files = formData.getAll('imageFiles');
 
-  for (const entry of files) {
-    if (!(entry instanceof File) || entry.size <= 0) {
+  for (const uploadedImage of uploadedImages) {
+    if (!uploadedImage?.assetUrl) {
       continue;
     }
 
-    try {
-      const uploadedAsset = await uploadCmsAsset(entry, `gallery/${folderId}/images`, 'galeriebild');
-      nextImages.push({
-        id: randomUUID(),
-        assetUrl: uploadedAsset.url,
-        assetName: uploadedAsset.name,
-        assetContentType: uploadedAsset.contentType,
-      });
-    } catch (error) {
-      return redirectForGalleryUploadError(request, formData, error);
-    }
+    nextImages.push({
+      id: crypto.randomUUID(),
+      assetUrl: String(uploadedImage.assetUrl || '').trim(),
+      assetName: String(uploadedImage.assetName || '').trim(),
+      assetContentType: String(uploadedImage.assetContentType || '').trim(),
+    });
   }
 
   try {
@@ -136,20 +106,25 @@ export async function POST(request: Request) {
       )
     );
   } catch (error) {
+    const formData = new FormData();
+    formData.set('returnToFolder', sanitizeText(payload.returnToFolder || null));
+
     if (isFirebaseAuthSaveError(error)) {
-      return NextResponse.redirect(buildRedirectUrl(request, formData, undefined, 'firebase-auth'), { status: 303 });
+      return NextResponse.json({ redirectTo: buildRedirectUrl(request, formData, undefined, 'firebase-auth').toString() }, { status: 500 });
     }
 
     if (isInvalidFirebaseSaveError(error)) {
-      return NextResponse.redirect(buildRedirectUrl(request, formData, undefined, 'invalid-firebase'), { status: 303 });
+      return NextResponse.json({ redirectTo: buildRedirectUrl(request, formData, undefined, 'invalid-firebase').toString() }, { status: 500 });
     }
 
     if (isReadonlyFallbackError(error)) {
-      return NextResponse.redirect(buildRedirectUrl(request, formData, undefined, 'missing-config'), { status: 303 });
+      return NextResponse.json({ redirectTo: buildRedirectUrl(request, formData, undefined, 'missing-config').toString() }, { status: 500 });
     }
 
     throw error;
   }
 
-  return NextResponse.redirect(buildRedirectUrl(request, formData, 'images-added'), { status: 303 });
+  const formData = new FormData();
+  formData.set('returnToFolder', sanitizeText(payload.returnToFolder || null));
+  return NextResponse.json({ redirectTo: buildRedirectUrl(request, formData, 'images-added').toString() });
 }

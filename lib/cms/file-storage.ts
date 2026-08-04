@@ -71,6 +71,72 @@ function sanitizeFilename(filename: string) {
     .toLowerCase();
 }
 
+function buildObjectName(fileName: string, folder: string, fallbackName: string) {
+  const extension = extname(fileName);
+  const baseName = sanitizeFilename(fileName.replace(new RegExp(`${extension}$`), '')) || fallbackName;
+
+  return `cms/${folder}/${Date.now()}-${randomUUID()}-${baseName}${extension.toLowerCase()}`;
+}
+
+export interface CmsAssetUploadTarget {
+  uploadUrl: string;
+  assetUrl: string;
+  assetName: string;
+  assetContentType: string;
+  downloadToken: string;
+}
+
+export async function createCmsAssetUploadTarget(fileName: string, contentType: string, folder: string, fallbackName: string) {
+  if (!hasFirebaseConfig()) {
+    throw new Error(FIREBASE_STORAGE_UPLOAD_ERROR);
+  }
+
+  getFirebaseDb();
+
+  const buckets = getFirebaseStorageBucketCandidates();
+
+  if (!buckets.length) {
+    throw new Error(FIREBASE_STORAGE_UPLOAD_ERROR);
+  }
+
+  const objectName = buildObjectName(fileName, folder, fallbackName);
+  const normalizedContentType = contentType || 'application/octet-stream';
+  let lastError: unknown;
+
+  for (const bucketName of buckets) {
+    try {
+      const bucket = getStorage().bucket(bucketName);
+      const storedFile = bucket.file(objectName);
+      const downloadToken = randomUUID();
+      const [uploadUrl] = await storedFile.getSignedUrl({
+        version: 'v4',
+        action: 'write',
+        expires: Date.now() + 15 * 60 * 1000,
+        contentType: normalizedContentType,
+        extensionHeaders: {
+          'x-goog-meta-firebaseStorageDownloadTokens': downloadToken,
+        },
+      });
+
+      return {
+        uploadUrl,
+        assetUrl: createFirebaseDownloadUrl(bucket.name, objectName, downloadToken),
+        assetName: fileName,
+        assetContentType: normalizedContentType,
+        downloadToken,
+      } satisfies CmsAssetUploadTarget;
+    } catch (error) {
+      if (isFirebaseAuthError(error)) {
+        throw toFirebaseAuthError();
+      }
+
+      lastError = error;
+    }
+  }
+
+  throw toFirebaseStorageUploadError(lastError);
+}
+
 export async function uploadCmsAsset(file: File, folder: string, fallbackName: string) {
   if (!hasFirebaseConfig()) {
     throw new Error(FIREBASE_STORAGE_UPLOAD_ERROR);
@@ -84,9 +150,7 @@ export async function uploadCmsAsset(file: File, folder: string, fallbackName: s
     throw new Error(FIREBASE_STORAGE_UPLOAD_ERROR);
   }
 
-  const extension = extname(file.name);
-  const baseName = sanitizeFilename(file.name.replace(new RegExp(`${extension}$`), '')) || fallbackName;
-  const objectName = `cms/${folder}/${Date.now()}-${randomUUID()}-${baseName}${extension.toLowerCase()}`;
+  const objectName = buildObjectName(file.name, folder, fallbackName);
   const buffer = Buffer.from(await file.arrayBuffer());
   let lastError: unknown;
 

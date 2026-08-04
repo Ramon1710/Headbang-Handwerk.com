@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { ArrowLeft, FolderOpen, X } from 'lucide-react';
 import type { GalleryFolder } from '@/lib/cms/schema';
+import type { CmsAssetUploadTarget } from '@/lib/cms/file-storage';
 
 interface GalleryViewerProps {
   folders: GalleryFolder[];
@@ -13,11 +14,122 @@ interface GalleryViewerProps {
 export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null }: GalleryViewerProps) {
   const [activeFolderId, setActiveFolderId] = useState<string | null>(initialFolderId);
   const [activeImageUrl, setActiveImageUrl] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const activeFolder = useMemo(
     () => folders.find((folder) => folder.id === activeFolderId) || null,
     [activeFolderId, folders]
   );
+
+  async function handleUploadSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!activeFolder || !fileInputRef.current) {
+      return;
+    }
+
+    const files = Array.from(fileInputRef.current.files || []).filter((file) => file.size > 0);
+
+    if (!files.length) {
+      setUploadError('Bitte mindestens ein Bild auswählen.');
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const targetsResponse = await fetch('/api/cms/gallery/upload-targets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          folderId: activeFolder.id,
+          files: files.map((file) => ({
+            name: file.name,
+            type: file.type,
+          })),
+        }),
+      });
+
+      const targetsPayload = (await targetsResponse.json()) as {
+        redirectTo?: string;
+        errorCode?: string;
+        uploadTargets?: CmsAssetUploadTarget[];
+      };
+
+      if (targetsPayload.redirectTo) {
+        window.location.assign(targetsPayload.redirectTo);
+        return;
+      }
+
+      if (!targetsResponse.ok || !targetsPayload.uploadTargets || targetsPayload.uploadTargets.length !== files.length) {
+        throw new Error(targetsPayload.errorCode || 'image-upload');
+      }
+
+      await Promise.all(
+        targetsPayload.uploadTargets.map((target, index) =>
+          fetch(target.uploadUrl, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': files[index]?.type || 'application/octet-stream',
+              'x-goog-meta-firebaseStorageDownloadTokens': target.downloadToken,
+            },
+            body: files[index],
+          }).then((response) => {
+            if (!response.ok) {
+              throw new Error('image-upload');
+            }
+          })
+        )
+      );
+
+      const commitResponse = await fetch('/api/cms/gallery/add-images', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          folderId: activeFolder.id,
+          returnToFolder: activeFolder.id,
+          uploadedImages: targetsPayload.uploadTargets.map((target) => ({
+            assetUrl: target.assetUrl,
+            assetName: target.assetName,
+            assetContentType: target.assetContentType,
+          })),
+        }),
+      });
+
+      const commitPayload = (await commitResponse.json()) as {
+        redirectTo?: string;
+      };
+
+      if (commitPayload.redirectTo) {
+        window.location.assign(commitPayload.redirectTo);
+        return;
+      }
+
+      throw new Error('image-upload');
+    } catch (error) {
+      const errorCode = error instanceof Error ? error.message : 'image-upload';
+      setUploadError(
+        errorCode === 'missing-config'
+          ? 'Speichern ist ohne vollständige Firebase-Konfiguration nicht möglich.'
+          : errorCode === 'invalid-firebase'
+            ? 'Firebase ist gesetzt, aber ungültig formatiert.'
+            : errorCode === 'image-upload-bucket'
+              ? 'Der Firebase-Storage-Bucket wurde nicht gefunden.'
+              : errorCode === 'image-upload-permission'
+                ? 'Dem Service Account fehlen Rechte auf Firebase Storage.'
+                : 'Das Bild konnte nicht hochgeladen werden.'
+      );
+    } finally {
+      setIsUploading(false);
+    }
+  }
 
   if (activeFolder) {
     return (
@@ -38,12 +150,13 @@ export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null
             <p className="body-copy mt-2 text-sm">{activeFolder.images.length} Bilder in diesem Ordner.</p>
           </div>
           {isAdmin ? (
-            <form action="/api/cms/gallery/add-images" method="post" encType="multipart/form-data" className="w-full max-w-md rounded-[1.2rem] border border-white/10 bg-black/20 p-4 text-left">
+            <form onSubmit={handleUploadSubmit} className="w-full max-w-md rounded-[1.2rem] border border-white/10 bg-black/20 p-4 text-left">
               <input type="hidden" name="folderId" value={activeFolder.id} />
               <input type="hidden" name="returnToFolder" value={activeFolder.id} />
               <label className="block">
                 <span className="mb-2 block text-sm font-semibold text-white">Weitere Bilder in diesen Ordner hochladen</span>
                 <input
+                  ref={fileInputRef}
                   type="file"
                   name="imageFiles"
                   accept=".png,.jpg,.jpeg,.webp"
@@ -51,8 +164,9 @@ export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null
                   className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-white focus:border-[color:var(--color-accent)]"
                 />
               </label>
-              <button type="submit" className="mt-4 w-full rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">
-                Bilder in Ordner hochladen
+              {uploadError ? <p className="mt-3 rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">{uploadError}</p> : null}
+              <button type="submit" disabled={isUploading} className="mt-4 w-full rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60">
+                {isUploading ? 'Lädt hoch...' : 'Bilder in Ordner hochladen'}
               </button>
             </form>
           ) : null}
