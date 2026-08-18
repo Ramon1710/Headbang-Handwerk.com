@@ -3,12 +3,91 @@
 import { useMemo, useRef, useState } from 'react';
 import { ArrowLeft, FolderOpen, X } from 'lucide-react';
 import type { GalleryFolder } from '@/lib/cms/schema';
-import type { CmsAssetUploadTarget } from '@/lib/cms/file-storage';
 
 interface GalleryViewerProps {
   folders: GalleryFolder[];
   isAdmin?: boolean;
   initialFolderId?: string | null;
+}
+
+const MAX_UPLOAD_BYTES = 3.5 * 1024 * 1024;
+const MAX_IMAGE_DIMENSION = 2200;
+
+function replaceFileExtension(fileName: string, extension: string) {
+  return fileName.replace(/[\r\n]/g, '').replace(/\.[^.]+$/, '') + extension;
+}
+
+async function loadImageBitmap(file: File) {
+  const objectUrl = URL.createObjectURL(file);
+
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error('image-load'));
+      element.src = objectUrl;
+    });
+
+    return image;
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
+async function canvasToBlob(canvas: HTMLCanvasElement, mimeType: string, quality?: number) {
+  return await new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error('image-upload'));
+        return;
+      }
+
+      resolve(blob);
+    }, mimeType, quality);
+  });
+}
+
+async function compressImageForUpload(file: File) {
+  if (!file.type.startsWith('image/')) {
+    return file;
+  }
+
+  if (file.size <= MAX_UPLOAD_BYTES) {
+    return file;
+  }
+
+  const image = await loadImageBitmap(file);
+  const longestEdge = Math.max(image.naturalWidth, image.naturalHeight) || 1;
+  const scale = Math.min(1, MAX_IMAGE_DIMENSION / longestEdge);
+  let width = Math.max(1, Math.round(image.naturalWidth * scale));
+  let height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+
+  if (!context) {
+    throw new Error('image-upload');
+  }
+
+  const qualities = [0.86, 0.78, 0.7, 0.6, 0.52];
+
+  for (const quality of qualities) {
+    canvas.width = width;
+    canvas.height = height;
+    context.clearRect(0, 0, width, height);
+    context.drawImage(image, 0, 0, width, height);
+
+    const blob = await canvasToBlob(canvas, 'image/jpeg', quality);
+
+    if (blob.size <= MAX_UPLOAD_BYTES) {
+      return new File([blob], replaceFileExtension(file.name, '.jpg'), { type: 'image/jpeg' });
+    }
+
+    width = Math.max(1, Math.round(width * 0.88));
+    height = Math.max(1, Math.round(height * 0.88));
+  }
+
+  throw new Error('image-too-large');
 }
 
 export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null }: GalleryViewerProps) {
@@ -41,51 +120,36 @@ export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null
     setUploadError(null);
 
     try {
-      const targetsResponse = await fetch('/api/cms/gallery/upload-targets', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          folderId: activeFolder.id,
-          files: files.map((file) => ({
-            name: file.name,
-            type: file.type,
-          })),
-        }),
-      });
+      const uploadedImages: Array<{ assetUrl: string; assetName: string; assetContentType: string }> = [];
 
-      const targetsPayload = (await targetsResponse.json()) as {
-        redirectTo?: string;
-        errorCode?: string;
-        uploadTargets?: CmsAssetUploadTarget[];
-      };
+      for (const file of files) {
+        const compressedFile = await compressImageForUpload(file);
+        const formData = new FormData();
+        formData.set('folderId', activeFolder.id);
+        formData.set('imageFile', compressedFile);
 
-      if (targetsPayload.redirectTo) {
-        window.location.assign(targetsPayload.redirectTo);
-        return;
+        const uploadResponse = await fetch('/api/cms/gallery/upload-image', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const uploadPayload = (await uploadResponse.json()) as {
+          redirectTo?: string;
+          errorCode?: string;
+          uploadedImage?: { assetUrl: string; assetName: string; assetContentType: string };
+        };
+
+        if (uploadPayload.redirectTo) {
+          window.location.assign(uploadPayload.redirectTo);
+          return;
+        }
+
+        if (!uploadResponse.ok || !uploadPayload.uploadedImage?.assetUrl) {
+          throw new Error(uploadPayload.errorCode || 'image-upload');
+        }
+
+        uploadedImages.push(uploadPayload.uploadedImage);
       }
-
-      if (!targetsResponse.ok || !targetsPayload.uploadTargets || targetsPayload.uploadTargets.length !== files.length) {
-        throw new Error(targetsPayload.errorCode || 'image-upload');
-      }
-
-      await Promise.all(
-        targetsPayload.uploadTargets.map((target, index) =>
-          fetch(target.uploadUrl, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': files[index]?.type || 'application/octet-stream',
-              'x-goog-meta-firebaseStorageDownloadTokens': target.downloadToken,
-            },
-            body: files[index],
-          }).then((response) => {
-            if (!response.ok) {
-              throw new Error('image-upload');
-            }
-          })
-        )
-      );
 
       const commitResponse = await fetch('/api/cms/gallery/add-images', {
         method: 'POST',
@@ -95,11 +159,7 @@ export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null
         body: JSON.stringify({
           folderId: activeFolder.id,
           returnToFolder: activeFolder.id,
-          uploadedImages: targetsPayload.uploadTargets.map((target) => ({
-            assetUrl: target.assetUrl,
-            assetName: target.assetName,
-            assetContentType: target.assetContentType,
-          })),
+          uploadedImages,
         }),
       });
 
@@ -124,6 +184,8 @@ export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null
               ? 'Der Firebase-Storage-Bucket wurde nicht gefunden.'
               : errorCode === 'image-upload-permission'
                 ? 'Dem Service Account fehlen Rechte auf Firebase Storage.'
+                : errorCode === 'image-too-large'
+                  ? 'Das Bild ist auch nach Komprimierung noch zu groß. Bitte verkleinere es vor dem Upload.'
                 : 'Das Bild konnte nicht hochgeladen werden.'
       );
     } finally {
