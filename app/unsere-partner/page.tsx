@@ -7,6 +7,7 @@ import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { resolveLiveBoxStyle, resolveLiveHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
 import { isExternalUrl } from '@/lib/site';
+import { normalizePartnerLogoBoxOpacity } from '@/lib/utils';
 import { addPartnerAction, movePartnerAction, removePartnerAction, updatePartnerAction } from './actions';
 
 export const metadata: Metadata = {
@@ -106,7 +107,7 @@ export default async function UnserePartnerPage({
               </label>
               <label className="block">
                 <span className="mb-2 block text-sm font-semibold text-white">Logo-Kasten Transparenz in %</span>
-                <input name="logoBoxOpacity" type="number" min="0" max="100" defaultValue="55" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                <input name="logoBoxOpacity" type="number" min="0" max="100" defaultValue="100" className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
               </label>
               <label className="block lg:col-span-2">
                 <span className="mb-2 block text-sm font-semibold text-white">Logo hochladen</span>
@@ -140,7 +141,12 @@ export default async function UnserePartnerPage({
                   <div className="flex flex-1 flex-col gap-5 sm:flex-row sm:items-start">
                       <div
                         className="flex h-28 w-full max-w-[12rem] items-center justify-center overflow-hidden rounded-[1.3rem] border border-[color:var(--color-accent)]/25 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                        style={{ backgroundColor: hexToRgba(partner.logoBoxBackground || '#3a2718', partner.logoBoxOpacity ?? 55) }}
+                        style={{
+                          backgroundColor: hexToRgba(
+                            partner.logoBoxBackground || '#3a2718',
+                            normalizePartnerLogoBoxOpacity(partner.logoBoxBackground, partner.logoBoxOpacity, 100),
+                          ),
+                        }}
                       >
                       {partner.logo.assetUrl ? (
                         <img src={partner.logo.assetUrl} alt={`${partner.name} Logo`} className="max-h-full w-auto object-contain" />
@@ -180,7 +186,7 @@ export default async function UnserePartnerPage({
                         </label>
                         <label className="block">
                           <span className="mb-2 block text-sm font-semibold text-white">Logo-Kasten Transparenz in %</span>
-                          <input name="logoBoxOpacity" type="number" min="0" max="100" defaultValue={String(partner.logoBoxOpacity ?? 55)} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                          <input name="logoBoxOpacity" type="number" min="0" max="100" defaultValue={String(normalizePartnerLogoBoxOpacity(partner.logoBoxBackground, partner.logoBoxOpacity, 100))} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                         </label>
                         <textarea name="description" rows={4} defaultValue={partner.description} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
                         <label className="block">

@@ -13,12 +13,13 @@ import { hasFirebaseConfig, isFirebaseAuthError, isInvalidFirebaseConfigError } 
 import { getCmsContent, isFirebaseAuthSaveError, isInvalidFirebaseSaveError, isReadonlyFallbackError, saveCmsContent } from '@/lib/cms/storage';
 import type { CmsContent, PartnerEntry } from '@/lib/cms/schema';
 import { normalizeExternalUrl } from '@/lib/site';
+import { normalizePartnerLogoBoxOpacity } from '@/lib/utils';
 
 function sanitizeText(value: FormDataEntryValue | null) {
   return String(value || '').trim();
 }
 
-function sanitizeOpacity(value: FormDataEntryValue | null, fallback = 55) {
+function sanitizeOpacity(value: FormDataEntryValue | null, fallback = 100) {
   const parsed = Number.parseInt(String(value || ''), 10);
 
   if (!Number.isFinite(parsed)) {
@@ -57,13 +58,19 @@ function ensurePartnerId(partners: PartnerEntry[], requestedId: string, name: st
 }
 
 function parsePartnerFromFormData(formData: FormData, existing?: PartnerEntry): PartnerEntry {
+  const logoBoxBackground = sanitizeText(formData.get('logoBoxBackground')) || existing?.logoBoxBackground || '#3a2718';
+
   return {
     id: existing?.id || '',
     name: sanitizeText(formData.get('name')),
     website: normalizeExternalUrl(sanitizeText(formData.get('website'))),
     description: sanitizeText(formData.get('description')),
-    logoBoxBackground: sanitizeText(formData.get('logoBoxBackground')) || existing?.logoBoxBackground || '#3a2718',
-    logoBoxOpacity: sanitizeOpacity(formData.get('logoBoxOpacity'), existing?.logoBoxOpacity ?? 55),
+    logoBoxBackground,
+    logoBoxOpacity: normalizePartnerLogoBoxOpacity(
+      logoBoxBackground,
+      sanitizeOpacity(formData.get('logoBoxOpacity'), existing?.logoBoxOpacity ?? 100),
+      100,
+    ),
     logo: existing?.logo || {
       assetUrl: '',
       assetName: '',
