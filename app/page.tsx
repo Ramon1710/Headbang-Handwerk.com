@@ -183,6 +183,7 @@ export default async function HomePage({
   const membershipImageSrc = home.membershipImage.assetUrl;
   const backgroundImageSrc = home.backgroundImage.assetUrl || wackenBackgroundImage.src;
   const upcomingEvents = getUpcomingEvents(cms.site.events, { limit: 3 });
+  const nextMobileEvent = upcomingEvents.slice(0, 1);
   const visibleNewsItems = getVisibleHomeNewsItems(home.newsItems, 3);
   const savedMessage = getSavedMessage(params?.homeSaved);
   const layoutSettings = home.displaySettings;
@@ -552,9 +553,14 @@ export default async function HomePage({
                   <Button href="/veranstaltungen" variant="secondary">{home.eventsSectionCtaLabel}</Button>
                 </div>
                 {upcomingEvents.length ? (
-                  <div className={getPreviewGridClasses(upcomingEvents.length)} style={{ gap: `${layoutSettings.cardGap}px` }}>
-                    {upcomingEvents.map((event) => <HomeEventPreviewCard key={event.id} event={event} imageHeight={layoutSettings.eventImageHeight} />)}
-                  </div>
+                  <>
+                    <div className="md:hidden" style={{ gap: `${layoutSettings.cardGap}px` }}>
+                      {nextMobileEvent.map((event) => <HomeEventPreviewCard key={event.id} event={event} imageHeight={layoutSettings.eventImageHeight} />)}
+                    </div>
+                    <div className={cn('hidden md:grid', getPreviewGridClasses(upcomingEvents.length))} style={{ gap: `${layoutSettings.cardGap}px` }}>
+                      {upcomingEvents.map((event) => <HomeEventPreviewCard key={event.id} event={event} imageHeight={layoutSettings.eventImageHeight} />)}
+                    </div>
+                  </>
                 ) : (
                   <div className="rounded-[1.7rem] border border-dashed border-white/15 bg-[linear-gradient(180deg,rgba(18,12,9,0.86)_0%,rgba(9,6,4,0.76)_100%)] px-6 py-7 text-[#ead9c5]">
                     <p className="body-copy whitespace-pre-line">{home.eventsEmptyText}</p>

@@ -119,7 +119,7 @@ export default async function UeberUnsPage({
             <LiveEditableText as="h2" className="section-title mb-8" editorKey="about.teamTitle" initialHtml={resolveLiveHtml(liveEditor, 'about.teamTitle', 'Der Vorstand')} isAdmin={isAdmin} title="Über uns Team Titel" />
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {teamMembers.map((member, index) => (
-                <LiveResizableBox key={`${member.role}-${index}`} boxKey={`about.teamMembers.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamMembers.${index}.box`)} isAdmin={isAdmin} className="h-full rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(28,19,14,0.96)_0%,rgba(11,8,6,0.9)_100%)] p-4 text-left shadow-[0_18px_36px_rgba(0,0,0,0.22)]">
+                <div key={`${member.role}-${index}`} className="h-full rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(28,19,14,0.96)_0%,rgba(11,8,6,0.9)_100%)] p-4 text-left shadow-[0_18px_36px_rgba(0,0,0,0.22)]">
                   <LiveResizableBox
                     boxKey={`about.teamMembers.${index}.image.box`}
                     initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamMembers.${index}.image.box`)}
@@ -139,7 +139,7 @@ export default async function UeberUnsPage({
                   <div className="mt-4">
                     <LiveEditableText as="h3" className="text-lg font-black text-white" editorKey={`about.teamMembers.${index}.role`} initialHtml={resolveLiveHtml(liveEditor, `about.teamMembers.${index}.role`, member.role)} isAdmin={isAdmin} title={`Über uns Teamrolle ${index + 1}`} />
                   </div>
-                </LiveResizableBox>
+                </div>
               ))}
             </div>
           </LiveResizableBox>
