@@ -35,6 +35,7 @@ export const defaultCmsContent: CmsContent = {
       { id: 'home', label: 'Startseite', href: '/', placement: 'primary' },
       { id: 'about', label: 'Über uns', href: '/ueber-uns', placement: 'primary' },
       { id: 'events', label: 'Veranstaltungen', href: '/veranstaltungen', placement: 'primary' },
+      { id: 'gallery', label: 'Galerie', href: '/gallerie', placement: 'primary' },
       { id: 'membership', label: 'Mitglied werden', href: '/formular', placement: 'primary' },
       { id: 'partners', label: 'Partner', href: '/unsere-partner', placement: 'primary' },
       { id: 'shop', label: 'Shop', href: '/merchandise', placement: 'primary' },

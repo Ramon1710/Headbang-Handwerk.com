@@ -111,20 +111,19 @@ export default async function UeberUnsPage({
             </section>
           ) : null}
 
-          <LiveResizableBox boxKey="about.hero.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'about.hero.box')} isAdmin={isAdmin} allowPosition={false} applySavedHeight={false} className="copy-center content-flow mb-14 text-center">
+          <LiveResizableBox boxKey="about.hero.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'about.hero.box')} isAdmin={isAdmin} className="copy-center content-flow mb-14 text-center">
             <LiveEditableText as="h1" className="page-title mb-0" editorKey="about.pageTitle" initialHtml={resolveLiveHtml(liveEditor, 'about.pageTitle', 'Über uns')} isAdmin={isAdmin} title="Über uns Titel" />
           </LiveResizableBox>
 
-          <LiveResizableBox boxKey="about.team.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'about.team.box')} isAdmin={isAdmin} allowPosition={false} applySavedHeight={false} className="section-shell content-box mb-12 mt-16 text-center">
+          <LiveResizableBox boxKey="about.team.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'about.team.box')} isAdmin={isAdmin} className="section-shell content-box mb-12 mt-16 text-center">
             <LiveEditableText as="h2" className="section-title mb-8" editorKey="about.teamTitle" initialHtml={resolveLiveHtml(liveEditor, 'about.teamTitle', 'Der Vorstand')} isAdmin={isAdmin} title="Über uns Team Titel" />
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {teamMembers.map((member, index) => (
-                <LiveResizableBox key={`${member.role}-${index}`} boxKey={`about.teamMembers.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamMembers.${index}.box`)} isAdmin={isAdmin} allowPosition={false} applySavedHeight={false} className="h-full rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(28,19,14,0.96)_0%,rgba(11,8,6,0.9)_100%)] p-4 text-left shadow-[0_18px_36px_rgba(0,0,0,0.22)]">
+                <LiveResizableBox key={`${member.role}-${index}`} boxKey={`about.teamMembers.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamMembers.${index}.box`)} isAdmin={isAdmin} className="h-full rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(28,19,14,0.96)_0%,rgba(11,8,6,0.9)_100%)] p-4 text-left shadow-[0_18px_36px_rgba(0,0,0,0.22)]">
                   <LiveResizableBox
                     boxKey={`about.teamMembers.${index}.image.box`}
                     initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamMembers.${index}.image.box`)}
                     isAdmin={isAdmin}
-                    allowPosition={false}
                     className="min-h-[16rem] overflow-hidden rounded-[1.2rem] border border-white/8 bg-[linear-gradient(180deg,rgba(42,31,24,0.95)_0%,rgba(21,15,11,0.86)_100%)]"
                   >
                     {member.image.assetUrl ? (
@@ -145,7 +144,7 @@ export default async function UeberUnsPage({
             </div>
           </LiveResizableBox>
 
-          <LiveResizableBox boxKey="about.story.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'about.story.box')} isAdmin={isAdmin} allowPosition={false} applySavedHeight={false} className="overflow-hidden rounded-[2rem] border border-[color:var(--color-border)]/70 bg-[linear-gradient(135deg,rgba(255,122,0,0.08)_0%,rgba(19,13,9,0.92)_28%,rgba(10,7,5,0.96)_100%)] px-6 py-10 shadow-[0_24px_60px_rgba(0,0,0,0.28)] sm:px-10">
+          <LiveResizableBox boxKey="about.story.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'about.story.box')} isAdmin={isAdmin} className="overflow-hidden rounded-[2rem] border border-[color:var(--color-border)]/70 bg-[linear-gradient(135deg,rgba(255,122,0,0.08)_0%,rgba(19,13,9,0.92)_28%,rgba(10,7,5,0.96)_100%)] px-6 py-10 shadow-[0_24px_60px_rgba(0,0,0,0.28)] sm:px-10">
             <LiveEditableText as="div" className="body-copy mx-auto max-w-4xl text-[#ecdcc9] [&_li]:list-none [&_ul]:pl-0 [&_p]:leading-8" editorKey="about.story.content" initialHtml={resolveLiveRichHtml(liveEditor, 'about.story.content', ABOUT_STORY_FALLBACK_HTML)} isAdmin={isAdmin} title="Über uns Inhalt" normalizeTypography />
           </LiveResizableBox>
         </div>

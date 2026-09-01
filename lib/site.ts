@@ -1,7 +1,7 @@
 import type { FooterLink, NavigationLink } from '@/lib/cms/schema';
 
 const REMOVED_NAV_HREFS = new Set(['/drei-d-stand', '/partner-unterstuetzerinfo', '/hühnerjagt']);
-export type NavigationItemId = 'home' | 'about' | 'events' | 'membership' | 'partners' | 'shop' | 'sponsor' | 'donation' | 'game';
+export type NavigationItemId = 'home' | 'about' | 'events' | 'gallery' | 'membership' | 'partners' | 'shop' | 'sponsor' | 'donation' | 'game';
 export type NavigationPlacement = 'primary' | 'more';
 
 interface NavigationItemDefinition {
@@ -15,6 +15,7 @@ const NAVIGATION_ITEMS: NavigationItemDefinition[] = [
   { id: 'home', defaultLabel: 'Startseite', defaultHref: '/', defaultPlacement: 'primary' },
   { id: 'about', defaultLabel: 'Über uns', defaultHref: '/ueber-uns', defaultPlacement: 'primary' },
   { id: 'events', defaultLabel: 'Veranstaltungen', defaultHref: '/veranstaltungen', defaultPlacement: 'primary' },
+  { id: 'gallery', defaultLabel: 'Galerie', defaultHref: '/gallerie', defaultPlacement: 'primary' },
   { id: 'membership', defaultLabel: 'Mitglied werden', defaultHref: '/formular', defaultPlacement: 'primary' },
   { id: 'partners', defaultLabel: 'Partner', defaultHref: '/unsere-partner', defaultPlacement: 'primary' },
   { id: 'shop', defaultLabel: 'Shop', defaultHref: '/merchandise', defaultPlacement: 'primary' },
