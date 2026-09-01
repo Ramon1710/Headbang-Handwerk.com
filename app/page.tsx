@@ -3,6 +3,7 @@ import { ArrowRight, CalendarDays, EyeOff, ImageIcon, MapPin, Newspaper, Users2 
 import { SiteNavigation } from '@/components/site-navigation';
 import { Footer } from '@/components/footer';
 import { LiveLayoutSaveProvider } from '@/components/live-layout-save-context';
+import { LiveResizableBox } from '@/components/live-resizable-box';
 import { ConfirmSubmitButton } from '@/components/confirm-submit-button';
 import { FormValueSubmitButton } from '@/components/form-value-submit-button';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ import {
   updateHomeNewsSectionAction,
 } from '@/app/admin/home-actions';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { resolveLiveBoxStyle } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
 import { getUpcomingEvents } from '@/lib/events';
 import {
@@ -184,6 +186,7 @@ export default async function HomePage({
   const visibleNewsItems = getVisibleHomeNewsItems(home.newsItems, 3);
   const savedMessage = getSavedMessage(params?.homeSaved);
   const layoutSettings = home.displaySettings;
+  const liveEditor = cms.site.liveEditor;
 
   return (
     <>
@@ -518,92 +521,100 @@ export default async function HomePage({
               </div>
             ) : null}
 
-            <section className="relative overflow-hidden rounded-[2rem] border border-white/10 shadow-[0_28px_70px_rgba(0,0,0,0.28)]" style={getHeroStyles(layoutSettings)}>
-              <img src={heroImageSrc} alt={home.heroImageAlt || home.heroTitle} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: `${home.heroImagePositionX}% ${home.heroImagePositionY}%` }} />
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,4,2,0.92)_0%,rgba(7,4,2,0.76)_44%,rgba(7,4,2,0.48)_100%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(255,136,36,0.18)_0%,transparent_28%)]" />
-              <div className="relative z-10 flex h-full items-end px-6 py-8 sm:px-8 lg:px-12 lg:py-12">
-                <div className="max-w-3xl">
-                  <p className="text-xs font-black uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Headbang Handwerk</p>
-                  <h1 className="section-title mt-4 max-w-4xl text-white drop-shadow-[0_8px_20px_rgba(0,0,0,0.5)]" style={getHeroTitleStyles(layoutSettings)}>{home.heroTitle}</h1>
-                  <p className="mt-5 text-xl font-semibold text-[#f3e6d7] sm:text-2xl">{home.heroSubtitle}</p>
-                  {home.heroDescription ? <p className="body-copy mt-5 max-w-2xl whitespace-pre-line text-[#f0dfcd]">{home.heroDescription}</p> : null}
-                  <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                    <Button href={home.heroPrimaryCtaHref} size="lg">{home.heroPrimaryCtaLabel}<ArrowRight className="h-4 w-4" /></Button>
-                    <Button href={home.heroSecondaryCtaHref} size="lg" variant="secondary">{home.heroSecondaryCtaLabel}</Button>
+            <LiveResizableBox boxKey="home.hero.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'home.hero.box')} isAdmin={isAdmin} className="w-full">
+              <section className="relative overflow-hidden rounded-[2rem] border border-white/10 shadow-[0_28px_70px_rgba(0,0,0,0.28)]" style={getHeroStyles(layoutSettings)}>
+                <img src={heroImageSrc} alt={home.heroImageAlt || home.heroTitle} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: `${home.heroImagePositionX}% ${home.heroImagePositionY}%` }} />
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,4,2,0.92)_0%,rgba(7,4,2,0.76)_44%,rgba(7,4,2,0.48)_100%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(255,136,36,0.18)_0%,transparent_28%)]" />
+                <div className="relative z-10 flex h-full items-end justify-center px-6 py-8 sm:px-8 lg:px-12 lg:py-12">
+                  <div className="max-w-3xl text-center">
+                    <p className="text-xs font-black uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Headbang Handwerk</p>
+                    <h1 className="section-title mt-4 max-w-4xl text-white drop-shadow-[0_8px_20px_rgba(0,0,0,0.5)]" style={getHeroTitleStyles(layoutSettings)}>{home.heroTitle}</h1>
+                    <p className="mt-5 text-xl font-semibold text-[#f3e6d7] sm:text-2xl">{home.heroSubtitle}</p>
+                    {home.heroDescription ? <p className="body-copy mt-5 max-w-2xl whitespace-pre-line text-[#f0dfcd] sm:mx-auto">{home.heroDescription}</p> : null}
+                    <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
+                      <Button href={home.heroPrimaryCtaHref} size="lg">{home.heroPrimaryCtaLabel}<ArrowRight className="h-4 w-4" /></Button>
+                      <Button href={home.heroSecondaryCtaHref} size="lg" variant="secondary">{home.heroSecondaryCtaLabel}</Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </section>
+              </section>
+            </LiveResizableBox>
 
-            <section style={getSectionSpacingStyles(layoutSettings)}>
-              <div className="mb-8 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-                <div className="max-w-3xl">
-                  <p className="text-xs font-black uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Live aus dem CMS</p>
-                  <h2 className="section-title mt-3 text-white" style={getSectionTitleStyles(layoutSettings)}>{home.eventsSectionTitle}</h2>
-                  {home.eventsSectionIntro ? <p className="body-copy mt-4 whitespace-pre-line text-[#ecdbca]">{home.eventsSectionIntro}</p> : null}
+            <LiveResizableBox boxKey="home.events.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'home.events.box')} isAdmin={isAdmin} className="w-full" applySavedHeight={false}>
+              <section style={getSectionSpacingStyles(layoutSettings)}>
+                <div className="mb-8 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                  <div className="max-w-3xl">
+                    <p className="text-xs font-black uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Live aus dem CMS</p>
+                    <h2 className="section-title mt-3 text-white" style={getSectionTitleStyles(layoutSettings)}>{home.eventsSectionTitle}</h2>
+                    {home.eventsSectionIntro ? <p className="body-copy mt-4 whitespace-pre-line text-[#ecdbca]">{home.eventsSectionIntro}</p> : null}
+                  </div>
+                  <Button href="/veranstaltungen" variant="secondary">{home.eventsSectionCtaLabel}</Button>
                 </div>
-                <Button href="/veranstaltungen" variant="secondary">{home.eventsSectionCtaLabel}</Button>
-              </div>
-              {upcomingEvents.length ? (
-                <div className={getPreviewGridClasses(upcomingEvents.length)} style={{ gap: `${layoutSettings.cardGap}px` }}>
-                  {upcomingEvents.map((event) => <HomeEventPreviewCard key={event.id} event={event} imageHeight={layoutSettings.eventImageHeight} />)}
-                </div>
-              ) : (
-                <div className="rounded-[1.7rem] border border-dashed border-white/15 bg-[linear-gradient(180deg,rgba(18,12,9,0.86)_0%,rgba(9,6,4,0.76)_100%)] px-6 py-7 text-[#ead9c5]">
-                  <p className="body-copy whitespace-pre-line">{home.eventsEmptyText}</p>
-                </div>
-              )}
-              {upcomingEvents.length ? (
-                <div className="mt-8 flex justify-center">
-                  <Button href="/veranstaltungen" size="lg">{home.eventsSectionCtaLabel}</Button>
-                </div>
-              ) : null}
-            </section>
+                {upcomingEvents.length ? (
+                  <div className={getPreviewGridClasses(upcomingEvents.length)} style={{ gap: `${layoutSettings.cardGap}px` }}>
+                    {upcomingEvents.map((event) => <HomeEventPreviewCard key={event.id} event={event} imageHeight={layoutSettings.eventImageHeight} />)}
+                  </div>
+                ) : (
+                  <div className="rounded-[1.7rem] border border-dashed border-white/15 bg-[linear-gradient(180deg,rgba(18,12,9,0.86)_0%,rgba(9,6,4,0.76)_100%)] px-6 py-7 text-[#ead9c5]">
+                    <p className="body-copy whitespace-pre-line">{home.eventsEmptyText}</p>
+                  </div>
+                )}
+                {upcomingEvents.length ? (
+                  <div className="mt-8 flex justify-center">
+                    <Button href="/veranstaltungen" size="lg">{home.eventsSectionCtaLabel}</Button>
+                  </div>
+                ) : null}
+              </section>
+            </LiveResizableBox>
 
-            <section style={getSectionSpacingStyles(layoutSettings)}>
-              <div className="mb-8 max-w-3xl">
-                <p className="text-xs font-black uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Aktuelles</p>
-                <h2 className="section-title mt-3 text-white" style={getSectionTitleStyles(layoutSettings)}>{home.newsSectionTitle}</h2>
-                {home.newsSectionIntro ? <p className="body-copy mt-4 whitespace-pre-line text-[#ecdbca]">{home.newsSectionIntro}</p> : null}
-              </div>
-              {visibleNewsItems.length ? (
-                <div className={cn(getPreviewGridClasses(visibleNewsItems.length), visibleNewsItems.length === 1 ? 'items-start' : '')} style={{ gap: `${layoutSettings.cardGap}px` }}>
-                  {visibleNewsItems.map((item) => <HomeNewsPreviewCard key={item.id} item={item} imageHeight={layoutSettings.newsImageHeight} />)}
+            <LiveResizableBox boxKey="home.news.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'home.news.box')} isAdmin={isAdmin} className="w-full" applySavedHeight={false}>
+              <section style={getSectionSpacingStyles(layoutSettings)}>
+                <div className="mb-8 max-w-3xl">
+                  <p className="text-xs font-black uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Aktuelles</p>
+                  <h2 className="section-title mt-3 text-white" style={getSectionTitleStyles(layoutSettings)}>{home.newsSectionTitle}</h2>
+                  {home.newsSectionIntro ? <p className="body-copy mt-4 whitespace-pre-line text-[#ecdbca]">{home.newsSectionIntro}</p> : null}
                 </div>
-              ) : (
-                <div className="rounded-[1.7rem] border border-dashed border-white/15 bg-[linear-gradient(180deg,rgba(18,12,9,0.86)_0%,rgba(9,6,4,0.76)_100%)] px-6 py-7 text-[#ead9c5]">
-                  <p className="body-copy whitespace-pre-line">{home.newsEmptyText}</p>
-                </div>
-              )}
-            </section>
+                {visibleNewsItems.length ? (
+                  <div className={cn(getPreviewGridClasses(visibleNewsItems.length), visibleNewsItems.length === 1 ? 'items-start' : '')} style={{ gap: `${layoutSettings.cardGap}px` }}>
+                    {visibleNewsItems.map((item) => <HomeNewsPreviewCard key={item.id} item={item} imageHeight={layoutSettings.newsImageHeight} />)}
+                  </div>
+                ) : (
+                  <div className="rounded-[1.7rem] border border-dashed border-white/15 bg-[linear-gradient(180deg,rgba(18,12,9,0.86)_0%,rgba(9,6,4,0.76)_100%)] px-6 py-7 text-[#ead9c5]">
+                    <p className="body-copy whitespace-pre-line">{home.newsEmptyText}</p>
+                  </div>
+                )}
+              </section>
+            </LiveResizableBox>
 
-            <section style={getSectionSpacingStyles(layoutSettings)}>
-              <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(24,15,11,0.94)_0%,rgba(10,7,5,0.9)_100%)] shadow-[0_28px_70px_rgba(0,0,0,0.24)]">
-                <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr]" style={{ minHeight: `${layoutSettings.membershipMinHeight}px` }}>
-                  <div className="flex items-center px-6 py-8 sm:px-8 lg:px-10">
-                    <div className="max-w-2xl">
-                      <p className="text-xs font-black uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Mitmachen</p>
-                      <h2 className="section-title mt-3 text-white" style={getSectionTitleStyles(layoutSettings)}>{home.membershipTitle}</h2>
-                      <p className="body-copy mt-5 whitespace-pre-line text-[#efdfcd]">{home.membershipBody}</p>
-                      <div className="mt-8">
-                        <Button href={home.membershipCtaHref} size="lg">{home.membershipCtaLabel}<ArrowRight className="h-4 w-4" /></Button>
+            <LiveResizableBox boxKey="home.membership.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'home.membership.box')} isAdmin={isAdmin} className="w-full">
+              <section style={getSectionSpacingStyles(layoutSettings)}>
+                <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(24,15,11,0.94)_0%,rgba(10,7,5,0.9)_100%)] shadow-[0_28px_70px_rgba(0,0,0,0.24)]">
+                  <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr]" style={{ minHeight: `${layoutSettings.membershipMinHeight}px` }}>
+                    <div className="flex items-center px-6 py-8 sm:px-8 lg:px-10">
+                      <div className="max-w-2xl">
+                        <p className="text-xs font-black uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Mitmachen</p>
+                        <h2 className="section-title mt-3 text-white" style={getSectionTitleStyles(layoutSettings)}>{home.membershipTitle}</h2>
+                        <p className="body-copy mt-5 whitespace-pre-line text-[#efdfcd]">{home.membershipBody}</p>
+                        <div className="mt-8">
+                          <Button href={home.membershipCtaHref} size="lg">{home.membershipCtaLabel}<ArrowRight className="h-4 w-4" /></Button>
+                        </div>
                       </div>
                     </div>
+                    {membershipImageSrc ? (
+                      <div className="relative min-h-[18rem] border-t border-white/10 lg:min-h-full lg:border-l lg:border-t-0">
+                        <img src={membershipImageSrc} alt={home.membershipImageAlt || home.membershipTitle} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: `${home.membershipImagePositionX}% ${home.membershipImagePositionY}%` }} />
+                        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,4,2,0.18)_0%,rgba(7,4,2,0.5)_100%)] lg:bg-[linear-gradient(90deg,rgba(7,4,2,0.2)_0%,rgba(7,4,2,0.5)_100%)]" />
+                      </div>
+                    ) : (
+                      <div className="flex min-h-[18rem] items-center justify-center border-t border-white/10 bg-black/15 text-[#baa791] lg:border-l lg:border-t-0">
+                        <div className="flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.16em]"><Users2 className="h-5 w-5" />Kein Bild hinterlegt</div>
+                      </div>
+                    )}
                   </div>
-                  {membershipImageSrc ? (
-                    <div className="relative min-h-[18rem] border-t border-white/10 lg:min-h-full lg:border-l lg:border-t-0">
-                      <img src={membershipImageSrc} alt={home.membershipImageAlt || home.membershipTitle} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: `${home.membershipImagePositionX}% ${home.membershipImagePositionY}%` }} />
-                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,4,2,0.18)_0%,rgba(7,4,2,0.5)_100%)] lg:bg-[linear-gradient(90deg,rgba(7,4,2,0.2)_0%,rgba(7,4,2,0.5)_100%)]" />
-                    </div>
-                  ) : (
-                    <div className="flex min-h-[18rem] items-center justify-center border-t border-white/10 bg-black/15 text-[#baa791] lg:border-l lg:border-t-0">
-                      <div className="flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.16em]"><Users2 className="h-5 w-5" />Kein Bild hinterlegt</div>
-                    </div>
-                  )}
                 </div>
-              </div>
-            </section>
+              </section>
+            </LiveResizableBox>
           </div>
         </main>
         <Footer content={cms.site.footer} isAdmin={isAdmin} liveEditor={cms.site.liveEditor} logoSrc={cms.site.logo.assetUrl} contactEmail={cms.site.contact.email} />

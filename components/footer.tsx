@@ -177,7 +177,15 @@ export function Footer({
                 <LiveEditableText as="div" className="block" editorKey="footer.brandHighlight" initialHtml={resolveLiveHtml(liveEditor, 'footer.brandHighlight', content.brandHighlight)} isAdmin={isAdmin} title="Footer Hervorhebung" />
               </div>
             </div>
-            <p className="body-copy mt-5 max-w-2xl">{content.description}</p>
+            <LiveEditableText
+              as="div"
+              className="body-copy mt-5 max-w-2xl"
+              editorKey="footer.description"
+              initialHtml={resolveLiveHtml(liveEditor, 'footer.description', content.description || '')}
+              isAdmin={isAdmin}
+              title="Footer Beschreibung"
+              normalizeTypography
+            />
             <div className="mt-6 flex flex-wrap items-center gap-3">
               {visibleSocialLinks.map((link) => {
                 const Icon = icons[link.platform];

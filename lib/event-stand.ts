@@ -100,16 +100,20 @@ export function normalizeEvent(event: Event): Event {
   const startDate = normalizeStructuredEventDate(event.startDate);
   const endDate = normalizeStructuredEventDate(event.endDate);
   const status = normalizeEventStatus(event.status, 'planned');
+  const normalizedImageUrl = typeof event.imageUrl === 'string' && event.imageUrl.trim() ? event.imageUrl.trim() : undefined;
+  const normalizedImageAlt = typeof event.imageAlt === 'string' && event.imageAlt.trim() ? event.imageAlt.trim() : undefined;
+  const normalizedCtaUrl = typeof event.ctaUrl === 'string' && event.ctaUrl.trim() ? event.ctaUrl.trim() : undefined;
 
   return {
     ...event,
-    startDate,
-    endDate: startDate && endDate && endDate >= startDate ? endDate : undefined,
     status,
-    imageUrl: typeof event.imageUrl === 'string' && event.imageUrl.trim() ? event.imageUrl.trim() : undefined,
-    imageAlt: typeof event.imageAlt === 'string' && event.imageAlt.trim() ? event.imageAlt.trim() : undefined,
     standEnabled: event.standEnabled ?? status === 'confirmed',
     stand: normalizeEventStandConfig(event.stand),
+    ...(startDate ? { startDate } : {}),
+    ...(startDate && endDate && endDate >= startDate ? { endDate } : {}),
+    ...(normalizedCtaUrl ? { ctaUrl: normalizedCtaUrl } : {}),
+    ...(normalizedImageUrl ? { imageUrl: normalizedImageUrl } : {}),
+    ...(normalizedImageAlt ? { imageAlt: normalizedImageAlt } : {}),
   };
 }
 

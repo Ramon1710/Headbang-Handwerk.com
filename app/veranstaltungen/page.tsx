@@ -38,7 +38,7 @@ export default async function VeranstaltungenPage({
       return null;
     }
 
-    return decodeURIComponent(adminError);
+    return adminError;
   }
 
   function renderSection(title: string, editorKey: string, boxKey: string, dotClassName: string, items: typeof events) {
