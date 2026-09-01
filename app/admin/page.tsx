@@ -343,8 +343,10 @@ export default async function AdminPage({
             </div>
             <InputField label="Footer Überschrift" name="footerHeadline" defaultValue={formValues.footerHeadline} />
             <InputField label="Footer Zusatz" name="footerHighlight" defaultValue={formValues.footerHighlight} />
+            <TextareaField label="Footer Beschreibung" name="footerDescription" defaultValue={formValues.footerDescription} rows={4} />
             <InputField label="Facebook URL" name="facebookUrl" defaultValue={formValues.facebookUrl} />
             <InputField label="Instagram URL" name="instagramUrl" defaultValue={formValues.instagramUrl} />
+            <InputField label="TikTok URL" name="tiktokUrl" defaultValue={formValues.tiktokUrl} />
             <InputField label="YouTube URL" name="youtubeUrl" defaultValue={formValues.youtubeUrl} />
           </section>
 

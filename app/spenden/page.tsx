@@ -4,8 +4,14 @@ import { LiveEditableText } from '@/components/live-editable-text';
 import { LiveResizableBox } from '@/components/live-resizable-box';
 import { Button } from '@/components/ui/button';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
-import { resolveLiveBoxStyle, resolveLiveHtml } from '@/lib/cms/live-editor';
+import { resolveLiveBoxStyle, resolveLiveHtml, resolveLiveRichHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
+
+function normalizeHeadingHtml(html: string) {
+  return html
+    .replace(/<(\/?)div\b[^>]*>/gi, '<$1span>')
+    .replace(/<(\/?)p\b[^>]*>/gi, '<$1span>');
+}
 
 export const metadata: Metadata = {
   title: 'Spenden-Seite – Headbang Handwerk',
@@ -33,8 +39,8 @@ export default async function SpendenPage({
           </LiveResizableBox>
 
           <LiveResizableBox boxKey="donation.status.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'donation.status.box')} isAdmin={isAdmin} className="section-shell content-box">
-            <LiveEditableText as="h2" className="section-title" editorKey="donation.statusTitle" initialHtml={resolveLiveHtml(liveEditor, 'donation.statusTitle', 'Spenden werden in Kürze möglich')} isAdmin={isAdmin} title="Spenden Status Titel" normalizeTypography />
-            <LiveEditableText as="p" className="body-copy mt-4" editorKey="donation.statusBody" initialHtml={resolveLiveHtml(liveEditor, 'donation.statusBody', 'Aktuell steht noch kein Giro-Konto zur Verfügung. Sobald unser Spendenkonto eingerichtet ist, könnt ihr hier direkt alle Informationen und Möglichkeiten zur Unterstützung finden.')} isAdmin={isAdmin} title="Spenden Status Text" normalizeTypography />
+            <LiveEditableText as="h2" className="section-title" editorKey="donation.statusTitle" initialHtml={normalizeHeadingHtml(resolveLiveRichHtml(liveEditor, 'donation.statusTitle', 'Spenden werden in Kürze möglich'))} isAdmin={isAdmin} title="Spenden Status Titel" normalizeTypography />
+            <LiveEditableText as="div" className="body-copy mt-4 space-y-4 [&_div]:mb-4 [&_div:last-child]:mb-0 [&_p]:mb-4 [&_p:last-child]:mb-0" editorKey="donation.statusBody" initialHtml={resolveLiveRichHtml(liveEditor, 'donation.statusBody', '<p>Aktuell steht noch kein Giro-Konto zur Verfügung.</p><p>Sobald unser Spendenkonto eingerichtet ist, könnt ihr hier direkt alle Informationen und Möglichkeiten zur Unterstützung finden.</p>')} isAdmin={isAdmin} title="Spenden Status Text" normalizeTypography />
             <div className="mt-6 grid gap-4">
               <Button href="/kontakt" className="w-full justify-center">Kontakt aufnehmen</Button>
               <Button href="/veranstaltungen" variant="secondary" className="w-full justify-center">Zu den Veranstaltungen</Button>

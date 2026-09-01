@@ -1,14 +1,39 @@
-import type { NavigationLink } from '@/lib/cms/schema';
+import type { FooterLink, NavigationLink } from '@/lib/cms/schema';
 
 const REMOVED_NAV_HREFS = new Set(['/drei-d-stand', '/partner-unterstuetzerinfo', '/hühnerjagt']);
-const MEMBERSHIP_LINK: NavigationLink = { label: 'Mitglied werden', href: '/formular' };
-const SPONSOR_LINK: NavigationLink = { label: 'Sponsor werden', href: '/sponsoren' };
-const DONATION_LINK: NavigationLink = { label: 'Spenden', href: '/spenden' };
-const PARTNERS_LINK: NavigationLink = { label: 'Unsere Partner', href: '/unsere-partner' };
-const MERCHANDISE_LINK: NavigationLink = { label: 'Merchandise', href: '/merchandise' };
-const GALLERY_LINK: NavigationLink = { label: 'Galerie', href: '/gallerie' };
-const GAME_LINK: NavigationLink = { label: 'Game', href: '/game' };
-const CANONICAL_NAV_ORDER = ['/', '/veranstaltungen', '/gallerie', '/game', '/formular', '/sponsoren', '/spenden', '/unsere-partner', '/merchandise', '/ueber-uns', '/kontakt'];
+export type NavigationItemId = 'home' | 'about' | 'events' | 'membership' | 'partners' | 'shop' | 'sponsor' | 'donation' | 'game';
+export type NavigationPlacement = 'primary' | 'more';
+
+interface NavigationItemDefinition {
+  id: NavigationItemId;
+  defaultLabel: string;
+  defaultHref: string;
+  defaultPlacement: NavigationPlacement;
+}
+
+const NAVIGATION_ITEMS: NavigationItemDefinition[] = [
+  { id: 'home', defaultLabel: 'Startseite', defaultHref: '/', defaultPlacement: 'primary' },
+  { id: 'about', defaultLabel: 'Über uns', defaultHref: '/ueber-uns', defaultPlacement: 'primary' },
+  { id: 'events', defaultLabel: 'Veranstaltungen', defaultHref: '/veranstaltungen', defaultPlacement: 'primary' },
+  { id: 'membership', defaultLabel: 'Mitglied werden', defaultHref: '/formular', defaultPlacement: 'primary' },
+  { id: 'partners', defaultLabel: 'Partner', defaultHref: '/unsere-partner', defaultPlacement: 'primary' },
+  { id: 'shop', defaultLabel: 'Shop', defaultHref: '/merchandise', defaultPlacement: 'primary' },
+  { id: 'sponsor', defaultLabel: 'Sponsor werden', defaultHref: '/sponsoren', defaultPlacement: 'more' },
+  { id: 'donation', defaultLabel: 'Spenden', defaultHref: '/spenden', defaultPlacement: 'more' },
+  { id: 'game', defaultLabel: 'Spiele', defaultHref: '/game', defaultPlacement: 'more' },
+];
+
+const NAVIGATION_ITEM_BY_ID = new Map(NAVIGATION_ITEMS.map((item) => [item.id, item]));
+const NAVIGATION_ITEM_BY_HREF = new Map(NAVIGATION_ITEMS.map((item) => [item.defaultHref, item]));
+const FOOTER_INFORMATION_DEFAULT_LINKS: FooterLink[] = [
+  { id: 'about', label: 'Über uns', href: '/ueber-uns' },
+  { id: 'events', label: 'Veranstaltungen', href: '/veranstaltungen' },
+  { id: 'membership', label: 'Mitglied werden', href: '/formular' },
+  { id: 'partners', label: 'Partner', href: '/unsere-partner' },
+];
+const FOOTER_CONTACT_DEFAULT_LINKS: FooterLink[] = [{ id: 'contact', label: 'Kontaktseite', href: '/kontakt' }];
+
+export const NAVIGATION_ITEM_IDS = NAVIGATION_ITEMS.map((item) => item.id);
 
 function normalizeHref(href: string) {
   if (!href || href === '/') {
@@ -16,6 +41,64 @@ function normalizeHref(href: string) {
   }
 
   return href.endsWith('/') ? href.slice(0, -1) : href;
+}
+
+export function normalizeSafeText(value: string) {
+  return value.trim().replace(/\s+/g, ' ');
+}
+
+export function normalizeInternalHref(href: string, fallback = '/') {
+  const trimmed = href.trim();
+
+  if (!trimmed) {
+    return fallback;
+  }
+
+  if (!trimmed.startsWith('/') || trimmed.startsWith('//') || /[\u0000-\u001f]/.test(trimmed)) {
+    return fallback;
+  }
+
+  if (/^(javascript|data|vbscript):/i.test(trimmed)) {
+    return fallback;
+  }
+
+  return normalizeHref(trimmed);
+}
+
+export function normalizeNavigationPlacement(value: unknown, fallback: NavigationPlacement = 'primary'): NavigationPlacement {
+  return value === 'more' || value === 'primary' ? value : fallback;
+}
+
+function isNavigationItemId(value: string): value is NavigationItemId {
+  return NAVIGATION_ITEM_BY_ID.has(value as NavigationItemId);
+}
+
+function resolveNavigationDefinition(link: NavigationLink) {
+  if (link.id && isNavigationItemId(link.id)) {
+    return NAVIGATION_ITEM_BY_ID.get(link.id) || null;
+  }
+
+  const href = normalizeHref(link.href);
+  return NAVIGATION_ITEM_BY_HREF.get(href) || null;
+}
+
+export function normalizeNavigationLabel(id: NavigationItemId, value: string) {
+  const definition = NAVIGATION_ITEM_BY_ID.get(id);
+
+  if (!definition) {
+    return normalizeSafeText(value);
+  }
+
+  return normalizeSafeText(value) || definition.defaultLabel;
+}
+
+export function getDefaultNavigationLinks(): NavigationLink[] {
+  return NAVIGATION_ITEMS.map((item) => ({
+    id: item.id,
+    label: item.defaultLabel,
+    href: item.defaultHref,
+    placement: item.defaultPlacement,
+  }));
 }
 
 export function getEventStandHref(eventId: string) {
@@ -48,6 +131,20 @@ export function normalizeExternalUrl(url: string) {
   return trimmed;
 }
 
+export function normalizeSafeSocialUrl(url: string) {
+  const normalized = normalizeExternalUrl(url);
+
+  if (!normalized || normalized === '#') {
+    return '';
+  }
+
+  if (!/^(https?:\/\/|mailto:|tel:)/i.test(normalized)) {
+    return '';
+  }
+
+  return normalized;
+}
+
 function looksLikeUrl(value: string) {
   const trimmed = value.trim();
 
@@ -77,115 +174,83 @@ export function isExternalUrl(url: string) {
 }
 
 export function normalizeNavigationLinks(links: NavigationLink[]) {
-  const filteredLinks: NavigationLink[] = [];
-  const seenHrefs = new Set<string>();
+  const linksById = new Map<NavigationItemId, NavigationLink>();
 
   for (const link of links) {
-    const normalizedHref = normalizeHref(link.href);
+    const definition = resolveNavigationDefinition(link);
 
-    if (!normalizedHref || REMOVED_NAV_HREFS.has(normalizedHref) || seenHrefs.has(normalizedHref)) {
+    if (!definition) {
       continue;
     }
 
-    seenHrefs.add(normalizedHref);
-    if (normalizedHref === SPONSOR_LINK.href) {
-      filteredLinks.push({ ...link, href: normalizedHref, label: SPONSOR_LINK.label });
+    const href = normalizeInternalHref(link.href, definition.defaultHref);
+
+    if (!href || REMOVED_NAV_HREFS.has(href)) {
       continue;
     }
 
-    if (normalizedHref === MEMBERSHIP_LINK.href) {
-      filteredLinks.push({ ...link, href: normalizedHref, label: MEMBERSHIP_LINK.label });
+    linksById.set(definition.id, {
+      id: definition.id,
+      href,
+      label: link.id ? normalizeNavigationLabel(definition.id, link.label) : definition.defaultLabel,
+      placement: normalizeNavigationPlacement(link.placement, definition.defaultPlacement),
+    });
+  }
+
+  return NAVIGATION_ITEMS.map((item) =>
+    linksById.get(item.id) || {
+      id: item.id,
+      label: item.defaultLabel,
+      href: item.defaultHref,
+      placement: item.defaultPlacement,
+    }
+  );
+}
+
+export function getNavigationSections(links: NavigationLink[]) {
+  const normalizedLinks = normalizeNavigationLinks(links);
+
+  return {
+    primaryLinks: normalizedLinks.filter((link) => normalizeNavigationPlacement(link.placement, 'primary') === 'primary'),
+    moreLinks: normalizedLinks.filter((link) => normalizeNavigationPlacement(link.placement, 'primary') === 'more'),
+    orderedLinks: normalizedLinks,
+  };
+}
+
+function normalizeFooterLinks(links: FooterLink[], defaults: FooterLink[]): FooterLink[] {
+  const resolved: FooterLink[] = [];
+
+  for (const [index, link] of links.entries()) {
+    const fallback = defaults[index];
+    const label = normalizeSafeText(link.label || fallback?.label || '');
+    const href = normalizeInternalHref(link.href || fallback?.href || '', fallback?.href || '/kontakt');
+
+    if (!label || !href) {
       continue;
     }
 
-    filteredLinks.push({ ...link, href: normalizedHref });
+    resolved.push({
+      id: link.id || fallback?.id,
+      label,
+      href,
+    });
   }
 
-  if (!seenHrefs.has(MEMBERSHIP_LINK.href)) {
-    const eventsIndex = filteredLinks.findIndex((link) => link.href === '/veranstaltungen');
+  return resolved;
+}
 
-    if (eventsIndex >= 0) {
-      filteredLinks.splice(eventsIndex + 1, 0, MEMBERSHIP_LINK);
-    } else {
-      filteredLinks.unshift(MEMBERSHIP_LINK);
-    }
-  }
+export function getDefaultFooterInformationLinks(): FooterLink[] {
+  return FOOTER_INFORMATION_DEFAULT_LINKS.map((link) => ({ ...link }));
+}
 
-  if (!seenHrefs.has(SPONSOR_LINK.href)) {
-    const membershipIndex = filteredLinks.findIndex((link) => link.href === MEMBERSHIP_LINK.href);
+export function getDefaultFooterContactLinks(): FooterLink[] {
+  return FOOTER_CONTACT_DEFAULT_LINKS.map((link) => ({ ...link }));
+}
 
-    if (membershipIndex >= 0) {
-      filteredLinks.splice(membershipIndex + 1, 0, SPONSOR_LINK);
-    } else {
-      filteredLinks.push(SPONSOR_LINK);
-    }
-  }
+export function normalizeFooterInformationLinks(links: FooterLink[]): FooterLink[] {
+  return normalizeFooterLinks(links, FOOTER_INFORMATION_DEFAULT_LINKS);
+}
 
-  if (!seenHrefs.has(DONATION_LINK.href)) {
-    const sponsorIndex = filteredLinks.findIndex((link) => link.href === SPONSOR_LINK.href);
-
-    if (sponsorIndex >= 0) {
-      filteredLinks.splice(sponsorIndex + 1, 0, DONATION_LINK);
-    } else {
-      filteredLinks.push(DONATION_LINK);
-    }
-  }
-
-  if (!seenHrefs.has(PARTNERS_LINK.href)) {
-    const donationIndex = filteredLinks.findIndex((link) => link.href === DONATION_LINK.href);
-
-    if (donationIndex >= 0) {
-      filteredLinks.splice(donationIndex + 1, 0, PARTNERS_LINK);
-    } else {
-      filteredLinks.push(PARTNERS_LINK);
-    }
-  }
-
-  if (!seenHrefs.has(MERCHANDISE_LINK.href)) {
-    const sponsorsIndex = filteredLinks.findIndex((link) => link.href === PARTNERS_LINK.href || link.href === DONATION_LINK.href);
-
-    if (sponsorsIndex >= 0) {
-      filteredLinks.splice(sponsorsIndex + 1, 0, MERCHANDISE_LINK);
-    } else {
-      filteredLinks.push(MERCHANDISE_LINK);
-    }
-  }
-
-  if (!seenHrefs.has(GALLERY_LINK.href)) {
-    const eventsIndex = filteredLinks.findIndex((link) => link.href === '/veranstaltungen');
-
-    if (eventsIndex >= 0) {
-      filteredLinks.splice(eventsIndex + 1, 0, GALLERY_LINK);
-    } else {
-      filteredLinks.push(GALLERY_LINK);
-    }
-  }
-
-  if (!seenHrefs.has(GAME_LINK.href)) {
-    const galleryIndex = filteredLinks.findIndex((link) => link.href === GALLERY_LINK.href);
-
-    if (galleryIndex >= 0) {
-      filteredLinks.splice(galleryIndex + 1, 0, GAME_LINK);
-    } else {
-      filteredLinks.push(GAME_LINK);
-    }
-  }
-
-  const orderedLinks: NavigationLink[] = [];
-
-  for (const href of CANONICAL_NAV_ORDER) {
-    const link = filteredLinks.find((entry) => entry.href === href);
-
-    if (link) {
-      orderedLinks.push(link);
-    }
-  }
-
-  for (const link of filteredLinks) {
-    if (!orderedLinks.some((entry) => entry.href === link.href)) {
-      orderedLinks.push(link);
-    }
-  }
-
-  return orderedLinks;
+export function normalizeFooterContactLinks(links: FooterLink[]): FooterLink[] {
+  return normalizeFooterLinks(links, FOOTER_CONTACT_DEFAULT_LINKS);
 }

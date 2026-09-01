@@ -19,8 +19,10 @@ export interface ThemeSettings {
 }
 
 export interface NavigationLink {
+  id?: string;
   label: string;
   href: string;
+  placement?: 'primary' | 'more';
 }
 
 export interface MediaAsset {
@@ -41,7 +43,13 @@ export interface GalleryFolder {
 }
 
 export interface FooterSocialLink {
-  platform: 'facebook' | 'instagram' | 'youtube';
+  platform: 'facebook' | 'instagram' | 'youtube' | 'tiktok';
+  label: string;
+  href: string;
+}
+
+export interface FooterLink {
+  id?: string;
   label: string;
   href: string;
 }
@@ -66,6 +74,35 @@ export interface ProcessStepContent {
   number: string;
   title: string;
   text: string;
+}
+
+export interface HomeNewsItem {
+  id: string;
+  title: string;
+  excerpt: string;
+  imageUrl: string;
+  imageAlt: string;
+  imageName?: string;
+  imageContentType?: string;
+  publishedAt: string;
+  linkLabel?: string;
+  linkHref?: string;
+  visible: boolean;
+}
+
+export interface HomeDisplaySettings {
+  heroHeightDesktop: number;
+  heroHeightMobile: number;
+  heroTitleSizeDesktop: number;
+  heroTitleSizeMobile: number;
+  sectionTitleSizeDesktop: number;
+  sectionTitleSizeMobile: number;
+  sectionSpacingDesktop: number;
+  sectionSpacingMobile: number;
+  cardGap: number;
+  eventImageHeight: number;
+  newsImageHeight: number;
+  membershipMinHeight: number;
 }
 
 export interface LiveEditorBoxStyle {
@@ -122,6 +159,28 @@ export interface HomePageContent {
   newsImages: MediaAsset[];
   newsImagePositionX: number;
   newsImagePositionY: number;
+  heroSubtitle: string;
+  heroDescription: string;
+  heroImageAlt: string;
+  heroImagePositionX: number;
+  heroImagePositionY: number;
+  eventsSectionTitle: string;
+  eventsSectionIntro: string;
+  eventsSectionCtaLabel: string;
+  eventsEmptyText: string;
+  newsSectionTitle: string;
+  newsSectionIntro: string;
+  newsEmptyText: string;
+  newsItems: HomeNewsItem[];
+  membershipTitle: string;
+  membershipBody: string;
+  membershipCtaLabel: string;
+  membershipCtaHref: string;
+  membershipImage: MediaAsset;
+  membershipImageAlt: string;
+  membershipImagePositionX: number;
+  membershipImagePositionY: number;
+  displaySettings: HomeDisplaySettings;
   updatePrimaryCtaLabel: string;
   updatePrimaryCtaHref: string;
   updateSecondaryCtaLabel: string;
@@ -150,8 +209,14 @@ export interface HomePageContent {
 export interface FooterContent {
   brandHeadline: string;
   brandHighlight: string;
+  description?: string;
   copyrightName: string;
   socialLinks: FooterSocialLink[];
+  informationHeading?: string;
+  informationLinks?: FooterLink[];
+  contactHeading?: string;
+  contactLinks?: FooterLink[];
+  contactEmail?: string;
 }
 
 export interface SponsorsPageContent {
@@ -171,14 +236,34 @@ export interface AboutValueItem {
   description: string;
 }
 
+export interface AboutSectionContent {
+  eyebrow: string;
+  title: string;
+  paragraphs: string[];
+  bullets?: string[];
+}
+
+export interface AboutTeamMember {
+  role: string;
+  description: string;
+  image: MediaAsset;
+  imageAlt: string;
+}
+
 export interface AboutPageContent {
   title: string;
   accentWord: string;
   introParagraphs: string[];
   values: AboutValueItem[];
+  sections: AboutSectionContent[];
   teamTitle: string;
+  teamLead: string;
   teamRoles: string[];
   teamImages: MediaAsset[];
+  teamMembers: AboutTeamMember[];
+  closingEyebrow: string;
+  closingTitle: string;
+  closingBody: string;
   ctaLabel: string;
   ctaHref: string;
 }

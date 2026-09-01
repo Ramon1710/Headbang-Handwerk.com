@@ -2,14 +2,17 @@ export interface Event {
   id: string;
   title: string;
   date: string;
+  startDate?: string;
+  endDate?: string;
   location: string;
   festivalName: string;
   description: string;
-  status: 'planned' | 'confirmed' | 'completed';
+  status: 'planned' | 'confirmed' | 'completed' | 'cancelled';
   standEnabled?: boolean;
   ctaText: string;
   ctaUrl?: string;
   imageUrl?: string;
+  imageAlt?: string;
   stand?: EventStandConfig;
 }
 

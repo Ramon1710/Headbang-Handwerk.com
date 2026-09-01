@@ -18,7 +18,10 @@ const statusMap = {
   confirmed: { label: 'Bestätigt', variant: 'success' as const },
   planned: { label: 'Geplant', variant: 'warning' as const },
   completed: { label: 'Abgeschlossen', variant: 'default' as const },
+  cancelled: { label: 'Abgesagt', variant: 'danger' as const },
 };
+
+const EVENT_IMAGE_FALLBACK_SRC = '/Headbang Stand Bild.png';
 
 export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix }: EventCardProps) {
   const { label, variant } = statusMap[event.status];
@@ -27,9 +30,14 @@ export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix 
   const canOpenStand = Boolean(event.standEnabled);
   const ctaHref = resolveEventCtaUrl(event.ctaUrl, event.ctaText);
   const opensExternalSite = isExternalUrl(ctaHref);
+  const imageSrc = event.imageUrl || EVENT_IMAGE_FALLBACK_SRC;
+  const imageAlt = event.imageAlt || event.title;
 
   const cardContent = (
     <>
+      <div className="mb-5 overflow-hidden rounded-[1.2rem] border border-white/10 bg-black/30 shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
+        <img src={imageSrc} alt={imageAlt} className="h-48 w-full object-cover" />
+      </div>
       <div className="flex items-start justify-center mb-4">
         <Badge variant={variant}>
           <LiveEditableText

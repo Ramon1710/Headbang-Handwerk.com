@@ -1,248 +1,189 @@
-import { ArrowRight, ImageIcon } from 'lucide-react';
+import type { CSSProperties } from 'react';
+import { ArrowRight, CalendarDays, EyeOff, ImageIcon, MapPin, Newspaper, Users2 } from 'lucide-react';
 import { SiteNavigation } from '@/components/site-navigation';
 import { Footer } from '@/components/footer';
-import { LiveEditableText } from '@/components/live-editable-text';
 import { LiveLayoutSaveProvider } from '@/components/live-layout-save-context';
-import { LiveResizableBox } from '@/components/live-resizable-box';
+import { ConfirmSubmitButton } from '@/components/confirm-submit-button';
+import { FormValueSubmitButton } from '@/components/form-value-submit-button';
 import { Button } from '@/components/ui/button';
-import { HomeNewsEditor } from '@/components/home-news-editor';
-import { logoutAction } from '@/app/admin/actions';
-import { updateHomeMediaAction } from '@/app/admin/media-actions';
+import {
+  addHomeNewsAction,
+  deleteHomeNewsAction,
+  moveHomeNewsAction,
+  updateHomeDisplaySettingsAction,
+  updateHomeEventsSectionAction,
+  updateHomeHeroAction,
+  updateHomeMembershipAction,
+  updateHomeNewsAction,
+  updateHomeNewsSectionAction,
+} from '@/app/admin/home-actions';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
-import { resolveLiveBoxStyle, resolveLiveHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
+import { getUpcomingEvents } from '@/lib/events';
+import {
+  HOME_DISPLAY_SETTING_SPECS,
+  getVisibleHomeNewsItems,
+  resolveHomeEventCtaHref,
+  resolveHomeNewsLinkHref,
+  resolveHomeNewsPublishedLabel,
+} from '@/lib/home';
+import { isExternalUrl } from '@/lib/site';
+import { cn } from '@/lib/utils';
 import standBeispielKiImage from '../Stand Beispiel KI.png';
 import wackenBackgroundImage from '../Wacken Hintergrund Bild.png';
-import type { MediaAsset } from '@/lib/cms/schema';
+import type { HomeDisplaySettings, HomeNewsItem, MediaAsset } from '@/lib/cms/schema';
 
-type LiveEditorState = Awaited<ReturnType<typeof getCmsContent>>['site']['liveEditor'];
+const EVENT_IMAGE_FALLBACK_SRC = '/Headbang Stand Bild.png';
 
-function getMediaErrorMessage(mediaError?: string) {
-  if (!mediaError) {
+function getSavedMessage(saved?: string) {
+  if (!saved) {
     return null;
   }
 
-  if (mediaError === 'missing-config') {
-    return 'Firebase ist für Uploads noch nicht vollständig gesetzt. Prüfe FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY und FIREBASE_STORAGE_BUCKET.';
-  }
+  const messages: Record<string, string> = {
+    hero: 'Hero-Bereich gespeichert.',
+    events: 'Veranstaltungs-Vorschau gespeichert.',
+    'news-section': 'News-Sektion gespeichert.',
+    'news-added': 'News-Eintrag angelegt.',
+    'news-updated': 'News-Eintrag gespeichert.',
+    'news-deleted': 'News-Eintrag gelöscht.',
+    'news-sorted': 'News-Reihenfolge gespeichert.',
+    membership: 'Mitgliederbereich gespeichert.',
+    display: 'Darstellungswerte gespeichert.',
+  };
 
-  if (mediaError.endsWith('-invalid-config')) {
-    return 'Firebase ist gesetzt, aber ungültig formatiert. Prüfe besonders FIREBASE_PRIVATE_KEY und FIREBASE_STORAGE_BUCKET.';
-  }
-
-  if (mediaError.endsWith('-bucket')) {
-    return 'Der Firebase-Storage-Bucket wurde nicht gefunden. Prüfe FIREBASE_STORAGE_BUCKET in Vercel.';
-  }
-
-  if (mediaError.endsWith('-permission')) {
-    return 'Der Firebase-Service-Account hat keine Schreibrechte auf den Storage-Bucket.';
-  }
-
-  return 'Upload fehlgeschlagen. Bitte Firebase-Storage prüfen.';
+  return messages[saved] || 'Änderungen gespeichert.';
 }
 
-function getMediaSavedMessage(mediaSaved?: string) {
-  if (!mediaSaved) {
-    return null;
-  }
-
-  if (mediaSaved === 'home') {
-    return 'Startseiten-Medien gespeichert.';
-  }
-
-  if (mediaSaved === 'logo') {
-    return 'Hauptlogo gespeichert.';
-  }
-
-  return 'Änderungen gespeichert.';
+function getImagePreviewSrc(asset: MediaAsset, fallbackSrc: string) {
+  return asset.assetUrl || fallbackSrc;
 }
 
-function getMediaAssetKind(asset: MediaAsset) {
-  const url = asset.assetUrl.toLowerCase();
-  const contentType = asset.assetContentType.toLowerCase();
-
-  if (contentType.startsWith('video/') || /(\.mp4|\.mov|\.webm)$/i.test(url)) {
-    return 'video';
-  }
-
-  if (contentType.startsWith('image/') || /(\.png|\.jpe?g|\.webp|\.svg)$/i.test(url)) {
-    return 'image';
-  }
-
-  return 'file';
+function getHeroStyles(settings: HomeDisplaySettings): CSSProperties {
+  return {
+    minHeight: `clamp(${settings.heroHeightMobile}px, 72vh, ${settings.heroHeightDesktop}px)`,
+  };
 }
 
-function HomeActionCard({
-  boxKey,
-  titleKey,
-  bodyKey,
-  ctaKey,
-  title,
-  body,
-  href,
-  linkLabel,
-  mediaAsset,
-  showCta = true,
-  isAdmin,
-  liveEditor,
-}: {
-  boxKey: string;
-  titleKey: string;
-  bodyKey: string;
-  ctaKey: string;
-  title: string;
-  body: string;
-  href: string;
-  linkLabel: string;
-  mediaAsset?: MediaAsset;
-  showCta?: boolean;
-  isAdmin: boolean;
-  liveEditor: LiveEditorState;
-}) {
-  const hasMediaAsset = Boolean(mediaAsset?.assetUrl);
-  const mediaAssetKind = mediaAsset ? getMediaAssetKind(mediaAsset) : 'file';
+function getSectionSpacingStyles(settings: HomeDisplaySettings): CSSProperties {
+  return {
+    marginTop: `clamp(${settings.sectionSpacingMobile}px, 8vw, ${settings.sectionSpacingDesktop}px)`,
+  };
+}
 
+function getSectionTitleStyles(settings: HomeDisplaySettings): CSSProperties {
+  return {
+    fontSize: `clamp(${settings.sectionTitleSizeMobile}px, 4vw, ${settings.sectionTitleSizeDesktop}px)`,
+    lineHeight: 0.95,
+  };
+}
+
+function getHeroTitleStyles(settings: HomeDisplaySettings): CSSProperties {
+  return {
+    fontSize: `clamp(${settings.heroTitleSizeMobile}px, 7vw, ${settings.heroTitleSizeDesktop}px)`,
+    lineHeight: 0.94,
+  };
+}
+
+function getPreviewGridClasses(itemCount: number) {
+  if (itemCount <= 1) {
+    return 'mx-auto max-w-3xl grid grid-cols-1';
+  }
+
+  if (itemCount === 2) {
+    return 'mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-2';
+  }
+
+  return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+}
+
+function AdminPanel({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   return (
-    <LiveResizableBox
-      boxKey={boxKey}
-      initialStyle={resolveLiveBoxStyle(liveEditor, boxKey)}
-      isAdmin={isAdmin}
-      className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.9)_0%,rgba(10,7,5,0.82)_100%)] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)] sm:p-7"
-    >
-      <LiveEditableText
-        as="h3"
-        className="section-title uppercase"
-        editorKey={titleKey}
-        initialHtml={resolveLiveHtml(liveEditor, titleKey, title)}
-        isAdmin={isAdmin}
-        title={`${title} Überschrift`}
-        normalizeTypography
-      />
-      <LiveEditableText
-        as="p"
-        className="body-copy mt-3"
-        editorKey={bodyKey}
-        initialHtml={resolveLiveHtml(liveEditor, bodyKey, body)}
-        isAdmin={isAdmin}
-        title={`${title} Beschreibung`}
-        normalizeTypography
-      />
-      {hasMediaAsset ? (
-        mediaAssetKind === 'video' ? (
-          <div className="mt-4 overflow-hidden rounded-[1rem] border border-white/10 bg-black/40 shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
-            <video
-              src={mediaAsset?.assetUrl}
-              controls
-              playsInline
-              preload="metadata"
-              className="h-full max-h-[24rem] w-full bg-black object-cover"
-            />
-          </div>
-        ) : mediaAssetKind === 'image' ? (
-          <div className="mt-4 overflow-hidden rounded-[1rem] border border-white/10 bg-black/40 shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
-            <img src={mediaAsset?.assetUrl} alt={mediaAsset?.assetName || title} className="h-full max-h-[24rem] w-full object-cover" />
-          </div>
-        ) : (
-          <a
-            href={mediaAsset?.assetUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-4 inline-flex rounded-[0.8rem] border border-[color:var(--color-border)] bg-black/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-[color:var(--color-accent)]"
-          >
-            Datei öffnen
-          </a>
-        )
-      ) : null}
-      {showCta ? (
-        isAdmin ? (
-          <div className="link-copy mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2.5 text-sm font-bold tracking-wide">
-            <LiveEditableText
-              as="span"
-              className="link-copy text-sm font-bold tracking-wide"
-              editorKey={ctaKey}
-              initialHtml={resolveLiveHtml(liveEditor, ctaKey, linkLabel)}
-              isAdmin={isAdmin}
-              title={`${title} Buttontext`}
-              normalizeTypography
-            />
-            <ArrowRight className="h-4 w-4" />
-          </div>
-        ) : (
-          <Button href={href} variant="secondary" className="mt-4 w-full justify-center">
-            {resolveLiveHtml(liveEditor, ctaKey, linkLabel).replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        )
-      ) : null}
-    </LiveResizableBox>
+    <section className="rounded-[1.6rem] border border-[#ff9d3c]/30 bg-[#130d09]/92 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.28)] backdrop-blur-sm">
+      <div className="mb-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#ffcf98]">Startseite</p>
+        <h2 className="mt-1 text-xl font-black text-white">{title}</h2>
+        <p className="mt-2 text-sm text-[#ead7bf]">{description}</p>
+      </div>
+      {children}
+    </section>
   );
 }
 
-function HomeNewsCard({
-  home,
-  liveEditor,
-  isAdmin,
-}: {
-  home: Awaited<ReturnType<typeof getCmsContent>>['site']['home'];
-  liveEditor: LiveEditorState;
-  isAdmin: boolean;
-}) {
+function HomeEventPreviewCard({ event, imageHeight }: { event: Awaited<ReturnType<typeof getCmsContent>>['site']['events'][number]; imageHeight: number }) {
+  const ctaHref = resolveHomeEventCtaHref(event.ctaUrl);
+  const ctaLabel = event.ctaText?.trim() || 'Zur Veranstaltungsübersicht';
+  const statusLabel = event.status === 'planned' ? 'Geplant' : event.status === 'confirmed' ? 'Bestätigt' : null;
+
   return (
-    <LiveResizableBox
-      boxKey="home.simple.news.box"
-      initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.news.box')}
-      isAdmin={isAdmin}
-      className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
-    >
-      <LiveEditableText
-        as="h3"
-        className="section-title uppercase"
-        editorKey="home.newsTitle"
-        initialHtml={resolveLiveHtml(liveEditor, 'home.newsTitle', home.newsTitle)}
-        isAdmin={isAdmin}
-        title="News Überschrift"
-        normalizeTypography
-      />
-      <HomeNewsEditor
-        editorKey="home.newsParagraphs.0"
-        className="body-copy mt-3"
-        initialHtml={resolveLiveHtml(liveEditor, 'home.newsParagraphs.0', home.newsParagraphs[0] || '')}
-        isAdmin={isAdmin}
-        title="News Text"
-        images={home.newsImages}
-        imagePositionX={home.newsImagePositionX}
-        imagePositionY={home.newsImagePositionY}
-      />
-      {home.newsImages[0]?.assetUrl ? (
-        <div className="mt-4 overflow-hidden rounded-[1rem] border border-white/10 bg-black/30 shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
-          <img
-            src={home.newsImages[0].assetUrl}
-            alt={home.newsImages[0].assetName || 'News Bild'}
-            className="h-52 w-full object-cover"
-            style={{ objectPosition: `${home.newsImagePositionX}% ${home.newsImagePositionY}%` }}
-          />
+    <article className="group overflow-hidden rounded-[1.7rem] border border-white/10 bg-[linear-gradient(180deg,rgba(23,15,11,0.94)_0%,rgba(10,7,5,0.9)_100%)] shadow-[0_20px_50px_rgba(0,0,0,0.24)]">
+      <div className="overflow-hidden border-b border-white/10 bg-black/30">
+        <img src={event.imageUrl || EVENT_IMAGE_FALLBACK_SRC} alt={event.imageAlt || event.title} className="w-full object-cover transition duration-300 group-hover:scale-[1.02]" style={{ height: `${imageHeight}px` }} />
+      </div>
+      <div className="p-6">
+        {statusLabel ? <span className="inline-flex rounded-full border border-[color:var(--color-accent)]/40 bg-[color:var(--color-accent)]/10 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-[color:var(--color-accent-soft)]">{statusLabel}</span> : null}
+        <h3 className="section-title mt-4 text-[1.55rem] leading-[0.98] text-white">{event.title}</h3>
+        <div className="mt-4 space-y-2 text-sm text-[#e7d7c5]">
+          <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-[color:var(--color-accent)]" />{event.date}</p>
+          <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-[color:var(--color-accent)]" />{event.location}</p>
+        </div>
+        <p className="body-copy mt-4 text-[#e7d7c5]">{event.description}</p>
+        <div className="mt-6">
+          <Button href={ctaHref} variant="secondary" className="w-full justify-center" target={isExternalUrl(ctaHref) ? '_blank' : undefined} rel={isExternalUrl(ctaHref) ? 'noreferrer noopener' : undefined}>
+            {ctaLabel}
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function HomeNewsPreviewCard({ item, imageHeight }: { item: HomeNewsItem; imageHeight: number }) {
+  const publishedLabel = resolveHomeNewsPublishedLabel(item.publishedAt);
+  const linkHref = resolveHomeNewsLinkHref(item.linkHref || '');
+
+  return (
+    <article className="overflow-hidden rounded-[1.7rem] border border-white/10 bg-[linear-gradient(180deg,rgba(24,16,12,0.94)_0%,rgba(10,7,5,0.88)_100%)] shadow-[0_20px_50px_rgba(0,0,0,0.24)]">
+      {item.imageUrl ? (
+        <div className="overflow-hidden border-b border-white/10 bg-black/30">
+          <img src={item.imageUrl} alt={item.imageAlt || item.title} className="w-full object-cover" style={{ height: `${imageHeight}px` }} />
         </div>
       ) : null}
-    </LiveResizableBox>
+      <div className="p-6">
+        {publishedLabel ? <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--color-accent-soft)]">{publishedLabel}</p> : null}
+        <h3 className="section-title mt-3 text-[1.4rem] leading-[0.98] text-white">{item.title}</h3>
+        <p className="body-copy mt-4 whitespace-pre-line text-[#eadbc8]">{item.excerpt}</p>
+        {linkHref ? (
+          <div className="mt-6">
+            <Button href={linkHref} variant="secondary" className="w-full justify-center" target={isExternalUrl(linkHref) ? '_blank' : undefined} rel={isExternalUrl(linkHref) ? 'noreferrer noopener' : undefined}>
+              {item.linkLabel || 'Mehr erfahren'}
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : null}
+      </div>
+    </article>
   );
 }
 
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams?: Promise<{ view?: string; mediaSaved?: string; mediaError?: string }>;
+  searchParams?: Promise<{ view?: string; homeSaved?: string; homeError?: string }>;
 }) {
   const params = searchParams ? await searchParams : undefined;
   const cms = await getCmsContent();
   const isAuthenticatedAdmin = await isAdminAuthenticated();
   const isAdmin = isAuthenticatedAdmin && params?.view !== 'user';
   const home = cms.site.home;
-  const liveEditor = cms.site.liveEditor;
-  const heroImageSrc = home.heroImage.assetUrl || standBeispielKiImage.src;
+  const heroImageSrc = getImagePreviewSrc(home.heroImage, standBeispielKiImage.src);
+  const membershipImageSrc = home.membershipImage.assetUrl;
   const backgroundImageSrc = home.backgroundImage.assetUrl || wackenBackgroundImage.src;
-  const instagramVideo = home.instagramVideo;
-  const mediaErrorMessage = getMediaErrorMessage(params?.mediaError);
-  const mediaSavedMessage = getMediaSavedMessage(params?.mediaSaved);
+  const upcomingEvents = getUpcomingEvents(cms.site.events, { limit: 3 });
+  const visibleNewsItems = getVisibleHomeNewsItems(home.newsItems, 3);
+  const savedMessage = getSavedMessage(params?.homeSaved);
+  const layoutSettings = home.displaySettings;
 
   return (
     <>
@@ -261,291 +202,411 @@ export default async function HomePage({
             backgroundSize: 'cover, cover',
           }}
         >
-          {isAdmin ? (
-            <>
-              <form action={logoutAction} className="fixed left-4 top-4 z-[61]">
-                <button
-                  type="submit"
-                  className="rounded-2xl border border-[#ff9d3c]/50 bg-[#130d09]/94 px-4 py-3 text-sm font-black text-[#f4e5d2] shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-sm transition hover:border-[#ffb14d] hover:text-white"
-                >
-                  Admin-Ansicht verlassen
-                </button>
-              </form>
-              <section className="fixed left-4 top-24 z-[61] w-[min(22rem,calc(100vw-2rem))] rounded-[1.4rem] border border-[#ff9d3c]/40 bg-[#130d09]/92 p-4 text-[#f4e5d2] shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-sm">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#ffcf98]">Oben links</p>
-                    <h2 className="mt-1 text-lg font-black text-white">Hauptlogo tauschen</h2>
-                  </div>
-                  {cms.site.logo.assetUrl ? (
-                    <img src={cms.site.logo.assetUrl} alt={cms.site.logo.assetName || 'Aktuelles Logo'} className="h-12 w-20 rounded-lg bg-black/20 object-contain p-1" />
-                  ) : (
-                    <div className="flex h-12 w-20 items-center justify-center rounded-lg border border-white/10 bg-black/20 text-[0.65rem] font-semibold text-[#cdbca7]">
-                      Standard
-                    </div>
-                  )}
-                </div>
-                <form action={updateHomeMediaAction} className="mt-4 grid gap-3">
-                  <label className="block">
-                    <span className="mb-2 block text-sm font-semibold text-white">Logo-Datei</span>
-                    <input type="file" name="logoAssetFile" accept=".png,.jpg,.jpeg,.webp,.svg" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-black" />
-                  </label>
-                  <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-[#d9c8b5]">
-                    <input type="checkbox" name="removeLogoAsset" className="h-4 w-4" />
-                    Hochgeladenes Logo entfernen
-                  </label>
-                  {mediaSavedMessage ? <p className="rounded-xl border border-green-500/30 bg-green-950/40 px-4 py-3 text-sm text-green-200">{mediaSavedMessage}</p> : null}
-                  {mediaErrorMessage ? <p className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">{mediaErrorMessage}</p> : null}
-                  <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">Logo speichern</button>
-                </form>
-              </section>
-              <div className="fixed bottom-4 right-4 z-[60] max-w-sm rounded-2xl border border-[#ff9d3c]/50 bg-[#130d09]/92 px-4 py-3 text-sm text-[#f4e5d2] shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-sm">
-                Klick auf Text zum Bearbeiten. Ziehe unten rechts an Kästchen, um ihre Größe zu ändern.
-              </div>
-            </>
-          ) : null}
-
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_12%,rgba(255,143,42,0.18)_0%,transparent_30%),linear-gradient(180deg,rgba(6,3,2,0.15)_0%,rgba(6,3,2,0.82)_100%)]" />
 
-          <div className="site-shell relative z-10 px-4 pb-10 pt-28 sm:px-6 md:pb-12 lg:px-8">
+          <div className="site-shell relative z-10 px-4 pb-14 pt-28 sm:px-6 lg:px-8 lg:pt-32">
+            {savedMessage ? <p className="mb-6 rounded-2xl border border-green-500/30 bg-green-950/40 px-5 py-4 text-sm font-semibold text-green-200">{savedMessage}</p> : null}
+            {params?.homeError ? <p className="mb-6 rounded-2xl border border-red-500/30 bg-red-950/40 px-5 py-4 text-sm font-semibold text-red-200">{params.homeError}</p> : null}
+
             {isAdmin ? (
-              <section className="mb-6 rounded-[1.6rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.84)_100%)] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
-                <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-                  <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--color-accent-soft)]">Startseiten Medien</p>
-                    <h2 className="mt-2 text-2xl font-black text-white">Bild und Hintergrund per Firebase pflegen</h2>
-                  </div>
-                  <div className="text-sm font-semibold">
-                    {mediaSavedMessage ? <p className="rounded-xl border border-green-500/30 bg-green-950/40 px-4 py-3 text-green-200">{mediaSavedMessage}</p> : null}
-                    {mediaErrorMessage ? <p className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-red-200">{mediaErrorMessage}</p> : null}
-                  </div>
-                </div>
-                <form action={updateHomeMediaAction} className="mt-5 grid gap-4 md:grid-cols-2">
-                  <label className="block">
-                    <span className="mb-2 block text-sm font-semibold text-white">Startseitenbild</span>
-                    <input type="file" name="heroImageFile" accept=".png,.jpg,.jpeg,.webp" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-black" />
-                  </label>
-                  <label className="block">
-                    <span className="mb-2 block text-sm font-semibold text-white">Hintergrundbild</span>
-                    <input type="file" name="backgroundImageFile" accept=".png,.jpg,.jpeg,.webp" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-black" />
-                  </label>
-                  <label className="block md:col-span-2">
-                    <span className="mb-2 block text-sm font-semibold text-white">Instagram-Video</span>
-                    <input type="file" name="instagramVideoFile" accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-black" />
-                    {instagramVideo.assetUrl ? (
-                      <span className="mt-2 block text-xs text-[color:var(--color-muted)]">
-                        Aktuell hochgeladen: {instagramVideo.assetName || 'Instagram-Video'}
-                      </span>
+              <div className="grid gap-5 xl:grid-cols-2">
+                <AdminPanel title="Hero" description="Hero-Texte, sichere Buttonziele und das große Titelbild der Startseite pflegen.">
+                  <form action={updateHomeHeroAction} className="grid gap-4">
+                    <label className="block">
+                      <span className="mb-2 block text-sm font-semibold text-white">Hauptüberschrift</span>
+                      <textarea name="heroTitle" defaultValue={home.heroTitle} rows={3} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                    </label>
+                    <label className="block">
+                      <span className="mb-2 block text-sm font-semibold text-white">Zusatzzeile</span>
+                      <input name="heroSubtitle" defaultValue={home.heroSubtitle} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                    </label>
+                    <label className="block">
+                      <span className="mb-2 block text-sm font-semibold text-white">Beschreibung optional</span>
+                      <textarea name="heroDescription" defaultValue={home.heroDescription} rows={4} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                    </label>
+                    <div className="grid gap-4 lg:grid-cols-2">
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Button 1 Text</span>
+                        <input name="heroPrimaryCtaLabel" defaultValue={home.heroPrimaryCtaLabel} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Button 1 Ziel</span>
+                        <input name="heroPrimaryCtaHref" defaultValue={home.heroPrimaryCtaHref} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Button 2 Text</span>
+                        <input name="heroSecondaryCtaLabel" defaultValue={home.heroSecondaryCtaLabel} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Button 2 Ziel</span>
+                        <input name="heroSecondaryCtaHref" defaultValue={home.heroSecondaryCtaHref} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
+                    </div>
+                    <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Hero-Bild</span>
+                        <input type="file" name="heroImageFile" accept=".png,.jpg,.jpeg,.webp" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-black" />
+                        <span className="mt-2 block text-xs text-[#c9b7a3]">Erlaubt: PNG, JPG, WEBP bis 3,5 MB.</span>
+                      </label>
+                      <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
+                        <img src={heroImageSrc} alt={home.heroImageAlt || home.heroTitle} className="h-36 w-full object-cover" style={{ objectPosition: `${home.heroImagePositionX}% ${home.heroImagePositionY}%` }} />
+                      </div>
+                    </div>
+                    <div className="grid gap-4 lg:grid-cols-3">
+                      <label className="block lg:col-span-2">
+                        <span className="mb-2 block text-sm font-semibold text-white">Alternativtext</span>
+                        <input name="heroImageAlt" defaultValue={home.heroImageAlt} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
+                      <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-[#dbc8b4]">
+                        <input type="checkbox" name="removeHeroImage" className="h-4 w-4" />
+                        Hero-Bild entfernen
+                      </label>
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Bildfokus X</span>
+                        <input type="range" name="heroImagePositionX" min="0" max="100" step="1" defaultValue={home.heroImagePositionX} className="w-full" />
+                      </label>
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Bildfokus Y</span>
+                        <input type="range" name="heroImagePositionY" min="0" max="100" step="1" defaultValue={home.heroImagePositionY} className="w-full" />
+                      </label>
+                    </div>
+                    <div className="flex justify-end">
+                      <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">Hero speichern</button>
+                    </div>
+                  </form>
+                </AdminPanel>
+
+                <AdminPanel title="Veranstaltungen-Vorschau" description="Texte und Fallbacks der automatisch geladenen nächsten drei Veranstaltungen steuern.">
+                  <form action={updateHomeEventsSectionAction} className="grid gap-4">
+                    <label className="block">
+                      <span className="mb-2 block text-sm font-semibold text-white">Überschrift</span>
+                      <input name="eventsSectionTitle" defaultValue={home.eventsSectionTitle} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                    </label>
+                    <label className="block">
+                      <span className="mb-2 block text-sm font-semibold text-white">Einleitung optional</span>
+                      <textarea name="eventsSectionIntro" defaultValue={home.eventsSectionIntro} rows={3} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                    </label>
+                    <label className="block">
+                      <span className="mb-2 block text-sm font-semibold text-white">Buttontext</span>
+                      <input name="eventsSectionCtaLabel" defaultValue={home.eventsSectionCtaLabel} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                    </label>
+                    <label className="block">
+                      <span className="mb-2 block text-sm font-semibold text-white">Hinweis bei fehlenden Terminen</span>
+                      <textarea name="eventsEmptyText" defaultValue={home.eventsEmptyText} rows={3} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                    </label>
+                    <div className="flex justify-end">
+                      <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">Veranstaltungen speichern</button>
+                    </div>
+                  </form>
+                </AdminPanel>
+
+                <AdminPanel title="News" description="News-Sektion, einzelne Einträge, Sichtbarkeit, Reihenfolge und Bilder direkt auf der Startseite verwalten.">
+                  <div className="grid gap-5">
+                    <form action={updateHomeNewsSectionAction} className="grid gap-4 rounded-2xl border border-white/10 bg-black/15 p-4">
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Überschrift</span>
+                        <input name="newsSectionTitle" defaultValue={home.newsSectionTitle} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Einleitung optional</span>
+                        <textarea name="newsSectionIntro" defaultValue={home.newsSectionIntro} rows={3} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Hinweis bei fehlenden News</span>
+                        <textarea name="newsEmptyText" defaultValue={home.newsEmptyText} rows={3} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
+                      <div className="flex justify-end">
+                        <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">News-Sektion speichern</button>
+                      </div>
+                    </form>
+
+                    <form action={addHomeNewsAction} className="grid gap-4 rounded-2xl border border-white/10 bg-black/15 p-4">
+                      <h3 className="text-lg font-black text-white">Neuen News-Eintrag anlegen</h3>
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Titel</span>
+                        <input name="title" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Kurztext</span>
+                        <textarea name="excerpt" rows={4} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
+                      <div className="grid gap-4 lg:grid-cols-2">
+                        <label className="block">
+                          <span className="mb-2 block text-sm font-semibold text-white">Veröffentlicht am optional</span>
+                          <input type="date" name="publishedAt" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                        </label>
+                        <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-[#dbc8b4]">
+                          <input type="checkbox" name="visible" defaultChecked className="h-4 w-4" />
+                          Öffentlich sichtbar
+                        </label>
+                      </div>
+                      <div className="grid gap-4 lg:grid-cols-2">
+                        <label className="block">
+                          <span className="mb-2 block text-sm font-semibold text-white">Linktext optional</span>
+                          <input name="linkLabel" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                        </label>
+                        <label className="block">
+                          <span className="mb-2 block text-sm font-semibold text-white">Linkziel optional</span>
+                          <input name="linkHref" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                        </label>
+                      </div>
+                      <div className="grid gap-4 lg:grid-cols-2">
+                        <label className="block">
+                          <span className="mb-2 block text-sm font-semibold text-white">Bild optional</span>
+                          <input type="file" name="imageFile" accept=".png,.jpg,.jpeg,.webp" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-black" />
+                        </label>
+                        <label className="block">
+                          <span className="mb-2 block text-sm font-semibold text-white">Alternativtext</span>
+                          <input name="imageAlt" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                        </label>
+                      </div>
+                      <div className="flex justify-end">
+                        <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">News anlegen</button>
+                      </div>
+                    </form>
+
+                    {home.newsItems.length ? (
+                      <div className="grid gap-4">
+                        {home.newsItems.map((item, index) => (
+                          <form key={item.id} action={updateHomeNewsAction} className="grid gap-4 rounded-2xl border border-white/10 bg-black/15 p-4">
+                            <input type="hidden" name="newsId" value={item.id} />
+                            <input type="hidden" name="direction" value="" />
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                              <h3 className="text-lg font-black text-white">News {index + 1}</h3>
+                              <div className="flex flex-wrap gap-2">
+                                <FormValueSubmitButton formAction={moveHomeNewsAction} hiddenFieldName="direction" hiddenFieldValue="up" type="submit" className="rounded-lg border border-white/10 px-3 py-2 text-xs font-black uppercase tracking-[0.16em] text-[#f3dec4]">Nach oben</FormValueSubmitButton>
+                                <FormValueSubmitButton formAction={moveHomeNewsAction} hiddenFieldName="direction" hiddenFieldValue="down" type="submit" className="rounded-lg border border-white/10 px-3 py-2 text-xs font-black uppercase tracking-[0.16em] text-[#f3dec4]">Nach unten</FormValueSubmitButton>
+                              </div>
+                            </div>
+                            <label className="block">
+                              <span className="mb-2 block text-sm font-semibold text-white">Titel</span>
+                              <input name="title" defaultValue={item.title} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                            </label>
+                            <label className="block">
+                              <span className="mb-2 block text-sm font-semibold text-white">Kurztext</span>
+                              <textarea name="excerpt" defaultValue={item.excerpt} rows={4} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                            </label>
+                            <div className="grid gap-4 lg:grid-cols-2">
+                              <label className="block">
+                                <span className="mb-2 block text-sm font-semibold text-white">Veröffentlicht am optional</span>
+                                <input type="date" name="publishedAt" defaultValue={item.publishedAt} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                              </label>
+                              <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-[#dbc8b4]">
+                                <input type="checkbox" name="visible" defaultChecked={item.visible} className="h-4 w-4" />
+                                Öffentlich sichtbar
+                              </label>
+                            </div>
+                            <div className="grid gap-4 lg:grid-cols-2">
+                              <label className="block">
+                                <span className="mb-2 block text-sm font-semibold text-white">Linktext optional</span>
+                                <input name="linkLabel" defaultValue={item.linkLabel || ''} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                              </label>
+                              <label className="block">
+                                <span className="mb-2 block text-sm font-semibold text-white">Linkziel optional</span>
+                                <input name="linkHref" defaultValue={item.linkHref || ''} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                              </label>
+                            </div>
+                            <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+                              <label className="block">
+                                <span className="mb-2 block text-sm font-semibold text-white">Bild optional</span>
+                                <input type="file" name="imageFile" accept=".png,.jpg,.jpeg,.webp" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-black" />
+                              </label>
+                              {item.imageUrl ? (
+                                <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
+                                  <img src={item.imageUrl} alt={item.imageAlt || item.title} className="h-28 w-full object-cover" />
+                                </div>
+                              ) : (
+                                <div className="flex h-28 items-center justify-center rounded-xl border border-dashed border-white/10 bg-black/10 text-[#bfae99]">Kein Bild</div>
+                              )}
+                            </div>
+                            <div className="grid gap-4 lg:grid-cols-2">
+                              <label className="block">
+                                <span className="mb-2 block text-sm font-semibold text-white">Alternativtext</span>
+                                <input name="imageAlt" defaultValue={item.imageAlt} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                              </label>
+                              <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-[#dbc8b4]">
+                                <input type="checkbox" name="removeImage" className="h-4 w-4" />
+                                Bild entfernen
+                              </label>
+                            </div>
+                            <div className="flex flex-wrap justify-between gap-3">
+                              <div className="flex flex-wrap gap-3">
+                                <ConfirmSubmitButton formAction={deleteHomeNewsAction} type="submit" confirmMessage="Diesen News-Eintrag wirklich löschen?" className="rounded-xl border border-red-500/40 bg-red-950/40 px-4 py-3 text-sm font-black text-red-100 transition hover:bg-red-900/50">
+                                  News löschen
+                                </ConfirmSubmitButton>
+                                <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">News speichern</button>
+                              </div>
+                            </div>
+                          </form>
+                        ))}
+                      </div>
                     ) : null}
-                  </label>
-                  <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-[color:var(--color-muted)]">
-                    <input type="checkbox" name="removeHeroImage" className="h-4 w-4" />
-                    Startseitenbild entfernen
-                  </label>
-                  <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-[color:var(--color-muted)]">
-                    <input type="checkbox" name="removeBackgroundImage" className="h-4 w-4" />
-                    Hintergrundbild entfernen
-                  </label>
-                  <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-[color:var(--color-muted)] md:col-span-2">
-                    <input type="checkbox" name="removeInstagramVideo" className="h-4 w-4" />
-                    Instagram-Video entfernen
-                  </label>
-                  <div className="md:col-span-2 flex justify-end">
-                    <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">Medien speichern</button>
                   </div>
-                </form>
-              </section>
+                </AdminPanel>
+
+                <AdminPanel title="Mitgliederaufruf" description="Große Abschlussfläche mit Text, Bild und sicherem Ziel zur Mitgliedsseite pflegen.">
+                  <form action={updateHomeMembershipAction} className="grid gap-4">
+                    <label className="block">
+                      <span className="mb-2 block text-sm font-semibold text-white">Überschrift</span>
+                      <textarea name="membershipTitle" defaultValue={home.membershipTitle} rows={3} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                    </label>
+                    <label className="block">
+                      <span className="mb-2 block text-sm font-semibold text-white">Beschreibung</span>
+                      <textarea name="membershipBody" defaultValue={home.membershipBody} rows={4} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                    </label>
+                    <div className="grid gap-4 lg:grid-cols-2">
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Buttontext</span>
+                        <input name="membershipCtaLabel" defaultValue={home.membershipCtaLabel} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Buttonziel</span>
+                        <input name="membershipCtaHref" defaultValue={home.membershipCtaHref} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
+                    </div>
+                    <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Bild optional</span>
+                        <input type="file" name="membershipImageFile" accept=".png,.jpg,.jpeg,.webp" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-accent)] file:px-4 file:py-2 file:font-semibold file:text-black" />
+                      </label>
+                      {membershipImageSrc ? (
+                        <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
+                          <img src={membershipImageSrc} alt={home.membershipImageAlt || home.membershipTitle} className="h-36 w-full object-cover" style={{ objectPosition: `${home.membershipImagePositionX}% ${home.membershipImagePositionY}%` }} />
+                        </div>
+                      ) : (
+                        <div className="flex h-36 items-center justify-center rounded-xl border border-dashed border-white/10 bg-black/10 text-[#bfae99]">Kein Bild</div>
+                      )}
+                    </div>
+                    <div className="grid gap-4 lg:grid-cols-3">
+                      <label className="block lg:col-span-2">
+                        <span className="mb-2 block text-sm font-semibold text-white">Alternativtext</span>
+                        <input name="membershipImageAlt" defaultValue={home.membershipImageAlt} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                      </label>
+                      <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-[#dbc8b4]">
+                        <input type="checkbox" name="removeMembershipImage" className="h-4 w-4" />
+                        Bild entfernen
+                      </label>
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Bildfokus X</span>
+                        <input type="range" name="membershipImagePositionX" min="0" max="100" step="1" defaultValue={home.membershipImagePositionX} className="w-full" />
+                      </label>
+                      <label className="block">
+                        <span className="mb-2 block text-sm font-semibold text-white">Bildfokus Y</span>
+                        <input type="range" name="membershipImagePositionY" min="0" max="100" step="1" defaultValue={home.membershipImagePositionY} className="w-full" />
+                      </label>
+                    </div>
+                    <div className="flex justify-end">
+                      <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">Mitgliederbereich speichern</button>
+                    </div>
+                  </form>
+                </AdminPanel>
+
+                <AdminPanel title="Darstellung und Größen" description="Wichtige responsive Größen mit festen Mindest- und Maximalwerten pflegen. Es werden nur sichere numerische Werte gespeichert.">
+                  <form action={updateHomeDisplaySettingsAction} className="grid gap-4 md:grid-cols-2">
+                    {Object.entries(HOME_DISPLAY_SETTING_SPECS).map(([key, spec]) => (
+                      <label key={key} className="block rounded-2xl border border-white/10 bg-black/15 p-4">
+                        <span className="mb-2 block text-sm font-semibold text-white">{key}</span>
+                        <input type="number" name={key} min={spec.min} max={spec.max} step="1" defaultValue={home.displaySettings[key as keyof HomeDisplaySettings]} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />
+                        <span className="mt-2 block text-xs text-[#c9b7a3]">Standard {spec.defaultValue}, Minimum {spec.min}, Maximum {spec.max}</span>
+                      </label>
+                    ))}
+                    <div className="md:col-span-2 flex justify-end">
+                      <button type="submit" className="rounded-xl bg-[color:var(--color-accent)] px-5 py-3 text-sm font-black text-black transition hover:brightness-110">Darstellung speichern</button>
+                    </div>
+                  </form>
+                </AdminPanel>
+              </div>
             ) : null}
 
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-5">
-              <div className="flex min-w-0 flex-[1.8] flex-col gap-4">
-                <LiveResizableBox
-                  boxKey="home.simple.head.box"
-                  initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.head.box')}
-                  isAdmin={isAdmin}
-                  className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.9)_0%,rgba(10,7,5,0.82)_100%)] px-6 py-6 text-center shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
-                >
-                  <LiveEditableText
-                    as="h1"
-                    className="page-title text-center"
-                    editorKey="home.heroTitle"
-                    initialHtml={resolveLiveHtml(liveEditor, 'home.heroTitle', home.heroTitle)}
-                    isAdmin={isAdmin}
-                    title="Startseite Überschrift"
-                    normalizeTypography
-                  />
-                </LiveResizableBox>
-
-                <div className="md:hidden">
-                  <HomeNewsCard home={home} liveEditor={liveEditor} isAdmin={isAdmin} />
-                </div>
-
-                <LiveResizableBox
-                  boxKey="home.simple.greeting.box"
-                  initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.greeting.box')}
-                  isAdmin={isAdmin}
-                  className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.9)_0%,rgba(10,7,5,0.82)_100%)] px-6 py-5 text-center shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
-                >
-                  <LiveEditableText
-                    as="p"
-                    className="body-copy-lg"
-                    editorKey="home.heroLead"
-                    initialHtml={resolveLiveHtml(liveEditor, 'home.heroLead', home.heroLead)}
-                    isAdmin={isAdmin}
-                    title="Startseite Willkommensgruß"
-                    normalizeTypography
-                  />
-                </LiveResizableBox>
-
-                <LiveResizableBox
-                  boxKey="home.simple.info.box"
-                  initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.info.box')}
-                  isAdmin={isAdmin}
-                  className="min-h-[20rem] rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
-                >
-                  <LiveEditableText
-                    as="div"
-                    className="body-copy-lg"
-                    editorKey="home.heroBody"
-                    initialHtml={resolveLiveHtml(liveEditor, 'home.heroBody', home.heroBody)}
-                    isAdmin={isAdmin}
-                    title="Startseite Infotext"
-                    normalizeTypography
-                  />
-                </LiveResizableBox>
-              </div>
-
-              <div className="flex min-w-0 flex-1 flex-col gap-4">
-                <LiveResizableBox
-                  boxKey="home.simple.image.box"
-                  initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.image.box')}
-                  isAdmin={isAdmin}
-                  className="h-full min-h-[22rem] overflow-hidden rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
-                >
-                  {heroImageSrc ? (
-                    <img src={heroImageSrc} alt={home.heroImage.assetName || 'Startseitenbild'} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full min-h-[22rem] items-center justify-center bg-black/20 text-[color:var(--color-muted)]">
-                      <ImageIcon className="h-10 w-10" />
-                    </div>
-                  )}
-                </LiveResizableBox>
-              </div>
-            </div>
-
-            <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-start md:flex-wrap">
-              <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.form.box" titleKey="home.simple.form.title" bodyKey="home.simple.form.body" ctaKey="home.simple.form.cta" title="Mitglied werden" body="Handwerk. Laut. Sichtbar. Sei dabei." href="/formular" linkLabel="Zum Formular" isAdmin={isAdmin} liveEditor={liveEditor} />
-              </div>
-              <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.partner.box" titleKey="home.simple.partner.title" bodyKey="home.simple.partner.body" ctaKey="home.simple.partner.cta" title="Partner werden" body="Gemeinsam geben wir dem Handwerk die Bühne, die es verdient." href="/partner-unterstuetzerinfo" linkLabel="Zu den Informationen" isAdmin={isAdmin} liveEditor={liveEditor} />
-              </div>
-              <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.sponsor.box" titleKey="home.simple.sponsor.title" bodyKey="home.simple.sponsor.body" ctaKey="home.simple.sponsor.primaryCtaLabel" title="Sponsor werden" body="Gemeinsam schaffen wir Sichtbarkeit für das Handwerk und Ihr Engagement." href="/sponsoren" linkLabel="Zum Sponsoring" isAdmin={isAdmin} liveEditor={liveEditor} />
-              </div>
-            </div>
-
-            <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-start md:flex-wrap">
-              <div className="min-w-0 md:flex-1">
-                <HomeActionCard boxKey="home.simple.support.box" titleKey="home.simple.support.title" bodyKey="home.simple.support.body" ctaKey="home.simple.support.donation" title="Unterstützer werden" body="Weil gute Ideen Menschen brauchen, die an sie glauben." href="/spenden" linkLabel="Zur Spenden-Seite" isAdmin={isAdmin} liveEditor={liveEditor} />
-              </div>
-
-              <div className="min-w-0 md:flex-1">
-                <LiveResizableBox
-                  boxKey="home.simple.smallinfo.box"
-                  initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.smallinfo.box')}
-                  isAdmin={isAdmin}
-                  className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
-                >
-                  <LiveEditableText
-                    as="h3"
-                    className="section-title uppercase"
-                    editorKey="home.updateTitle"
-                    initialHtml={resolveLiveHtml(liveEditor, 'home.updateTitle', home.updateTitle)}
-                    isAdmin={isAdmin}
-                    title="Info Überschrift"
-                    normalizeTypography
-                  />
-                  <LiveEditableText
-                    as="p"
-                    className="body-copy mt-3"
-                    editorKey="home.updateParagraphs.0"
-                    initialHtml={resolveLiveHtml(liveEditor, 'home.updateParagraphs.0', home.updateParagraphs[0] || '')}
-                    isAdmin={isAdmin}
-                    title="Info Text"
-                    normalizeTypography
-                  />
-                  {isAdmin ? (
-                    <div className="link-copy mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-2.5 text-sm font-bold tracking-wide">
-                      Zu den Informationen
-                      <ArrowRight className="h-4 w-4" />
-                    </div>
-                  ) : (
-                    <Button href="/partner-unterstuetzerinfo" variant="secondary" className="mt-4 w-full justify-center">
-                      Zu den Informationen
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  )}
-                </LiveResizableBox>
-              </div>
-
-              <div className="min-w-0 md:flex-[1.2] md:max-w-[44%]">
-                <div className="flex min-w-0 flex-col gap-4">
-                <LiveResizableBox
-                  boxKey="home.simple.sponsorinfo.box"
-                  initialStyle={resolveLiveBoxStyle(liveEditor, 'home.simple.sponsorinfo.box')}
-                  isAdmin={isAdmin}
-                  className="rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(22,14,10,0.92)_0%,rgba(10,7,5,0.85)_100%)] px-6 py-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]"
-                >
-                  <LiveEditableText
-                    as="h3"
-                    className="section-title uppercase"
-                    editorKey="home.closingTitle"
-                    initialHtml={resolveLiveHtml(liveEditor, 'home.closingTitle', home.closingTitle)}
-                    isAdmin={isAdmin}
-                    title="Sponsor Info Überschrift"
-                    normalizeTypography
-                  />
-                  <LiveEditableText
-                    as="p"
-                    className="body-copy mt-3"
-                    editorKey="home.closingLead"
-                    initialHtml={resolveLiveHtml(liveEditor, 'home.closingLead', home.closingLead)}
-                    isAdmin={isAdmin}
-                    title="Sponsor Info Text"
-                    normalizeTypography
-                  />
-                  {isAdmin ? (
-                    <div className="link-copy mt-4 flex w-full items-center justify-center gap-2 rounded-[0.65rem] border border-[color:var(--color-accent)] bg-[color:var(--color-surface)] px-7 py-3.5 text-base font-bold tracking-wide shadow-[0_8px_20px_color-mix(in_srgb,var(--color-accent)_18%,transparent)]">
-                      <LiveEditableText
-                        as="span"
-                        className="link-copy text-base font-bold tracking-wide"
-                        editorKey="home.projectsBoxEventsCtaLabel"
-                        initialHtml={resolveLiveHtml(liveEditor, 'home.projectsBoxEventsCtaLabel', 'Zu den Veranstaltungen')}
-                        isAdmin={isAdmin}
-                        title="Projekt Info Buttontext"
-                        normalizeTypography
-                      />
-                      <ArrowRight className="h-4 w-4" />
-                    </div>
-                  ) : (
-                    <Button href="/veranstaltungen" className="mt-4 w-full justify-center">
-                      {resolveLiveHtml(liveEditor, 'home.projectsBoxEventsCtaLabel', 'Zu den Veranstaltungen').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '')}
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  )}
-                </LiveResizableBox>
-
-                <div className="hidden md:block">
-                  <HomeNewsCard home={home} liveEditor={liveEditor} isAdmin={isAdmin} />
-                </div>
+            <section className="relative overflow-hidden rounded-[2rem] border border-white/10 shadow-[0_28px_70px_rgba(0,0,0,0.28)]" style={getHeroStyles(layoutSettings)}>
+              <img src={heroImageSrc} alt={home.heroImageAlt || home.heroTitle} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: `${home.heroImagePositionX}% ${home.heroImagePositionY}%` }} />
+              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,4,2,0.92)_0%,rgba(7,4,2,0.76)_44%,rgba(7,4,2,0.48)_100%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(255,136,36,0.18)_0%,transparent_28%)]" />
+              <div className="relative z-10 flex h-full items-end px-6 py-8 sm:px-8 lg:px-12 lg:py-12">
+                <div className="max-w-3xl">
+                  <p className="text-xs font-black uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Headbang Handwerk</p>
+                  <h1 className="section-title mt-4 max-w-4xl text-white drop-shadow-[0_8px_20px_rgba(0,0,0,0.5)]" style={getHeroTitleStyles(layoutSettings)}>{home.heroTitle}</h1>
+                  <p className="mt-5 text-xl font-semibold text-[#f3e6d7] sm:text-2xl">{home.heroSubtitle}</p>
+                  {home.heroDescription ? <p className="body-copy mt-5 max-w-2xl whitespace-pre-line text-[#f0dfcd]">{home.heroDescription}</p> : null}
+                  <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                    <Button href={home.heroPrimaryCtaHref} size="lg">{home.heroPrimaryCtaLabel}<ArrowRight className="h-4 w-4" /></Button>
+                    <Button href={home.heroSecondaryCtaHref} size="lg" variant="secondary">{home.heroSecondaryCtaLabel}</Button>
+                  </div>
                 </div>
               </div>
+            </section>
 
-            </div>
+            <section style={getSectionSpacingStyles(layoutSettings)}>
+              <div className="mb-8 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                <div className="max-w-3xl">
+                  <p className="text-xs font-black uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Live aus dem CMS</p>
+                  <h2 className="section-title mt-3 text-white" style={getSectionTitleStyles(layoutSettings)}>{home.eventsSectionTitle}</h2>
+                  {home.eventsSectionIntro ? <p className="body-copy mt-4 whitespace-pre-line text-[#ecdbca]">{home.eventsSectionIntro}</p> : null}
+                </div>
+                <Button href="/veranstaltungen" variant="secondary">{home.eventsSectionCtaLabel}</Button>
+              </div>
+              {upcomingEvents.length ? (
+                <div className={getPreviewGridClasses(upcomingEvents.length)} style={{ gap: `${layoutSettings.cardGap}px` }}>
+                  {upcomingEvents.map((event) => <HomeEventPreviewCard key={event.id} event={event} imageHeight={layoutSettings.eventImageHeight} />)}
+                </div>
+              ) : (
+                <div className="rounded-[1.7rem] border border-dashed border-white/15 bg-[linear-gradient(180deg,rgba(18,12,9,0.86)_0%,rgba(9,6,4,0.76)_100%)] px-6 py-7 text-[#ead9c5]">
+                  <p className="body-copy whitespace-pre-line">{home.eventsEmptyText}</p>
+                </div>
+              )}
+              {upcomingEvents.length ? (
+                <div className="mt-8 flex justify-center">
+                  <Button href="/veranstaltungen" size="lg">{home.eventsSectionCtaLabel}</Button>
+                </div>
+              ) : null}
+            </section>
+
+            <section style={getSectionSpacingStyles(layoutSettings)}>
+              <div className="mb-8 max-w-3xl">
+                <p className="text-xs font-black uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Aktuelles</p>
+                <h2 className="section-title mt-3 text-white" style={getSectionTitleStyles(layoutSettings)}>{home.newsSectionTitle}</h2>
+                {home.newsSectionIntro ? <p className="body-copy mt-4 whitespace-pre-line text-[#ecdbca]">{home.newsSectionIntro}</p> : null}
+              </div>
+              {visibleNewsItems.length ? (
+                <div className={cn(getPreviewGridClasses(visibleNewsItems.length), visibleNewsItems.length === 1 ? 'items-start' : '')} style={{ gap: `${layoutSettings.cardGap}px` }}>
+                  {visibleNewsItems.map((item) => <HomeNewsPreviewCard key={item.id} item={item} imageHeight={layoutSettings.newsImageHeight} />)}
+                </div>
+              ) : (
+                <div className="rounded-[1.7rem] border border-dashed border-white/15 bg-[linear-gradient(180deg,rgba(18,12,9,0.86)_0%,rgba(9,6,4,0.76)_100%)] px-6 py-7 text-[#ead9c5]">
+                  <p className="body-copy whitespace-pre-line">{home.newsEmptyText}</p>
+                </div>
+              )}
+            </section>
+
+            <section style={getSectionSpacingStyles(layoutSettings)}>
+              <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(24,15,11,0.94)_0%,rgba(10,7,5,0.9)_100%)] shadow-[0_28px_70px_rgba(0,0,0,0.24)]">
+                <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr]" style={{ minHeight: `${layoutSettings.membershipMinHeight}px` }}>
+                  <div className="flex items-center px-6 py-8 sm:px-8 lg:px-10">
+                    <div className="max-w-2xl">
+                      <p className="text-xs font-black uppercase tracking-[0.28em] text-[color:var(--color-accent-soft)]">Mitmachen</p>
+                      <h2 className="section-title mt-3 text-white" style={getSectionTitleStyles(layoutSettings)}>{home.membershipTitle}</h2>
+                      <p className="body-copy mt-5 whitespace-pre-line text-[#efdfcd]">{home.membershipBody}</p>
+                      <div className="mt-8">
+                        <Button href={home.membershipCtaHref} size="lg">{home.membershipCtaLabel}<ArrowRight className="h-4 w-4" /></Button>
+                      </div>
+                    </div>
+                  </div>
+                  {membershipImageSrc ? (
+                    <div className="relative min-h-[18rem] border-t border-white/10 lg:min-h-full lg:border-l lg:border-t-0">
+                      <img src={membershipImageSrc} alt={home.membershipImageAlt || home.membershipTitle} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: `${home.membershipImagePositionX}% ${home.membershipImagePositionY}%` }} />
+                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,4,2,0.18)_0%,rgba(7,4,2,0.5)_100%)] lg:bg-[linear-gradient(90deg,rgba(7,4,2,0.2)_0%,rgba(7,4,2,0.5)_100%)]" />
+                    </div>
+                  ) : (
+                    <div className="flex min-h-[18rem] items-center justify-center border-t border-white/10 bg-black/15 text-[#baa791] lg:border-l lg:border-t-0">
+                      <div className="flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.16em]"><Users2 className="h-5 w-5" />Kein Bild hinterlegt</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
           </div>
         </main>
-        <Footer content={cms.site.footer} isAdmin={isAdmin} liveEditor={liveEditor} />
+        <Footer content={cms.site.footer} isAdmin={isAdmin} liveEditor={cms.site.liveEditor} logoSrc={cms.site.logo.assetUrl} contactEmail={cms.site.contact.email} />
       </LiveLayoutSaveProvider>
     </>
   );

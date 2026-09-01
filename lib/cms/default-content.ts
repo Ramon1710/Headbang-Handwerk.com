@@ -32,17 +32,15 @@ export const defaultCmsContent: CmsContent = {
       assetContentType: '',
     },
     navigationLinks: [
-      { label: 'Startseite', href: '/' },
-      { label: 'Veranstaltungen', href: '/veranstaltungen' },
-      { label: 'Galerie', href: '/gallerie' },
-      { label: 'Game', href: '/game' },
-      { label: 'Mitglied werden', href: '/formular' },
-      { label: 'Sponsor werden', href: '/sponsoren' },
-      { label: 'Spenden', href: '/spenden' },
-      { label: 'Unsere Partner', href: '/unsere-partner' },
-      { label: 'Merchandise', href: '/merchandise' },
-      { label: 'Über uns', href: '/ueber-uns' },
-      { label: 'Kontakt', href: '/kontakt' },
+      { id: 'home', label: 'Startseite', href: '/', placement: 'primary' },
+      { id: 'about', label: 'Über uns', href: '/ueber-uns', placement: 'primary' },
+      { id: 'events', label: 'Veranstaltungen', href: '/veranstaltungen', placement: 'primary' },
+      { id: 'membership', label: 'Mitglied werden', href: '/formular', placement: 'primary' },
+      { id: 'partners', label: 'Partner', href: '/unsere-partner', placement: 'primary' },
+      { id: 'shop', label: 'Shop', href: '/merchandise', placement: 'primary' },
+      { id: 'sponsor', label: 'Sponsor werden', href: '/sponsoren', placement: 'more' },
+      { id: 'donation', label: 'Spenden', href: '/spenden', placement: 'more' },
+      { id: 'game', label: 'Spiele', href: '/game', placement: 'more' },
     ],
     navigationCtaLabel: 'Jetzt unterstützen',
     navigationCtaHref: '/sponsoren',
@@ -56,14 +54,17 @@ export const defaultCmsContent: CmsContent = {
     home: {
       heroBadge: 'Startseite mit klarem Projektfokus',
       heroTitle: 'Handwerk trifft Metal. Leidenschaft trifft Zukunft.',
+      heroSubtitle: 'Handwerk. Laut. Sichtbar.',
+      heroDescription:
+        'Wir bringen das Handwerk dorthin, wo Energie, Gemeinschaft und Begeisterung aufeinandertreffen: auf große Bühnen, zu echten Begegnungen und mitten in eine Kultur, die Leidenschaft sichtbar macht.',
       heroLead:
         'Wir bringen das Handwerk dorthin, wo Energie, Gemeinschaft und Begeisterung aufeinandertreffen – auf die größten Metal-Festivals Europas.',
       heroBody:
         'Mit Headbang Handwerk e.V. schaffen wir eine Plattform, die zeigt, wie modern, vielseitig und kraftvoll das Handwerk wirklich ist. Zwischen Bühne, Feuer und tausenden Festivalbesuchern entsteht ein Ort, an dem echtes Können erlebbar wird: live, zum Anfassen und zum Mitmachen.',
-      heroPrimaryCtaLabel: 'Jetzt Partner werden',
-      heroPrimaryCtaHref: '/sponsoren',
-      heroSecondaryCtaLabel: 'Veranstaltungen ansehen',
-      heroSecondaryCtaHref: '/veranstaltungen',
+      heroPrimaryCtaLabel: 'Veranstaltungen entdecken',
+      heroPrimaryCtaHref: '/veranstaltungen',
+      heroSecondaryCtaLabel: 'Mitglied werden',
+      heroSecondaryCtaHref: '/formular',
       heroMetrics: [
         { value: 'Wacken 2027', label: 'Nächster großer Meilenstein im Projekt' },
         { value: 'Live-Demos', label: 'Handwerk als Erlebnis statt nur als Botschaft' },
@@ -150,6 +151,44 @@ export const defaultCmsContent: CmsContent = {
       newsImages: [],
       newsImagePositionX: 50,
       newsImagePositionY: 50,
+      heroImageAlt: 'Headbang Handwerk auf einem Festival',
+      heroImagePositionX: 50,
+      heroImagePositionY: 40,
+      eventsSectionTitle: 'Nächste Veranstaltungen',
+      eventsSectionIntro: 'Drei kommende Termine aus unserer Veranstaltungsverwaltung. Für mehr Details geht es direkt zur Übersicht.',
+      eventsSectionCtaLabel: 'Alle Veranstaltungen',
+      eventsEmptyText: 'Sobald kommende Veranstaltungen mit strukturiertem Datum hinterlegt sind, erscheinen sie hier automatisch.',
+      newsSectionTitle: 'Aktuelles aus dem Verein',
+      newsSectionIntro: 'Aktuelle Neuigkeiten, Einblicke und Hinweise aus dem Verein.',
+      newsEmptyText: 'Aktuell gibt es noch keine veröffentlichten Neuigkeiten.',
+      newsItems: [],
+      membershipTitle: 'Wir brauchen Menschen, die etwas bewegen.',
+      membershipBody:
+        'Werde Teil von Headbang Handwerk und unterstütze uns dabei, das Handwerk sichtbar, erlebbar und zukunftsfähig zu machen.',
+      membershipCtaLabel: 'Jetzt Mitglied werden',
+      membershipCtaHref: '/formular',
+      membershipImage: {
+        assetUrl: '',
+        assetName: '',
+        assetContentType: '',
+      },
+      membershipImageAlt: 'Mitgliederbereich Headbang Handwerk',
+      membershipImagePositionX: 50,
+      membershipImagePositionY: 50,
+      displaySettings: {
+        heroHeightDesktop: 640,
+        heroHeightMobile: 460,
+        heroTitleSizeDesktop: 76,
+        heroTitleSizeMobile: 40,
+        sectionTitleSizeDesktop: 44,
+        sectionTitleSizeMobile: 30,
+        sectionSpacingDesktop: 104,
+        sectionSpacingMobile: 72,
+        cardGap: 24,
+        eventImageHeight: 240,
+        newsImageHeight: 220,
+        membershipMinHeight: 400,
+      },
       updatePrimaryCtaLabel: 'Sponsoring ansehen',
       updatePrimaryCtaHref: '/sponsoren',
       updateSecondaryCtaLabel: 'Kontakt aufnehmen',
@@ -228,7 +267,62 @@ export const defaultCmsContent: CmsContent = {
           description: 'Headbang Handwerk europaweit auf allen großen Metal-Festivals etablieren.',
         },
       ],
-      teamTitle: 'Das Team',
+      sections: [
+        {
+          eyebrow: 'Wer wir sind',
+          title: 'Eine Plattform zwischen Bühne und Handwerk.',
+          paragraphs: [
+            'Mit Headbang Handwerk e.V. schaffen wir eine Plattform, die zeigt, wie modern, vielseitig und kraftvoll das Handwerk wirklich ist.',
+            'Zwischen Bühne, Feuer und tausenden Festivalbesuchern entsteht ein Ort, an dem echtes Können erlebbar wird: live, zum Anfassen und zum Mitmachen.',
+          ],
+        },
+        {
+          eyebrow: 'Warum alles entstanden ist',
+          title: 'Neue Wege für die Nachwuchsgewinnung.',
+          paragraphs: [
+            'Headbang Handwerk wurde mit einer einfachen Idee gegründet: Das Handwerk braucht neue Wege, um junge Menschen zu begeistern. Und Festivals sind genau der richtige Ort dafür.',
+          ],
+        },
+        {
+          eyebrow: 'Unsere Vision',
+          title: 'Eine europaweit sichtbare Festivalpräsenz.',
+          paragraphs: [
+            'Headbang Handwerk europaweit auf allen großen Metal-Festivals etablieren.',
+            'Der nächste große Schritt ist ein eigener Stand mit starken Partnern, sichtbaren Aktionen und einer klaren Botschaft: Handwerk gehört mitten ins Leben und auf große Bühnen.',
+          ],
+        },
+        {
+          eyebrow: 'Unsere Mission',
+          title: 'Handwerk als Erlebnis statt als Pflichtgefühl.',
+          paragraphs: [
+            'Nachwuchs fürs Handwerk gewinnen, dort wo die Jugend wirklich ist: auf Festivals.',
+            'Gemeinsam mit Partnern aus der Wirtschaft, Innungen und Betrieben präsentieren wir das Handwerk nicht als Pflicht – sondern als Erlebnis.',
+          ],
+        },
+        {
+          eyebrow: 'Unsere Ziele',
+          title: 'Sichtbarkeit, Nachwuchs und echte Beteiligung.',
+          paragraphs: [
+            'Unser Ziel ist klar: Handwerk sichtbar machen.',
+          ],
+          bullets: [
+            'Nachwuchs begeistern',
+            'Handwerk sichtbar machen',
+            'Unternehmen eine neue Bühne bieten',
+          ],
+        },
+        {
+          eyebrow: 'Warum Handwerk und Metal zusammenpassen',
+          title: 'Handwerk wird nicht erklärt. Es wird erlebt.',
+          paragraphs: [
+            'Wer einmal live gesehen hat, wie eine Klinge geschmiedet wird oder wie ein Zimmermann arbeitet, der vergisst das nicht mehr.',
+            'Ob durch interaktive Aktionen, Live-Demonstrationen oder innovative Standkonzepte: Wir zeigen, dass Handwerk genauso laut, ehrlich und leidenschaftlich ist wie die Musik, die diese Festivals prägt.',
+          ],
+        },
+      ],
+      teamTitle: 'Menschen hinter dem Verein',
+      teamLead:
+        'Wir sind ein Team aus Handwerksbegeisterten und Metal-Fans, das Leidenschaft, Organisation und Festivalenergie in ein gemeinsames Projekt übersetzt.',
       teamRoles: ['Gründer & Projektleitung', 'Marketing & Social Media', 'Technik & Aufbau'],
       teamImages: [
         {
@@ -247,8 +341,44 @@ export const defaultCmsContent: CmsContent = {
           assetContentType: '',
         },
       ],
-      ctaLabel: 'Kontakt aufnehmen',
-      ctaHref: '/kontakt',
+      teamMembers: [
+        {
+          role: 'Gründer & Projektleitung',
+          description: '',
+          image: {
+            assetUrl: '',
+            assetName: '',
+            assetContentType: '',
+          },
+          imageAlt: 'Teammitglied aus der Projektleitung von Headbang Handwerk',
+        },
+        {
+          role: 'Marketing & Social Media',
+          description: '',
+          image: {
+            assetUrl: '',
+            assetName: '',
+            assetContentType: '',
+          },
+          imageAlt: 'Teammitglied aus Marketing und Social Media von Headbang Handwerk',
+        },
+        {
+          role: 'Technik & Aufbau',
+          description: '',
+          image: {
+            assetUrl: '',
+            assetName: '',
+            assetContentType: '',
+          },
+          imageAlt: 'Teammitglied aus Technik und Aufbau von Headbang Handwerk',
+        },
+      ],
+      closingEyebrow: 'Mitmachen',
+      closingTitle: 'Wir brauchen Menschen, die etwas bewegen.',
+      closingBody:
+        'Werde Teil von Headbang Handwerk und unterstütze uns dabei, das Handwerk sichtbar, erlebbar und zukunftsfähig zu machen.',
+      ctaLabel: 'Jetzt Mitglied werden',
+      ctaHref: '/formular',
     },
     contact: {
       title: 'Kontakt',
@@ -323,12 +453,25 @@ export const defaultCmsContent: CmsContent = {
     footer: {
       brandHeadline: 'Headbang Handwerk',
       brandHighlight: ' - wir bringen das Handwerk auf die Bühne.',
+      description:
+        'Handwerk. Laut. Sichtbar. Wir verbinden Handwerk und Metal, fördern Nachwuchs und machen unser Handwerk auf den großen Bühnen sichtbar.',
       copyrightName: 'Headbang Handwerk e.V.',
       socialLinks: [
-        { platform: 'facebook', label: 'Facebook', href: '#' },
+        { platform: 'facebook', label: 'Facebook', href: '' },
         { platform: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/headbang.handwerk/' },
-        { platform: 'youtube', label: 'YouTube', href: '#' },
+        { platform: 'tiktok', label: 'TikTok', href: '' },
+        { platform: 'youtube', label: 'YouTube', href: '' },
       ],
+      informationHeading: 'Informationen',
+      informationLinks: [
+        { id: 'about', label: 'Über uns', href: '/ueber-uns' },
+        { id: 'events', label: 'Veranstaltungen', href: '/veranstaltungen' },
+        { id: 'membership', label: 'Mitglied werden', href: '/formular' },
+        { id: 'partners', label: 'Partner', href: '/unsere-partner' },
+      ],
+      contactHeading: 'Kontakt',
+      contactLinks: [{ id: 'contact', label: 'Kontaktseite', href: '/kontakt' }],
+      contactEmail: '',
     },
   },
 };

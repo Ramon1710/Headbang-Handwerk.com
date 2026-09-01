@@ -2,12 +2,20 @@ import type { Metadata } from 'next';
 import { SiteNavigation } from '@/components/site-navigation';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
+import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { getCmsContent } from '@/lib/cms/storage';
 
 export const metadata: Metadata = { title: 'Danke – Headbang Handwerk' };
 
-export default async function DankePage() {
+export default async function DankePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ view?: string }>;
+}) {
   const cms = await getCmsContent();
+  const params = searchParams ? await searchParams : undefined;
+  const isAuthenticatedAdmin = await isAdminAuthenticated();
+  const isAdmin = isAuthenticatedAdmin && params?.view !== 'user';
 
   return (
     <>
@@ -33,7 +41,7 @@ export default async function DankePage() {
           </div>
         </div>
       </main>
-      <Footer content={cms.site.footer} />
+      <Footer content={cms.site.footer} isAdmin={isAdmin} liveEditor={cms.site.liveEditor} logoSrc={cms.site.logo.assetUrl} contactEmail={cms.site.contact.email} />
     </>
   );
 }

@@ -142,8 +142,10 @@ export interface CmsFormValues {
   standReservedTitle: string;
   footerHeadline: string;
   footerHighlight: string;
+  footerDescription: string;
   facebookUrl: string;
   instagramUrl: string;
+  tiktokUrl: string;
   youtubeUrl: string;
   themeBackground: string;
   themeForeground: string;
@@ -244,8 +246,10 @@ export function cmsContentToFormValues(content: CmsContent): CmsFormValues {
     standReservedTitle: content.site.stand.reservedTitle,
     footerHeadline: content.site.footer.brandHeadline,
     footerHighlight: content.site.footer.brandHighlight,
+    footerDescription: content.site.footer.description || '',
     facebookUrl: socialMap.facebook || defaults.find((item) => item.platform === 'facebook')?.href || '#',
     instagramUrl: socialMap.instagram || defaults.find((item) => item.platform === 'instagram')?.href || '#',
+    tiktokUrl: socialMap.tiktok || defaults.find((item) => item.platform === 'tiktok')?.href || '',
     youtubeUrl: socialMap.youtube || defaults.find((item) => item.platform === 'youtube')?.href || '#',
     themeBackground: content.theme.background,
     themeForeground: content.theme.foreground,
@@ -409,6 +413,7 @@ export function mergeCmsContentFromForm(formData: FormData, current: CmsContent)
         ...current.site.footer,
         brandHeadline: getString(formData, 'footerHeadline', current.site.footer.brandHeadline),
         brandHighlight: getString(formData, 'footerHighlight', current.site.footer.brandHighlight),
+        description: getString(formData, 'footerDescription', current.site.footer.description || ''),
         socialLinks: current.site.footer.socialLinks.map((link) => ({
           ...link,
           href: getString(
@@ -417,6 +422,8 @@ export function mergeCmsContentFromForm(formData: FormData, current: CmsContent)
               ? 'facebookUrl'
               : link.platform === 'instagram'
                 ? 'instagramUrl'
+                : link.platform === 'tiktok'
+                  ? 'tiktokUrl'
                 : 'youtubeUrl',
             link.href
           ),

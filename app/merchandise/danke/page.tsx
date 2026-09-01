@@ -2,14 +2,22 @@ import type { Metadata } from 'next';
 import { SiteNavigation } from '@/components/site-navigation';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
+import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { getCmsContent } from '@/lib/cms/storage';
 import { MERCHANDISE_SUPPORT_TEXT } from '@/lib/merchandise';
 import { MerchandiseCheckoutSuccessReset } from './success-reset';
 
 export const metadata: Metadata = { title: 'Danke für deine Bestellung – Headbang Handwerk' };
 
-export default async function MerchandiseDankePage() {
+export default async function MerchandiseDankePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ view?: string }>;
+}) {
   const cms = await getCmsContent();
+  const params = searchParams ? await searchParams : undefined;
+  const isAuthenticatedAdmin = await isAdminAuthenticated();
+  const isAdmin = isAuthenticatedAdmin && params?.view !== 'user';
 
   return (
     <>
@@ -33,7 +41,7 @@ export default async function MerchandiseDankePage() {
           </div>
         </div>
       </main>
-      <Footer content={cms.site.footer} />
+      <Footer content={cms.site.footer} isAdmin={isAdmin} liveEditor={cms.site.liveEditor} logoSrc={cms.site.logo.assetUrl} contactEmail={cms.site.contact.email} />
     </>
   );
 }

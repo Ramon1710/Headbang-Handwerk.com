@@ -3,7 +3,7 @@ import { EditablePageShell } from '@/components/editable-page-shell';
 import { LiveEditableText } from '@/components/live-editable-text';
 import { LiveResizableBox } from '@/components/live-resizable-box';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
-import { resolveLiveBoxStyle, resolveLiveHtml } from '@/lib/cms/live-editor';
+import { resolveLiveBoxStyle, resolveLiveHtml, resolveLiveRichHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
 import { redirect } from 'next/navigation';
 import { GameClient } from './game-client';
@@ -93,10 +93,10 @@ export default async function GamePage({
           </h1>
           {selectedGame === 'baustellen-rocker' ? (
             <LiveEditableText
-              as="p"
-              className="mx-auto max-w-3xl body-copy-lg text-center"
+              as="div"
+              className="mx-auto max-w-3xl body-copy-lg text-center [&_div]:mb-4 [&_div:last-child]:mb-0 [&_p]:mb-4 [&_p:last-child]:mb-0"
               editorKey="game.lead"
-              initialHtml={resolveLiveHtml(cms.site.liveEditor, 'game.lead', selectedOption.lead)}
+              initialHtml={resolveLiveRichHtml(cms.site.liveEditor, 'game.lead', `<p>${selectedOption.lead}</p>`)}
               isAdmin={isAdmin}
               title="Game Einleitung"
             />

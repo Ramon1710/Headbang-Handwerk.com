@@ -39,7 +39,7 @@ export function EditablePageShell({ cms, isAdmin, mainClassName, children }: Edi
           ) : null}
           <div className="site-shell">{children}</div>
         </main>
-        <Footer content={cms.site.footer} isAdmin={isAdmin} liveEditor={cms.site.liveEditor} />
+        <Footer content={cms.site.footer} isAdmin={isAdmin} liveEditor={cms.site.liveEditor} logoSrc={cms.site.logo.assetUrl} contactEmail={cms.site.contact.email} />
       </LiveLayoutSaveProvider>
     </>
   );

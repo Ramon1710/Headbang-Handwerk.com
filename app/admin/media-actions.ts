@@ -160,11 +160,17 @@ export async function updateAboutTeamImagesAction(formData: FormData) {
   }
 
   const current = await getCmsContent();
-  const nextTeamImages = [...current.site.about.teamImages];
+  const nextTeamMembers = current.site.about.teamMembers.map((member) => ({
+    ...member,
+    image: { ...member.image },
+  }));
 
-  for (let index = 0; index < current.site.about.teamRoles.length; index += 1) {
+  for (let index = 0; index < current.site.about.teamMembers.length; index += 1) {
+    const submittedAlt = String(formData.get(`teamImageAlt${index}`) ?? '').trim();
+    nextTeamMembers[index].imageAlt = submittedAlt || nextTeamMembers[index].role;
+
     if (formData.get(`removeTeamImage${index}`) === 'on') {
-      nextTeamImages[index] = emptyAsset();
+      nextTeamMembers[index].image = emptyAsset();
     }
 
     const imageFile = formData.get(`teamImageFile${index}`);
@@ -175,7 +181,7 @@ export async function updateAboutTeamImagesAction(formData: FormData) {
 
     try {
       const uploadedAsset = await uploadCmsAsset(imageFile, 'about-team', `team-${index + 1}`);
-      nextTeamImages[index] = {
+      nextTeamMembers[index].image = {
         assetUrl: uploadedAsset.url,
         assetName: uploadedAsset.name,
         assetContentType: uploadedAsset.contentType,
@@ -191,7 +197,8 @@ export async function updateAboutTeamImagesAction(formData: FormData) {
       ...current.site,
       about: {
         ...current.site.about,
-        teamImages: nextTeamImages,
+        teamImages: nextTeamMembers.map((member) => member.image),
+        teamMembers: nextTeamMembers,
       },
     },
   });

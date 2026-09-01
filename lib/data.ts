@@ -6,6 +6,8 @@ export const events: Event[] = [
     id: 'wacken-2025',
     title: 'Wacken Open Air 2025',
     date: '30. Juli – 2. August 2025',
+    startDate: '2025-07-30',
+    endDate: '2025-08-02',
     location: 'Wacken, Schleswig-Holstein',
     festivalName: 'Wacken Open Air',
     description:
@@ -13,12 +15,15 @@ export const events: Event[] = [
     status: 'confirmed',
     ctaText: 'Jetzt Sponsor werden',
     ctaUrl: '/sponsoren',
+    imageAlt: 'Headbang Handwerk beim Wacken Open Air 2025',
     stand: createDefaultEventStandConfig(),
   },
   {
     id: 'summer-breeze-2025',
     title: 'Summer Breeze Open Air 2025',
     date: '13.–16. August 2025',
+    startDate: '2025-08-13',
+    endDate: '2025-08-16',
     location: 'Dinkelsbühl, Bayern',
     festivalName: 'Summer Breeze Open Air',
     description:
@@ -26,12 +31,15 @@ export const events: Event[] = [
     status: 'confirmed',
     ctaText: 'Bannerfläche buchen',
     ctaUrl: '/drei-d-stand',
+    imageAlt: 'Headbang Handwerk beim Summer Breeze Open Air 2025',
     stand: createDefaultEventStandConfig(),
   },
   {
     id: 'rock-am-ring-2025',
     title: 'Rock am Ring 2025',
     date: '6.–8. Juni 2025',
+    startDate: '2025-06-06',
+    endDate: '2025-06-08',
     location: 'Nürburgring, Rheinland-Pfalz',
     festivalName: 'Rock am Ring',
     description:
@@ -39,12 +47,15 @@ export const events: Event[] = [
     status: 'planned',
     ctaText: 'Mehr erfahren',
     ctaUrl: '/sponsoren',
+    imageAlt: 'Headbang Handwerk bei Rock am Ring 2025',
     stand: createDefaultEventStandConfig(),
   },
   {
     id: 'with-full-force-2025',
     title: 'With Full Force 2025',
     date: '4.–6. Juli 2025',
+    startDate: '2025-07-04',
+    endDate: '2025-07-06',
     location: 'Ferropolis, Sachsen-Anhalt',
     festivalName: 'With Full Force',
     description:
@@ -52,12 +63,15 @@ export const events: Event[] = [
     status: 'planned',
     ctaText: 'Jetzt anfragen',
     ctaUrl: '/kontakt',
+    imageAlt: 'Headbang Handwerk bei With Full Force 2025',
     stand: createDefaultEventStandConfig(),
   },
   {
     id: 'metaldays-2025',
     title: 'Metaldays 2025',
     date: '21.–26. Juli 2025',
+    startDate: '2025-07-21',
+    endDate: '2025-07-26',
     location: 'Tolmin, Slowenien',
     festivalName: 'Metaldays',
     description:
@@ -65,6 +79,7 @@ export const events: Event[] = [
     status: 'planned',
     ctaText: 'Infos anfragen',
     ctaUrl: '/kontakt',
+    imageAlt: 'Headbang Handwerk bei Metaldays 2025',
     stand: createDefaultEventStandConfig(),
   },
 ];

@@ -10,6 +10,7 @@ export function SectionEventsPreview() {
     confirmed: { label: 'Bestätigt', variant: 'success' as const },
     planned: { label: 'Geplant', variant: 'warning' as const },
     completed: { label: 'Abgeschlossen', variant: 'default' as const },
+    cancelled: { label: 'Abgesagt', variant: 'danger' as const },
   };
 
   return (

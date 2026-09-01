@@ -1,4 +1,5 @@
 import { logoutAction } from '@/app/admin/actions';
+import { updateNavigationAction } from '@/app/admin/chrome-actions';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
 import type { NavigationLink } from '@/lib/cms/schema';
 import { getCmsContent } from '@/lib/cms/storage';
@@ -25,6 +26,8 @@ export async function SiteNavigation({ links, ctaLabel, ctaHref }: SiteNavigatio
       showViewToggle={isAdmin}
       showLogout={isAdmin}
       logoutAction={logoutAction}
+      showNavigationEditor={isAdmin}
+      saveNavigationAction={updateNavigationAction}
     />
   );
 }

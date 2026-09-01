@@ -8,8 +8,18 @@ import {
   toFirebaseAuthError,
 } from './firebase';
 import { normalizeEvent } from '@/lib/event-stand';
+import {
+  getDefaultFooterContactLinks,
+  getDefaultFooterInformationLinks,
+  normalizeFooterContactLinks,
+  normalizeFooterInformationLinks,
+  normalizeNavigationLinks,
+  normalizeSafeSocialUrl,
+  normalizeSafeText,
+} from '@/lib/site';
+import { normalizeHomeContent as normalizeStructuredHomeContent } from '@/lib/home';
 import { emptyLiveEditorContent } from './live-editor';
-import type { CmsContent, GalleryFolder, GalleryImage, MediaAsset } from './schema';
+import type { CmsContent, FooterSocialLink, GalleryFolder, GalleryImage, MediaAsset } from './schema';
 
 const READONLY_FALLBACK_ERROR = 'CMS_READONLY_FALLBACK';
 const INVALID_FIREBASE_SAVE_ERROR = 'CMS_INVALID_FIREBASE_SAVE';
@@ -175,6 +185,67 @@ function normalizeGalleryFolder(folder: unknown): GalleryFolder | null {
   };
 }
 
+function normalizeAboutParagraphs(value: unknown, fallback: string[]) {
+  if (!Array.isArray(value)) {
+    return fallback;
+  }
+
+  const paragraphs = value.map((entry) => String(entry ?? '').trim()).filter(Boolean);
+  return paragraphs.length ? paragraphs : fallback;
+}
+
+function normalizeAboutBullets(value: unknown, fallback: string[] | undefined) {
+  if (!Array.isArray(value)) {
+    return fallback;
+  }
+
+  const bullets = value.map((entry) => String(entry ?? '').trim()).filter(Boolean);
+  return bullets.length ? bullets : fallback;
+}
+
+function normalizeAboutSections(sections: unknown, fallbackSections: typeof defaultCmsContent.site.about.sections) {
+  if (!Array.isArray(sections)) {
+    return fallbackSections;
+  }
+
+  return fallbackSections.map((fallbackSection, index) => {
+    const candidate = sections[index];
+    const section = candidate && typeof candidate === 'object' ? (candidate as Record<string, unknown>) : {};
+
+    return {
+      eyebrow: String(section.eyebrow ?? fallbackSection.eyebrow).trim() || fallbackSection.eyebrow,
+      title: String(section.title ?? fallbackSection.title).trim() || fallbackSection.title,
+      paragraphs: normalizeAboutParagraphs(section.paragraphs, fallbackSection.paragraphs),
+      ...(normalizeAboutBullets(section.bullets, fallbackSection.bullets)
+        ? { bullets: normalizeAboutBullets(section.bullets, fallbackSection.bullets) }
+        : {}),
+    };
+  });
+}
+
+function normalizeAboutTeamMembers(
+  members: unknown,
+  legacyRoles: string[],
+  legacyImages: MediaAsset[],
+  fallbackMembers: typeof defaultCmsContent.site.about.teamMembers
+) {
+  const candidateMembers = Array.isArray(members) ? members : [];
+
+  return fallbackMembers.map((fallbackMember, index) => {
+    const candidate = candidateMembers[index];
+    const member = candidate && typeof candidate === 'object' ? (candidate as Record<string, unknown>) : {};
+    const legacyRole = legacyRoles[index];
+    const legacyImage = legacyImages[index];
+
+    return {
+      role: String(member.role ?? legacyRole ?? fallbackMember.role).trim() || fallbackMember.role,
+      description: String(member.description ?? fallbackMember.description).trim(),
+      image: normalizeMediaAsset(member.image ?? legacyImage ?? fallbackMember.image),
+      imageAlt: String(member.imageAlt ?? fallbackMember.imageAlt ?? legacyRole ?? fallbackMember.role).trim() || fallbackMember.imageAlt,
+    };
+  });
+}
+
 function normalizePartnerEntry(partner: unknown) {
   if (!partner || typeof partner !== 'object') {
     return null;
@@ -278,10 +349,10 @@ function normalizeFooterSocialLinks(content: CmsContent) {
   const defaults = defaultCmsContent.site.footer.socialLinks;
   const currentLinks = Array.isArray(content.site.footer?.socialLinks) ? content.site.footer.socialLinks : [];
 
-  return defaults.map((defaultLink) => {
+  return defaults.map((defaultLink): FooterSocialLink => {
     const currentLink = currentLinks.find((link) => link.platform === defaultLink.platform);
-    const href = String(currentLink?.href ?? '').trim();
-    const normalizedHref = defaultLink.platform === 'instagram' ? defaultLink.href : href || defaultLink.href;
+    const href = normalizeSafeSocialUrl(String(currentLink?.href ?? defaultLink.href ?? ''));
+    const normalizedHref = defaultLink.platform === 'instagram' ? href || defaultLink.href : href;
 
     return {
       ...defaultLink,
@@ -292,35 +363,41 @@ function normalizeFooterSocialLinks(content: CmsContent) {
 }
 
 function normalizeContent(content: CmsContent): CmsContent {
+  const normalizedLiveEditor = {
+    ...emptyLiveEditorContent,
+    ...defaultCmsContent.site.liveEditor,
+    ...content.site.liveEditor,
+    richText: {
+      ...emptyLiveEditorContent.richText,
+      ...defaultCmsContent.site.liveEditor.richText,
+      ...(content.site.liveEditor?.richText || {}),
+    },
+    boxStyles: {
+      ...emptyLiveEditorContent.boxStyles,
+      ...defaultCmsContent.site.liveEditor.boxStyles,
+      ...(content.site.liveEditor?.boxStyles || {}),
+    },
+  };
+
   return {
+    ...content,
     theme: { ...defaultCmsContent.theme, ...content.theme },
     site: {
       ...defaultCmsContent.site,
       ...content.site,
       seo: { ...defaultCmsContent.site.seo, ...content.site.seo },
+      navigationLinks: normalizeNavigationLinks(Array.isArray(content.site.navigationLinks) ? content.site.navigationLinks : defaultCmsContent.site.navigationLinks),
       events: Array.isArray(content.site.events) ? content.site.events.map(normalizeEvent) : defaultCmsContent.site.events.map(normalizeEvent),
       sponsorPackages: Array.isArray(content.site.sponsorPackages)
         ? content.site.sponsorPackages
         : defaultCmsContent.site.sponsorPackages,
-      liveEditor: {
-        ...emptyLiveEditorContent,
-        ...defaultCmsContent.site.liveEditor,
-        ...content.site.liveEditor,
-        richText: {
-          ...emptyLiveEditorContent.richText,
-          ...defaultCmsContent.site.liveEditor.richText,
-          ...(content.site.liveEditor?.richText || {}),
-        },
-        boxStyles: {
-          ...emptyLiveEditorContent.boxStyles,
-          ...defaultCmsContent.site.liveEditor.boxStyles,
-          ...(content.site.liveEditor?.boxStyles || {}),
-        },
-      },
-      home: {
-        ...defaultCmsContent.site.home,
-        ...content.site.home,
+      liveEditor: normalizedLiveEditor,
+      home: normalizeStructuredHomeContent(
+        {
+          ...defaultCmsContent.site.home,
+          ...content.site.home,
         heroImage: normalizeMediaAsset(content.site.home?.heroImage),
+        membershipImage: normalizeMediaAsset(content.site.home?.membershipImage),
         backgroundImage: normalizeMediaAsset(content.site.home?.backgroundImage),
         instagramVideo: normalizeMediaAsset(content.site.home?.instagramVideo),
         newsTitle: String(content.site.home?.newsTitle ?? defaultCmsContent.site.home.newsTitle).trim() || defaultCmsContent.site.home.newsTitle,
@@ -335,15 +412,47 @@ function normalizeContent(content: CmsContent): CmsContent {
           : defaultCmsContent.site.home.newsImages,
         newsImagePositionX: normalizePercentage(content.site.home?.newsImagePositionX, defaultCmsContent.site.home.newsImagePositionX),
         newsImagePositionY: normalizePercentage(content.site.home?.newsImagePositionY, defaultCmsContent.site.home.newsImagePositionY),
-      },
+        },
+        normalizedLiveEditor,
+        defaultCmsContent.site.home
+      ),
       sponsors: { ...defaultCmsContent.site.sponsors, ...content.site.sponsors },
-      about: {
-        ...defaultCmsContent.site.about,
-        ...content.site.about,
-        teamImages: Array.isArray(content.site.about?.teamImages)
-          ? content.site.about.teamImages
-          : defaultCmsContent.site.about.teamImages,
-      },
+      about: (() => {
+        const fallbackAbout = defaultCmsContent.site.about;
+        const currentAbout = content.site.about ?? fallbackAbout;
+        const legacyRoles = Array.isArray(currentAbout.teamRoles)
+          ? currentAbout.teamRoles.map((entry) => String(entry ?? '').trim()).filter(Boolean)
+          : fallbackAbout.teamRoles;
+        const legacyImages = Array.isArray(currentAbout.teamImages)
+          ? currentAbout.teamImages.map(normalizeMediaAsset)
+          : fallbackAbout.teamImages;
+        const teamMembers = normalizeAboutTeamMembers(currentAbout.teamMembers, legacyRoles, legacyImages, fallbackAbout.teamMembers);
+
+        return {
+          ...fallbackAbout,
+          ...currentAbout,
+          introParagraphs: normalizeAboutParagraphs(currentAbout.introParagraphs, fallbackAbout.introParagraphs),
+          values: Array.isArray(currentAbout.values) && currentAbout.values.length
+            ? fallbackAbout.values.map((fallbackValue, index) => {
+                const candidate = currentAbout.values[index];
+
+                return {
+                  title: String(candidate?.title ?? fallbackValue.title).trim() || fallbackValue.title,
+                  description: String(candidate?.description ?? fallbackValue.description).trim() || fallbackValue.description,
+                };
+              })
+            : fallbackAbout.values,
+          sections: normalizeAboutSections(currentAbout.sections, fallbackAbout.sections),
+          teamLead: String(currentAbout.teamLead ?? fallbackAbout.teamLead).trim() || fallbackAbout.teamLead,
+          teamTitle: String(currentAbout.teamTitle ?? fallbackAbout.teamTitle).trim() || fallbackAbout.teamTitle,
+          teamRoles: teamMembers.map((member) => member.role),
+          teamImages: teamMembers.map((member) => member.image),
+          teamMembers,
+          closingEyebrow: String(currentAbout.closingEyebrow ?? fallbackAbout.closingEyebrow).trim() || fallbackAbout.closingEyebrow,
+          closingTitle: String(currentAbout.closingTitle ?? fallbackAbout.closingTitle).trim() || fallbackAbout.closingTitle,
+          closingBody: String(currentAbout.closingBody ?? fallbackAbout.closingBody).trim() || fallbackAbout.closingBody,
+        };
+      })(),
       contact: { ...defaultCmsContent.site.contact, ...content.site.contact },
       stand: { ...defaultCmsContent.site.stand, ...content.site.stand },
       merchandise: {
@@ -372,6 +481,26 @@ function normalizeContent(content: CmsContent): CmsContent {
       footer: {
         ...defaultCmsContent.site.footer,
         ...content.site.footer,
+        description:
+          normalizeSafeText(String(content.site.footer?.description ?? defaultCmsContent.site.footer.description ?? '')) ||
+          defaultCmsContent.site.footer.description,
+        informationHeading:
+          normalizeSafeText(String(content.site.footer?.informationHeading ?? defaultCmsContent.site.footer.informationHeading ?? '')) ||
+          defaultCmsContent.site.footer.informationHeading,
+        informationLinks: normalizeFooterInformationLinks(
+          Array.isArray(content.site.footer?.informationLinks)
+            ? content.site.footer.informationLinks
+            : getDefaultFooterInformationLinks()
+        ),
+        contactHeading:
+          normalizeSafeText(String(content.site.footer?.contactHeading ?? defaultCmsContent.site.footer.contactHeading ?? '')) ||
+          defaultCmsContent.site.footer.contactHeading,
+        contactLinks: normalizeFooterContactLinks(
+          Array.isArray(content.site.footer?.contactLinks)
+            ? content.site.footer.contactLinks
+            : getDefaultFooterContactLinks()
+        ),
+        contactEmail: String(content.site.footer?.contactEmail ?? '').trim(),
         socialLinks: normalizeFooterSocialLinks(content),
       },
     },
