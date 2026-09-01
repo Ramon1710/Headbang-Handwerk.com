@@ -2,29 +2,38 @@ import type { Metadata } from 'next';
 import { EditablePageShell } from '@/components/editable-page-shell';
 import { LiveEditableText } from '@/components/live-editable-text';
 import { LiveResizableBox } from '@/components/live-resizable-box';
-import { Button } from '@/components/ui/button';
 import { updateAboutTeamImagesAction } from '@/app/admin/media-actions';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
-import { resolveLiveBoxStyle, resolveLiveHtml, resolveLiveRichHtml, textParagraphHtml } from '@/lib/cms/live-editor';
+import { resolveLiveBoxStyle, resolveLiveHtml, resolveLiveRichHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
-import { ArrowRight, Drum, Flame, Hammer, Rocket, ShieldCheck, Users2 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Über uns – Headbang Handwerk',
 };
 
-const sectionIcons = [Users2, Hammer, Rocket, ShieldCheck, Flame, Drum];
-
-function getSectionFallbackHtml(section: Awaited<ReturnType<typeof getCmsContent>>['site']['about']['sections'][number]) {
-  const paragraphs = section.paragraphs.map((paragraph) => textParagraphHtml(paragraph, 'body-copy text-[#e8d9c7]')).join('');
-  const bullets = section.bullets?.length
-    ? `<ul class="mt-5 space-y-3 text-sm leading-7 text-[#f0e3d3]">${section.bullets
-        .map((bullet) => `<li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-[color:var(--color-accent)]"></span><span>${bullet}</span></li>`)
-        .join('')}</ul>`
-    : '';
-
-  return `${paragraphs}${bullets}`;
-}
+const ABOUT_STORY_FALLBACK_HTML = `
+<p class="mb-6 text-2xl font-black leading-tight text-white">Handwerk gehört dorthin, wo Menschen begeistert werden.</p>
+<p class="mb-5">Das Handwerk ist unverzichtbar – und trotzdem oft viel zu unsichtbar. Dabei entstehen genau hier Innovationen, Leidenschaft und Zukunft.</p>
+<p class="mb-5">Headbang Handwerk ist ein gemeinnütziger Verein, der neue Wege geht, um Menschen für das Handwerk zu begeistern. Gemeinsam mit Betrieben, Bildungseinrichtungen, Handwerksorganisationen, Verbänden, Veranstaltern und weiteren Partnern entwickeln wir Projekte, die Handwerk erlebbar machen und neue Zielgruppen erreichen.</p>
+<p class="mb-6 text-xl font-black text-white">Wie das aussehen kann?</p>
+<p class="mb-5">Wir schaffen keine klassischen Informationsstände – wir schaffen Erlebnisse.</p>
+<p class="mb-4">Dazu entwickeln wir gemeinsam mit unseren Partnern unter anderem:</p>
+<ul class="mb-6 space-y-3">
+  <li>• Mitmachstände auf Festivals, Veranstaltungen und Messen</li>
+  <li>• Handwerk zum Anfassen – von klassischen Gewerken bis zu modernen Technologien</li>
+  <li>• Innovative Themen wie Smart Home, Virtual Reality, Digitalisierung oder Robotik zum Ausprobieren</li>
+  <li>• Berufsorientierung durch den direkten Austausch mit Betrieben, Auszubildenden und Bildungseinrichtungen</li>
+  <li>• Kooperationen zwischen Handwerk, Kultur, Musik, Bildung und Gesellschaft</li>
+  <li>• Kreative Öffentlichkeitsarbeit, die zeigt, wie vielfältig, modern und spannend Handwerk heute ist</li>
+</ul>
+<p class="mb-5">Jedes Projekt entsteht gemeinsam mit unseren Partnern und wird individuell auf den jeweiligen Veranstaltungsort und die Zielgruppe abgestimmt. So entstehen keine Standardlösungen, sondern echte Erlebnisse mit Mehrwert – für Besucher, Betriebe und das Handwerk gleichermaßen.</p>
+<p class="mb-5">Ein Beispiel dafür ist unsere Idee, Handwerk auf Festivals wie auf einem der weltweit größten Metalfestival erlebbar zu machen. Nicht mit einem klassischen Infostand, sondern mit Mitmachaktionen, innovativen Technologien, Gesprächen mit Handwerksbetrieben und kreativen Formaten, die Menschen begeistern und zeigen, was modernes Handwerk heute leisten kann.</p>
+<p class="mb-5">Denn unser Ziel ist nicht ein einzelnes Festival oder ein einzelnes Projekt.</p>
+<p class="mb-5">Unser Ziel ist es, das Handwerk dort sichtbar zu machen, wo Menschen zusammenkommen, begeistert werden und neue Perspektiven entdecken.</p>
+<p class="mb-5">Denn wir sind überzeugt:</p>
+<p class="mb-6 text-xl font-black text-white">Menschen erinnern sich nicht an Flyer. Sie erinnern sich an Erlebnisse.</p>
+<p class="text-xl font-black text-white">Handwerk. Laut. Sichtbar.</p>
+`;
 
 function getMediaErrorMessage(mediaError?: string) {
   if (!mediaError) {
@@ -103,88 +112,41 @@ export default async function UeberUnsPage({
           ) : null}
 
           <LiveResizableBox boxKey="about.hero.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'about.hero.box')} isAdmin={isAdmin} allowPosition={false} applySavedHeight={false} className="copy-center content-flow mb-14 text-center">
-            <p className="eyebrow text-[color:var(--color-accent-soft)]">Vereinsporträt</p>
-            <h1 className="page-title mb-6">
-              <LiveEditableText as="span" className="inline" editorKey="about.title" initialHtml={resolveLiveHtml(liveEditor, 'about.title', about.title)} isAdmin={isAdmin} title="Über uns Titel" />{' '}
-              <LiveEditableText as="span" className="inline" editorKey="about.accentWord" initialHtml={resolveLiveHtml(liveEditor, 'about.accentWord', about.accentWord)} isAdmin={isAdmin} title="Über uns Hervorhebung" />
-            </h1>
-            <div className="mx-auto max-w-4xl space-y-5">
-              {about.introParagraphs.map((paragraph, index) => (
-                <LiveEditableText
-                  key={`${index}-${paragraph.slice(0, 24)}`}
-                  as="p"
-                  className={index === 0 ? 'body-copy-lg text-[#f0e3d3]' : 'body-copy text-[#dccab7]'}
-                  editorKey={`about.introParagraphs.${index}`}
-                  initialHtml={resolveLiveHtml(liveEditor, `about.introParagraphs.${index}`, paragraph)}
-                  isAdmin={isAdmin}
-                  title={`Über uns Absatz ${index + 1}`}
-                />
-              ))}
-            </div>
+            <LiveEditableText as="h1" className="page-title mb-0" editorKey="about.pageTitle" initialHtml={resolveLiveHtml(liveEditor, 'about.pageTitle', 'Über uns')} isAdmin={isAdmin} title="Über uns Titel" />
           </LiveResizableBox>
 
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            {about.sections.map((section, index) => {
-              const Icon = sectionIcons[index] || ArrowRight;
-
-              return (
-                <LiveResizableBox
-                  key={`${section.title}-${index}`}
-                  boxKey={`about.sections.${index}.box`}
-                  initialStyle={resolveLiveBoxStyle(liveEditor, `about.sections.${index}.box`)}
-                  isAdmin={isAdmin}
-                  allowPosition={false}
-                  applySavedHeight={false}
-                  className={`section-shell content-box h-full ${index === 0 || index === 5 ? 'xl:col-span-2' : ''}`}
-                >
-                  <div className="mb-5 flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--color-accent)]/10 ring-1 ring-[color:var(--color-accent)]/20">
-                      <Icon className="h-5 w-5 text-[color:var(--color-accent)]" />
-                    </div>
-                    <div>
-                      <LiveEditableText as="p" className="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--color-accent-soft)]" editorKey={`about.sections.${index}.eyebrow`} initialHtml={resolveLiveHtml(liveEditor, `about.sections.${index}.eyebrow`, section.eyebrow)} isAdmin={isAdmin} title={`Über uns Abschnitt ${index + 1} Augenbraue`} />
-                      <LiveEditableText as="h2" className="section-title mt-2 text-[1.9rem] leading-[0.98] text-white" editorKey={`about.sections.${index}.title`} initialHtml={resolveLiveHtml(liveEditor, `about.sections.${index}.title`, section.title)} isAdmin={isAdmin} title={`Über uns Abschnitt ${index + 1} Titel`} />
-                    </div>
-                  </div>
-                  <LiveEditableText as="div" className="content-flow [&_li]:list-none [&_li]:pl-0 [&_p]:text-[#e8d9c7] [&_span]:inline-block" editorKey={`about.sections.${index}.content`} initialHtml={resolveLiveRichHtml(liveEditor, `about.sections.${index}.content`, getSectionFallbackHtml(section))} isAdmin={isAdmin} title={`Über uns Abschnitt ${index + 1} Inhalt`} normalizeTypography />
-                </LiveResizableBox>
-              );
-            })}
-          </div>
-
           <LiveResizableBox boxKey="about.team.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'about.team.box')} isAdmin={isAdmin} allowPosition={false} applySavedHeight={false} className="section-shell content-box mb-12 mt-16 text-center">
-            <LiveEditableText as="h2" className="section-title mb-4" editorKey="about.teamTitle" initialHtml={resolveLiveHtml(liveEditor, 'about.teamTitle', about.teamTitle)} isAdmin={isAdmin} title="Über uns Team Titel" />
-            <LiveEditableText as="p" className="body-copy mx-auto mb-8 max-w-3xl text-[#dbcbb9]" editorKey="about.teamLead" initialHtml={resolveLiveHtml(liveEditor, 'about.teamLead', about.teamLead)} isAdmin={isAdmin} title="Über uns Team Einleitung" normalizeTypography />
+            <LiveEditableText as="h2" className="section-title mb-8" editorKey="about.teamTitle" initialHtml={resolveLiveHtml(liveEditor, 'about.teamTitle', 'Der Vorstand')} isAdmin={isAdmin} title="Über uns Team Titel" />
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {teamMembers.map((member, index) => (
                 <LiveResizableBox key={`${member.role}-${index}`} boxKey={`about.teamMembers.${index}.box`} initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamMembers.${index}.box`)} isAdmin={isAdmin} allowPosition={false} applySavedHeight={false} className="h-full rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(28,19,14,0.96)_0%,rgba(11,8,6,0.9)_100%)] p-4 text-left shadow-[0_18px_36px_rgba(0,0,0,0.22)]">
-                  <div className="overflow-hidden rounded-[1.2rem] border border-white/8 bg-[linear-gradient(180deg,rgba(42,31,24,0.95)_0%,rgba(21,15,11,0.86)_100%)]">
+                  <LiveResizableBox
+                    boxKey={`about.teamMembers.${index}.image.box`}
+                    initialStyle={resolveLiveBoxStyle(liveEditor, `about.teamMembers.${index}.image.box`)}
+                    isAdmin={isAdmin}
+                    allowPosition={false}
+                    className="min-h-[16rem] overflow-hidden rounded-[1.2rem] border border-white/8 bg-[linear-gradient(180deg,rgba(42,31,24,0.95)_0%,rgba(21,15,11,0.86)_100%)]"
+                  >
                     {member.image.assetUrl ? (
-                      <img src={member.image.assetUrl} alt={member.imageAlt || member.role} className="h-64 w-full object-cover" />
+                      <div className="flex h-full w-full items-center justify-center">
+                        <img src={member.image.assetUrl} alt={member.imageAlt || member.role} className="h-full w-full object-cover object-center" />
+                      </div>
                     ) : (
-                      <div className="flex h-64 items-center justify-center text-center text-sm font-semibold uppercase tracking-[0.18em] text-[#92745b]">
+                      <div className="flex h-full min-h-[16rem] items-center justify-center text-center text-sm font-semibold uppercase tracking-[0.18em] text-[#92745b]">
                         Bild folgt
                       </div>
                     )}
-                  </div>
-                  <div className="mt-4 space-y-3">
+                  </LiveResizableBox>
+                  <div className="mt-4">
                     <LiveEditableText as="h3" className="text-lg font-black text-white" editorKey={`about.teamMembers.${index}.role`} initialHtml={resolveLiveHtml(liveEditor, `about.teamMembers.${index}.role`, member.role)} isAdmin={isAdmin} title={`Über uns Teamrolle ${index + 1}`} />
-                    <LiveEditableText as="p" className="body-copy text-sm text-[#dccab7]" editorKey={`about.teamMembers.${index}.description`} initialHtml={resolveLiveHtml(liveEditor, `about.teamMembers.${index}.description`, member.description)} isAdmin={isAdmin} title={`Über uns Teamtext ${index + 1}`} normalizeTypography />
                   </div>
                 </LiveResizableBox>
               ))}
             </div>
           </LiveResizableBox>
 
-          <LiveResizableBox boxKey="about.closing.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'about.closing.box')} isAdmin={isAdmin} allowPosition={false} applySavedHeight={false} className="overflow-hidden rounded-[2rem] border border-[color:var(--color-border)]/70 bg-[linear-gradient(135deg,rgba(255,122,0,0.14)_0%,rgba(19,13,9,0.92)_34%,rgba(10,7,5,0.96)_100%)] px-6 py-10 text-center shadow-[0_24px_60px_rgba(0,0,0,0.28)] sm:px-10">
-            <LiveEditableText as="p" className="text-xs font-black uppercase tracking-[0.22em] text-[color:var(--color-accent-soft)]" editorKey="about.closingEyebrow" initialHtml={resolveLiveHtml(liveEditor, 'about.closingEyebrow', about.closingEyebrow)} isAdmin={isAdmin} title="Über uns Abschluss Eyebrow" />
-            <LiveEditableText as="h2" className="section-title mx-auto mt-4 max-w-3xl text-white" editorKey="about.closingTitle" initialHtml={resolveLiveHtml(liveEditor, 'about.closingTitle', about.closingTitle)} isAdmin={isAdmin} title="Über uns Abschluss Titel" />
-            <LiveEditableText as="p" className="body-copy mx-auto mt-5 max-w-2xl text-[#ecdcc9]" editorKey="about.closingBody" initialHtml={resolveLiveHtml(liveEditor, 'about.closingBody', about.closingBody)} isAdmin={isAdmin} title="Über uns Abschluss Text" normalizeTypography />
-            <div className="mt-8 flex justify-center">
-              <Button href={about.ctaHref} size="lg">
-                <LiveEditableText as="span" className="inline" editorKey="about.ctaLabel" initialHtml={resolveLiveHtml(liveEditor, 'about.ctaLabel', about.ctaLabel)} isAdmin={isAdmin} title="Über uns CTA" />
-              </Button>
-            </div>
+          <LiveResizableBox boxKey="about.story.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'about.story.box')} isAdmin={isAdmin} allowPosition={false} applySavedHeight={false} className="overflow-hidden rounded-[2rem] border border-[color:var(--color-border)]/70 bg-[linear-gradient(135deg,rgba(255,122,0,0.08)_0%,rgba(19,13,9,0.92)_28%,rgba(10,7,5,0.96)_100%)] px-6 py-10 shadow-[0_24px_60px_rgba(0,0,0,0.28)] sm:px-10">
+            <LiveEditableText as="div" className="body-copy mx-auto max-w-4xl text-[#ecdcc9] [&_li]:list-none [&_ul]:pl-0 [&_p]:leading-8" editorKey="about.story.content" initialHtml={resolveLiveRichHtml(liveEditor, 'about.story.content', ABOUT_STORY_FALLBACK_HTML)} isAdmin={isAdmin} title="Über uns Inhalt" normalizeTypography />
           </LiveResizableBox>
         </div>
     </EditablePageShell>

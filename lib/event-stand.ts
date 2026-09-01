@@ -97,6 +97,14 @@ export function normalizeEventStandConfig(stand?: Partial<EventStandConfig>): Ev
 }
 
 export function normalizeEvent(event: Event): Event {
+  const {
+    startDate: _rawStartDate,
+    endDate: _rawEndDate,
+    ctaUrl: _rawCtaUrl,
+    imageUrl: _rawImageUrl,
+    imageAlt: _rawImageAlt,
+    ...baseEvent
+  } = event;
   const startDate = normalizeStructuredEventDate(event.startDate);
   const endDate = normalizeStructuredEventDate(event.endDate);
   const status = normalizeEventStatus(event.status, 'planned');
@@ -105,7 +113,7 @@ export function normalizeEvent(event: Event): Event {
   const normalizedCtaUrl = typeof event.ctaUrl === 'string' && event.ctaUrl.trim() ? event.ctaUrl.trim() : undefined;
 
   return {
-    ...event,
+    ...baseEvent,
     status,
     standEnabled: event.standEnabled ?? status === 'confirmed',
     stand: normalizeEventStandConfig(event.stand),
