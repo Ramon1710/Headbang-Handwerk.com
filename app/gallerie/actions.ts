@@ -162,13 +162,13 @@ export async function addGalleryFolderAction(formData: FormData) {
   }
 
   await persistGallery(async (folders) => [
-    ...folders,
     {
       id: folderId,
       title,
       coverImage,
       images: [],
     },
+    ...folders,
   ]);
 
   redirect('/gallerie?adminSaved=folder-added');

@@ -74,7 +74,7 @@ export default async function UeberUnsPage({
   const teamMembers = about.teamMembers;
 
   return (
-    <EditablePageShell cms={cms} isAdmin={isAdmin} mainClassName="min-h-screen bg-transparent pt-28 pb-24">
+    <EditablePageShell cms={cms} isAdmin={isAdmin} mainClassName={isAdmin ? 'min-h-screen bg-transparent pt-28 pb-40' : 'min-h-screen bg-transparent pt-28 pb-24'}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {isAdmin ? (
             <section className="mb-10 rounded-[1.8rem] border border-[color:var(--color-border)]/70 bg-[linear-gradient(180deg,rgba(22,14,10,0.88)_0%,rgba(10,7,5,0.82)_100%)] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
@@ -144,7 +144,7 @@ export default async function UeberUnsPage({
             </div>
           </LiveResizableBox>
 
-          <LiveResizableBox boxKey="about.story.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'about.story.box')} isAdmin={isAdmin} className="overflow-hidden rounded-[2rem] border border-[color:var(--color-border)]/70 bg-[linear-gradient(135deg,rgba(255,122,0,0.08)_0%,rgba(19,13,9,0.92)_28%,rgba(10,7,5,0.96)_100%)] px-6 py-10 shadow-[0_24px_60px_rgba(0,0,0,0.28)] sm:px-10">
+          <LiveResizableBox boxKey="about.story.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'about.story.box')} isAdmin={isAdmin} className={`overflow-hidden rounded-[2rem] border border-[color:var(--color-border)]/70 bg-[linear-gradient(135deg,rgba(255,122,0,0.08)_0%,rgba(19,13,9,0.92)_28%,rgba(10,7,5,0.96)_100%)] px-6 py-10 shadow-[0_24px_60px_rgba(0,0,0,0.28)] sm:px-10 ${isAdmin ? 'mb-24' : ''}`}>
             <LiveEditableText as="div" className="body-copy mx-auto max-w-4xl text-[#ecdcc9] [&_li]:list-none [&_ul]:pl-0 [&_p]:leading-8" editorKey="about.story.content" initialHtml={resolveLiveRichHtml(liveEditor, 'about.story.content', ABOUT_STORY_FALLBACK_HTML)} isAdmin={isAdmin} title="Über uns Inhalt" normalizeTypography />
           </LiveResizableBox>
         </div>

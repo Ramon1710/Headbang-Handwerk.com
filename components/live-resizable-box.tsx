@@ -413,7 +413,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
           type="button"
           onPointerDown={handleWidthResizeStart}
           aria-label="Breite und Höhe ändern"
-          className="absolute bottom-2 left-1/2 z-20 hidden h-5 w-12 -translate-x-1/2 cursor-nwse-resize rounded-full border border-[#ff9d3c]/60 bg-[#1a110b]/90 md:block"
+          className="absolute bottom-3 left-1/2 z-20 hidden h-6 w-14 -translate-x-1/2 cursor-nwse-resize rounded-full border border-[#ff9d3c]/60 bg-[#1a110b]/90 md:block"
         >
           <span aria-hidden="true" className="pointer-events-none absolute inset-x-2 top-1/2 h-0.5 -translate-y-1/2 bg-[#ffcf98]" />
         </button>
@@ -423,9 +423,9 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
           type="button"
           onPointerDown={handleResizeStart}
           aria-label="Größe ändern"
-          className="absolute bottom-2 right-2 z-20 h-6 w-6 cursor-se-resize touch-none rounded-sm bg-[#1a110b]/88"
+          className="absolute bottom-4 right-4 z-20 h-8 w-8 cursor-se-resize touch-none rounded-md border border-[#ff9d3c]/45 bg-[#1a110b]/92 shadow-[0_10px_24px_rgba(0,0,0,0.28)]"
         >
-          <span aria-hidden="true" className="pointer-events-none absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2 border-[#ff9d3c]/80" />
+          <span aria-hidden="true" className="pointer-events-none absolute bottom-1 right-1 h-4 w-4 border-b-2 border-r-2 border-[#ff9d3c]/80" />
         </button>
       ) : null}
     </div>

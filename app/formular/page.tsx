@@ -25,7 +25,7 @@ export default async function FormularPage({
     <EditablePageShell cms={cms} isAdmin={isAdmin} mainClassName="min-h-screen bg-transparent pt-28 pb-24">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <LiveResizableBox boxKey="formPage.intro.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'formPage.intro.box')} isAdmin={isAdmin} className="section-shell content-box text-center sm:p-10 lg:p-12">
-          <LiveEditableText as="h1" className="page-title mx-auto max-w-[11ch]" editorKey="formPage.title" initialHtml={resolveLiveHtml(liveEditor, 'formPage.title', 'Mitglied werden / Formular')} isAdmin={isAdmin} title="Formular Titel" normalizeTypography />
+          <LiveEditableText as="h1" className="page-title mx-auto max-w-[11ch] text-center [&_p]:text-center [&_span]:text-center" editorKey="formPage.title" initialHtml={resolveLiveHtml(liveEditor, 'formPage.title', 'Mitglied werden / Formular')} isAdmin={isAdmin} title="Formular Titel" normalizeTypography />
           <LiveEditableText as="p" className="body-copy-lg mx-auto mt-6 max-w-3xl" editorKey="formPage.lead" initialHtml={resolveLiveHtml(liveEditor, 'formPage.lead', 'Hier könnt ihr euer gewünschtes Formular oder den direkten Erstkontakt für Mitgliedschaften und Anfragen einfügen.')} isAdmin={isAdmin} title="Formular Einleitung" normalizeTypography />
         </LiveResizableBox>
 
