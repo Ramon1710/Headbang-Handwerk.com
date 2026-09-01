@@ -99,6 +99,18 @@ function getPreviewGridClasses(itemCount: number) {
   return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
 }
 
+function getDesktopPreviewGridClasses(itemCount: number) {
+  if (itemCount <= 1) {
+    return 'md:mx-auto md:max-w-3xl md:grid md:grid-cols-1';
+  }
+
+  if (itemCount === 2) {
+    return 'md:mx-auto md:max-w-6xl md:grid md:grid-cols-2';
+  }
+
+  return 'md:grid md:grid-cols-2 lg:grid-cols-3';
+}
+
 function AdminPanel({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   return (
     <section className="rounded-[1.6rem] border border-[#ff9d3c]/30 bg-[#130d09]/92 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.28)] backdrop-blur-sm">
@@ -557,7 +569,7 @@ export default async function HomePage({
                     <div className="md:hidden" style={{ gap: `${layoutSettings.cardGap}px` }}>
                       {nextMobileEvent.map((event) => <HomeEventPreviewCard key={event.id} event={event} imageHeight={layoutSettings.eventImageHeight} />)}
                     </div>
-                    <div className={cn('hidden md:grid', getPreviewGridClasses(upcomingEvents.length))} style={{ gap: `${layoutSettings.cardGap}px` }}>
+                    <div className={cn('hidden', getDesktopPreviewGridClasses(upcomingEvents.length))} style={{ gap: `${layoutSettings.cardGap}px` }}>
                       {upcomingEvents.map((event) => <HomeEventPreviewCard key={event.id} event={event} imageHeight={layoutSettings.eventImageHeight} />)}
                     </div>
                   </>

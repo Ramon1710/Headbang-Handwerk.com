@@ -225,6 +225,38 @@ export async function updateGalleryFolderAction(formData: FormData) {
   redirect('/gallerie?adminSaved=folder-updated');
 }
 
+export async function moveGalleryFolderAction(formData: FormData) {
+  await assertAdmin();
+
+  const folderId = sanitizeText(formData.get('id'));
+  const direction = sanitizeText(formData.get('direction'));
+
+  if (!folderId || (direction !== 'forward' && direction !== 'backward')) {
+    redirect('/gallerie?adminError=invalid-order');
+  }
+
+  await persistGallery(async (folders) => {
+    const currentIndex = folders.findIndex((folder) => folder.id === folderId);
+
+    if (currentIndex < 0) {
+      return folders;
+    }
+
+    const targetIndex = direction === 'forward' ? currentIndex - 1 : currentIndex + 1;
+
+    if (targetIndex < 0 || targetIndex >= folders.length) {
+      return folders;
+    }
+
+    const nextFolders = [...folders];
+    const [folder] = nextFolders.splice(currentIndex, 1);
+    nextFolders.splice(targetIndex, 0, folder);
+    return nextFolders;
+  });
+
+  redirect('/gallerie?adminSaved=folder-moved');
+}
+
 export async function removeGalleryFolderAction(formData: FormData) {
   await assertAdmin();
 

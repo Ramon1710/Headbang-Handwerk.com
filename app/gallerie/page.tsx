@@ -9,6 +9,7 @@ import { getCmsContent } from '@/lib/cms/storage';
 import {
   addGalleryFolderAction,
   addGalleryImagesAction,
+  moveGalleryFolderAction,
   removeGalleryFolderAction,
   removeGalleryImageAction,
   updateGalleryFolderAction,
@@ -46,6 +47,8 @@ export default async function GalleryPage({
                 ? 'Das Bild konnte nicht hochgeladen werden. Prüfe Firebase Storage und den Service Account.'
                 : params?.adminError === 'missing-title'
                   ? 'Bitte einen Titel für den Ordner angeben.'
+                  : params?.adminError === 'invalid-order'
+                    ? 'Die gewünschte Ordner-Reihenfolge konnte nicht übernommen werden.'
                   : params?.adminError
                     ? 'Aktion fehlgeschlagen. Bitte Eingaben prüfen.'
                     : null;
@@ -85,7 +88,7 @@ export default async function GalleryPage({
             </form>
 
             <div className="mt-6 space-y-5">
-              {gallery.folders.map((folder) => (
+              {gallery.folders.map((folder, index) => (
                 <div key={folder.id} className="rounded-[1.4rem] border border-white/8 bg-black/10 p-5">
                   <div className="grid gap-5 xl:grid-cols-[1fr_auto] xl:items-end">
                     <form action={updateGalleryFolderAction} className="grid gap-3 md:grid-cols-2">
@@ -110,11 +113,22 @@ export default async function GalleryPage({
                       </div>
                     </form>
                     <div className="rounded-xl border border-[color:var(--color-border)]/70 bg-black/15 px-4 py-3 text-sm text-[color:var(--color-muted)] xl:min-w-64">
-                      Bilder verwaltest du direkt unten in der geöffneten Ordneransicht.
+                      <p>Position {index + 1} von {gallery.folders.length}</p>
+                      <p className="mt-2">Bilder verwaltest du direkt unten in der geöffneten Ordneransicht.</p>
                     </div>
                   </div>
 
                   <div className="mt-5 flex flex-wrap gap-3">
+                    <form action={moveGalleryFolderAction}>
+                      <input type="hidden" name="id" value={folder.id} />
+                      <input type="hidden" name="direction" value="forward" />
+                      <button type="submit" disabled={index === 0} className="rounded-xl border border-[color:var(--color-accent)]/35 px-4 py-3 text-sm font-black text-[color:var(--color-accent-soft)] transition hover:border-[color:var(--color-accent)] hover:text-white disabled:cursor-not-allowed disabled:opacity-40">Weiter nach vorne</button>
+                    </form>
+                    <form action={moveGalleryFolderAction}>
+                      <input type="hidden" name="id" value={folder.id} />
+                      <input type="hidden" name="direction" value="backward" />
+                      <button type="submit" disabled={index === gallery.folders.length - 1} className="rounded-xl border border-[color:var(--color-accent)]/35 px-4 py-3 text-sm font-black text-[color:var(--color-accent-soft)] transition hover:border-[color:var(--color-accent)] hover:text-white disabled:cursor-not-allowed disabled:opacity-40">Weiter nach hinten</button>
+                    </form>
                     <form action={removeGalleryFolderAction}>
                       <input type="hidden" name="id" value={folder.id} />
                       <button type="submit" className="rounded-xl bg-red-500/15 px-4 py-3 text-sm font-black text-red-200 transition hover:bg-red-500/25">Ordner entfernen</button>
