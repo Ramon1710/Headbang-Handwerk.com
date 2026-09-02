@@ -43,11 +43,22 @@ export function CheckoutClient({ sponsorPackages }: CheckoutClientProps) {
       });
       const data = await res.json();
 
+      if (!res.ok) {
+        throw new Error(typeof data.error === 'string' ? data.error : 'checkout-failed');
+      }
+
       if (data.url) {
         window.location.href = data.url;
+        return;
       }
-    } catch {
-      alert('Fehler beim Starten der Zahlung. Bitte kontaktiert uns direkt.');
+
+      throw new Error('checkout-failed');
+    } catch (error) {
+      const message = error instanceof Error && error.message
+        ? error.message
+        : 'Fehler beim Starten der Zahlung. Bitte kontaktiert uns direkt.';
+
+      alert(message);
     } finally {
       setLoading(false);
     }

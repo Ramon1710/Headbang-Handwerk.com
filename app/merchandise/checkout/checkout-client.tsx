@@ -87,14 +87,22 @@ export function MerchandiseCheckoutClient({ products }: MerchandiseCheckoutClien
       });
 
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error(typeof data.error === 'string' ? data.error : 'checkout-failed');
+      }
+
       if (data.url) {
         window.location.href = data.url;
         return;
       }
 
       throw new Error(data.error || 'checkout-failed');
-    } catch {
-      alert('Checkout konnte nicht gestartet werden. Bitte später erneut versuchen oder direkt Kontakt aufnehmen.');
+    } catch (error) {
+      const message = error instanceof Error && error.message
+        ? error.message
+        : 'Checkout konnte nicht gestartet werden. Bitte später erneut versuchen oder direkt Kontakt aufnehmen.';
+
+      alert(message);
     } finally {
       setLoading(false);
     }

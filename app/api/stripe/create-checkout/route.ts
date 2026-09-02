@@ -2,11 +2,94 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getCmsContent } from '@/lib/cms/storage';
 import { buildCartMetadata, validateCheckoutCustomer } from '@/lib/merchandise';
-import type { MerchandiseCartItem, MerchandiseCheckoutCustomer } from '@/lib/types';
+import type { MerchandiseCartItem, MerchandiseCheckoutCustomer, MerchandiseProduct } from '@/lib/types';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
   apiVersion: '2026-02-25.clover',
 });
+
+function buildMerchandiseLineItem(
+  product: MerchandiseProduct,
+  item: { quantity: number; size?: string; color?: string },
+  preferStripePriceId: boolean
+): Stripe.Checkout.SessionCreateParams.LineItem {
+  if (preferStripePriceId && product.stripePriceId) {
+    return {
+      price: product.stripePriceId,
+      quantity: item.quantity,
+    };
+  }
+
+  return {
+    price_data: {
+      currency: 'eur',
+      unit_amount: Math.round(product.price * 100),
+      product_data: {
+        name: `Headbang Handwerk – ${product.name}`,
+        description: [
+          product.description,
+          item.size ? `Größe: ${item.size}` : '',
+          item.color ? `Farbe: ${item.color}` : '',
+          product.estimatedDeliveryTime ? `Lieferzeit: ${product.estimatedDeliveryTime}` : '',
+        ]
+          .filter(Boolean)
+          .join(' · '),
+      },
+    },
+    quantity: item.quantity,
+  };
+}
+
+async function createMerchandiseCheckoutSession(params: {
+  items: Array<{
+    product: MerchandiseProduct;
+    quantity: number;
+    size?: string;
+    color?: string;
+  }>;
+  customer: MerchandiseCheckoutCustomer;
+  appUrl: string;
+  metadata: Record<string, string>;
+}) {
+  const createSession = async (preferStripePriceIds: boolean) => {
+    const lineItems = params.items.map(({ product, quantity, size, color }) =>
+      buildMerchandiseLineItem(product, { quantity, size, color }, preferStripePriceIds)
+    );
+
+    return stripe.checkout.sessions.create({
+      mode: 'payment',
+      customer_creation: 'always',
+      customer_email: params.customer.email,
+      billing_address_collection: 'required',
+      phone_number_collection: { enabled: true },
+      line_items: lineItems,
+      metadata: params.metadata,
+      success_url: `${params.appUrl}/merchandise/danke?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${params.appUrl}/merchandise/checkout`,
+    });
+  };
+
+  try {
+    return await createSession(true);
+  } catch (error) {
+    const stripeError = error instanceof Stripe.errors.StripeError ? error : null;
+    const shouldRetryWithoutPriceIds =
+      stripeError?.type === 'StripeInvalidRequestError' &&
+      stripeError.param === 'line_items' &&
+      params.items.some(({ product }) => Boolean(product.stripePriceId));
+
+    if (!shouldRetryWithoutPriceIds) {
+      throw error;
+    }
+
+    console.warn('Retrying merchandise checkout without Stripe price IDs', {
+      code: stripeError.code,
+      message: stripeError.message,
+    });
+
+    return createSession(false);
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,7 +124,12 @@ export async function POST(req: NextRequest) {
         color: item.color ? String(item.color) : undefined,
       }));
 
-      const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+      const checkoutItems: Array<{
+        product: MerchandiseProduct;
+        quantity: number;
+        size?: string;
+        color?: string;
+      }> = [];
 
       for (const item of sanitizedItems) {
         const product = cms.site.merchandise.products.find((entry) => entry.id === item.productId);
@@ -50,43 +138,20 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ error: 'Product not found' }, { status: 404 });
         }
 
-        if (product.stripePriceId) {
-          lineItems.push({
-            price: product.stripePriceId,
-            quantity: item.quantity,
-          });
-          continue;
-        }
-
-        lineItems.push({
-          price_data: {
-            currency: 'eur',
-            unit_amount: Math.round(product.price * 100),
-            product_data: {
-              name: `Headbang Handwerk – ${product.name}`,
-              description: [
-                product.description,
-                item.size ? `Größe: ${item.size}` : '',
-                item.color ? `Farbe: ${item.color}` : '',
-                product.estimatedDeliveryTime ? `Lieferzeit: ${product.estimatedDeliveryTime}` : '',
-              ]
-                .filter(Boolean)
-                .join(' · '),
-            },
-          },
+        checkoutItems.push({
+          product,
           quantity: item.quantity,
+          size: item.size,
+          color: item.color,
         });
       }
 
       const validatedCustomer = customerValidation.customer;
 
-      const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
-        customer_creation: 'always',
-        customer_email: validatedCustomer.email,
-        billing_address_collection: 'required',
-        phone_number_collection: { enabled: true },
-        line_items: lineItems,
+      const session = await createMerchandiseCheckoutSession({
+        items: checkoutItems,
+        customer: validatedCustomer,
+        appUrl,
         metadata: {
           orderKind: 'merchandise',
           customerFirstName: validatedCustomer.firstName,
@@ -98,8 +163,6 @@ export async function POST(req: NextRequest) {
           customerPhone: validatedCustomer.phone,
           ...buildCartMetadata(sanitizedItems),
         },
-        success_url: `${appUrl}/merchandise/danke?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${appUrl}/merchandise/checkout`,
       });
 
       return NextResponse.json({ url: session.url });
