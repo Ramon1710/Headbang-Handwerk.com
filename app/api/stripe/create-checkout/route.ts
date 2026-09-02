@@ -73,9 +73,16 @@ async function createMerchandiseCheckoutSession(params: {
     return await createSession(true);
   } catch (error) {
     const stripeError = error instanceof Stripe.errors.StripeError ? error : null;
+    const stripeParam = stripeError?.param || '';
     const shouldRetryWithoutPriceIds =
       stripeError?.type === 'StripeInvalidRequestError' &&
-      stripeError.param === 'line_items' &&
+      (
+        stripeParam === 'line_items' ||
+        stripeParam.includes('[price]') ||
+        stripeError.code === 'resource_missing' ||
+        stripeError.code === 'parameter_invalid_empty' ||
+        stripeError.code === 'parameter_unknown'
+      ) &&
       params.items.some(({ product }) => Boolean(product.stripePriceId));
 
     if (!shouldRetryWithoutPriceIds) {
@@ -201,6 +208,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: session.url });
   } catch (err) {
     console.error('Stripe error:', err);
+
+    if (err instanceof Stripe.errors.StripeAuthenticationError) {
+      return NextResponse.json({ error: 'Stripe authentication failed' }, { status: 502 });
+    }
+
+    if (err instanceof Stripe.errors.StripePermissionError) {
+      return NextResponse.json({ error: 'Stripe permission denied' }, { status: 502 });
+    }
+
+    if (err instanceof Stripe.errors.StripeInvalidRequestError) {
+      return NextResponse.json({ error: err.message || 'Stripe request invalid' }, { status: 400 });
+    }
+
+    if (err instanceof Error && err.message === 'Firebase ist nicht vollständig konfiguriert.') {
+      return NextResponse.json({ error: 'Firebase not configured' }, { status: 503 });
+    }
+
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
