@@ -6,7 +6,7 @@ import { zollhausShellStyles as styles } from '@/components/zollhaus/zollhaus-sh
 
 export const metadata: Metadata = {
   title: 'Zollhaus Admin Login',
-  description: 'Geschützter Zugang für den künftigen Zollhaus-Adminbereich.',
+  description: 'Geschützter Zugang für den Zollhaus-Shop.',
 };
 
 export default async function ZollhausAdminLoginPage({
@@ -25,13 +25,8 @@ export default async function ZollhausAdminLoginPage({
       <section className={styles.panel}>
         <h2 className={styles.panelTitle}>Zollhaus-Login</h2>
         <div className={styles.panelBody}>
-          <p>
-            Dieser Zugang ist ausschließlich für berechtigte Administratoren des Zollhaus-Bereichs vorgesehen.
-          </p>
-          <p>
-            Die Prüfung erfolgt vollständig serverseitig. Fehlgeschlagene Anmeldungen werden begrenzt und kurzzeitig
-            gesperrt.
-          </p>
+          <p>Dieser Zugang ist für berechtigte Administratorinnen und Administratoren des Zollhaus-Shops vorgesehen.</p>
+          <p>Bitte melden Sie sich mit Ihren persönlichen Zugangsdaten an.</p>
         </div>
         {params.error ? <div className={styles.mutedCard}>Anmeldung fehlgeschlagen. Bitte Eingaben prüfen und erneut versuchen.</div> : null}
         {params.locked ? <div className={styles.mutedCard}>Zu viele Fehlversuche. Bitte versuchen Sie es in einigen Minuten erneut.</div> : null}
@@ -40,7 +35,7 @@ export default async function ZollhausAdminLoginPage({
       <aside className={styles.panel}>
         <p className={styles.placeholderNote}>Geschützter Bereich</p>
         <div className={styles.panelBody}>
-          <p>Headbang-Administratoren dürfen diesen Bereich ebenfalls nutzen. Ein Zollhaus-Admin erhält jedoch keine globalen Rechte.</p>
+          <p>Der Login öffnet den geschützten Verwaltungsbereich für Produkte, Bestellungen und Shopvorschau.</p>
         </div>
       </aside>
 
@@ -64,12 +59,9 @@ export default async function ZollhausAdminLoginPage({
       </section>
 
       <aside className={styles.panel}>
-        <h2 className={styles.panelTitle}>Aktueller Stand</h2>
+        <h2 className={styles.panelTitle}>Hinweis</h2>
         <div className={styles.panelBody}>
-          <p>
-            Produkt- und Bestellverwaltung folgen später. In diesem Schritt wird nur der getrennte Zugriffsschutz für
-            Zollhaus und Headbang aktiviert.
-          </p>
+          <p>Bei Fragen zur Verwaltung hilft die geschützte Zollhaus-Administration mit Produktübersicht, Bestellungen und Vorschau.</p>
         </div>
       </aside>
     </div>

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { calculateZollhausCartTotal, clearZollhausCartAfterSuccess } from '@/lib/zollhaus/cart';
+import { resolveZollhausNotice } from '@/components/zollhaus/public-copy';
 import { formatPriceCentsForDisplay } from '@/lib/zollhaus/product-admin';
 import type { PublicZollhausProduct } from '@/lib/zollhaus/public-products';
 import { useZollhausCart } from '@/components/zollhaus/cart-provider';
@@ -50,6 +51,18 @@ export function ZollhausCheckoutClient({ products, settings }: CheckoutClientPro
   }, []);
 
   const productMap = useMemo(() => new Map(products.map((product) => [product.id, product])), [products]);
+  const invoiceNotice = resolveZollhausNotice(
+    settings.checkoutInvoiceNotice,
+    'Bestellungen werden bequem auf Rechnung entgegengenommen.'
+  );
+  const shippingNotice = resolveZollhausNotice(
+    settings.checkoutShippingNotice,
+    'Verfügbarkeit und Versand werden nach dem Absenden noch einmal geprüft.'
+  );
+  const legalNotice = resolveZollhausNotice(
+    settings.checkoutLegalNotice,
+    'Mit dem Absenden geben Sie eine verbindliche Bestellung auf Rechnung ab.'
+  );
   const missingItems = items.filter((item) => !productMap.has(item.productId));
   const totalPriceCents = calculateZollhausCartTotal(items, products);
 
@@ -101,9 +114,9 @@ export function ZollhausCheckoutClient({ products, settings }: CheckoutClientPro
         <div className={styles.noticeStack}>
           <div className={styles.checkoutBadge}>Bestellung auf Rechnung</div>
           <h2 className={styles.sectionTitle}>Rechnungsdaten und Bestellung prüfen</h2>
-          <p className={styles.muted}>{settings.checkoutInvoiceNotice}</p>
-          <p className={styles.muted}>{settings.checkoutShippingNotice}</p>
-          <p className={styles.muted}>{settings.checkoutLegalNotice}</p>
+          <p className={styles.muted}>{invoiceNotice}</p>
+          <p className={styles.muted}>{shippingNotice}</p>
+          <p className={styles.muted}>{legalNotice}</p>
         </div>
 
         <form onSubmit={handleSubmit} className={styles.summaryStack}>

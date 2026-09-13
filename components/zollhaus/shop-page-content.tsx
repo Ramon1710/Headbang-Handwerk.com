@@ -1,5 +1,6 @@
 import { zollhausShellStyles as styles } from '@/components/zollhaus/zollhaus-shell';
 import shopStyles from '@/components/zollhaus/public-shop.module.css';
+import { resolveZollhausNotice } from '@/components/zollhaus/public-copy';
 import { ZollhausShopClient } from '@/components/zollhaus/shop-client';
 import type { PublicZollhausProduct } from '@/lib/zollhaus/public-products';
 import type { ZollhausShopSettings } from '@/lib/zollhaus/types';
@@ -10,36 +11,37 @@ interface ZollhausShopPageContentProps {
 }
 
 export function ZollhausShopPageContent({ products, settings }: ZollhausShopPageContentProps) {
-  const soldOutCount = products.filter((product) => product.isSoldOut).length;
+  const invoiceNotice = resolveZollhausNotice(
+    settings.checkoutInvoiceNotice,
+    'Bestellungen werden bequem auf Rechnung entgegengenommen. Alle wichtigen Informationen erhalten Sie im Anschluss.'
+  );
+  const shippingNotice = resolveZollhausNotice(
+    settings.checkoutShippingNotice,
+    'Verfügbarkeit und Versand werden beim Absenden Ihrer Bestellung noch einmal sorgfältig geprüft.'
+  );
 
   return (
     <div className={shopStyles.stack}>
       <section className={styles.panel}>
         <div className={shopStyles.heroPanel}>
           <div className={shopStyles.heroMeta}>
-            <p className={shopStyles.eyebrow}>Zollhaus Leer</p>
+            <p className={shopStyles.eyebrow}>Aus dem Zollhaus</p>
             <h2 className={shopStyles.headline}>Zollhaus Shop</h2>
             <p className={shopStyles.intro}>
-              Eine eigenständige, modern aufgebaute Produktfläche für den Zollhausverein Leer. Gezeigt werden ausschließlich aktuell veröffentlichte Artikel aus der getrennten Zollhaus-Datenbasis.
+              Entdecke einzigartige Taschen und weitere besondere Artikel aus dem Zollhaus.
             </p>
           </div>
 
           <div className={shopStyles.heroStats}>
             <div className={shopStyles.heroStatCard}>
-              <span className={shopStyles.heroStatLabel}>Aktive Produkte</span>
-              <span className={shopStyles.heroStatValue}>{products.length}</span>
+              <span className={shopStyles.heroStatLabel}>Bestellen auf Rechnung</span>
+              <span className={shopStyles.heroStatValue}>{invoiceNotice}</span>
             </div>
             <div className={shopStyles.heroStatCard}>
-              <span className={shopStyles.heroStatLabel}>Aktuell ausverkauft</span>
-              <span className={shopStyles.heroStatValue}>{soldOutCount}</span>
+              <span className={shopStyles.heroStatLabel}>Gut zu wissen</span>
+              <span className={shopStyles.heroStatValue}>{shippingNotice}</span>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className={styles.panel}>
-        <div className={styles.panelBody}>
-          <p>Der Zollhaus-Shop arbeitet hier ausschließlich mit Warenkorb und Bestellung auf Rechnung. Preise, Verfügbarkeit und Gesamtbetrag werden erst beim Bestellen serverseitig verbindlich bestätigt.</p>
         </div>
       </section>
 
@@ -52,7 +54,7 @@ export function ZollhausShopPageContent({ products, settings }: ZollhausShopPage
         />
       ) : (
         <section className={shopStyles.emptyState}>
-          Derzeit sind noch keine öffentlichen Produkte freigeschaltet. Neue Artikel erscheinen hier automatisch, sobald sie im Zollhaus-Admin aktiviert wurden.
+          Aktuell sind keine Artikel verfügbar. Schau gerne bald wieder vorbei.
         </section>
       )}
     </div>

@@ -17,7 +17,7 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   title: 'Zollhaus Shop',
-  description: 'Eigenständiger Microsite-Bereich für den künftigen Zollhaus-Shop.',
+  description: 'Besondere Artikel und Produkte aus dem Zollhaus.',
   robots: {
     index: false,
     follow: false,

@@ -10,40 +10,33 @@ interface ZollhausShellProps {
 export function ZollhausShell({ children }: ZollhausShellProps) {
   return (
     <div className={styles.shell} data-zollhaus-root>
+      <div className={styles.topStripe} aria-hidden="true" />
       <div className={styles.frame}>
-        <header className={styles.topBar}>
-          <a href="https://zollhaus-leer.com/" target="_blank" rel="noreferrer noopener" className={styles.backLink}>
-            <span aria-hidden="true">↗</span>
-            <span>
-              <span className={styles.backLabel}>Zurück zum Zollhaus</span>
-              <span className={styles.backMeta}>Externer Link</span>
-            </span>
-          </a>
+        <header className={styles.header}>
+          <div className={styles.brandArea}>
+            <a href="https://zollhaus-leer.com/" target="_blank" rel="noreferrer noopener" className={styles.brandLink}>
+              <Image
+                src="/zollhaus/zollhaus-logo.svg"
+                alt="Zollhaus – Raum für Kultur"
+                width={420}
+                height={160}
+                className={styles.brandLogo}
+                priority
+              />
+            </a>
+
+            <a href="https://zollhaus-leer.com/" target="_blank" rel="noreferrer noopener" className={styles.backLink}>
+              Zurück zur Zollhaus-Website
+            </a>
+          </div>
 
           <div className={styles.supportBadge}>
             <div>
               <p className={styles.supportText}>Technisch unterstützt von Headbang Handwerk e.V.</p>
             </div>
-            <Image
-              src={headbangLogo}
-              alt="Headbang Handwerk e.V."
-              className={styles.supportLogo}
-              priority={false}
-            />
+            <Image src={headbangLogo} alt="Headbang Handwerk e.V." className={styles.supportLogo} priority={false} />
           </div>
         </header>
-
-        <section className={styles.hero}>
-          <p className={styles.eyebrow}>Microsite Vorschau</p>
-          <h1 className={styles.brand}>
-            Zollhaus Shop
-            <span className={styles.brandSubline}>Zollhaus Leer</span>
-          </h1>
-          <p className={styles.intro}>
-            Dieser Bereich wird als eigenständige Microsite innerhalb der bestehenden Anwendung vorbereitet. Navigation,
-            Footer und redaktionelle Headbang-Bausteine bleiben hier bewusst außen vor.
-          </p>
-        </section>
 
         <main className={styles.main}>{children}</main>
       </div>

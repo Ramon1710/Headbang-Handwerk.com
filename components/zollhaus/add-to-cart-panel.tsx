@@ -40,9 +40,9 @@ export function ZollhausAddToCartPanel({ product, compact = false }: { product: 
           </button>
         </div>
       </div>
-      <p className={styles.smallText}>{product.isSoldOut ? 'Ausverkaufte Artikel können nicht in den Warenkorb gelegt werden.' : `Maximal ${product.stockQuantity} Stück verfügbar.`}</p>
+      <p className={styles.smallText}>{product.isSoldOut ? 'Dieser Artikel ist momentan nicht verfügbar.' : `Derzeit sind bis zu ${product.stockQuantity} Stück verfügbar.`}</p>
       {addedMessage ? <p className={styles.helperText}>{addedMessage}</p> : null}
-      {!compact ? <p className={styles.helperText}>Die endgültige Verfügbarkeit und der Gesamtpreis werden erst serverseitig beim Bestellen bestätigt.</p> : null}
+      {!compact ? <p className={styles.helperText}>Verfügbarkeit und Gesamtpreis werden beim Absenden Ihrer Bestellung noch einmal geprüft.</p> : null}
     </div>
   );
 }

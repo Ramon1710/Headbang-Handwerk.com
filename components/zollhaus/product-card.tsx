@@ -21,7 +21,7 @@ function CardBody({
       <div className={styles.imageWrap}>
         <div className={styles.badgeRow}>
           <span className={product.isSoldOut ? styles.badgeSoldOut : styles.badgeActive}>{product.isSoldOut ? 'Ausverkauft' : 'Verfügbar'}</span>
-          <span className={styles.badgeSubtle}>{product.stockQuantity} Stk.</span>
+          <span className={styles.badgeSubtle}>{product.availabilityLabel}</span>
         </div>
         {primaryImage ? <img src={primaryImage.url} alt={primaryImage.alt} className={styles.image} /> : <div className={styles.placeholder}>Produktbild folgt</div>}
       </div>
@@ -53,7 +53,7 @@ function CardBody({
           </div>
         ) : null}
 
-        <p className={styles.notice}>{detailHint || 'Die Bestellfunktion wird aktuell vorbereitet.'}</p>
+        <p className={styles.notice}>{detailHint || 'Jetzt entdecken und bei Gefallen direkt in den Warenkorb legen.'}</p>
       </div>
     </article>
   );

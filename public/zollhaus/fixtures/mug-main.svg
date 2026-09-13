@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Zollhaus Becher">
+  <rect width="1200" height="900" fill="#eef7ff"/>
+  <rect width="1200" height="28" fill="#f2ca43"/>
+  <circle cx="920" cy="210" r="175" fill="#9ad7ff" fill-opacity="0.55"/>
+  <circle cx="255" cy="700" r="215" fill="#d8f2e2"/>
+  <rect x="105" y="130" width="990" height="640" rx="48" fill="#bfeecf"/>
+  <path d="M450 270h220c39 0 70 31 70 70v165c0 39-31 70-70 70H450c-39 0-70-31-70-70V340c0-39 31-70 70-70Zm290 48h44c58 0 106 48 106 106s-48 106-106 106h-44" fill="none" stroke="#1f2528" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="150" y="255" fill="#314046" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700" letter-spacing="4">ZOLLHAUS SHOP</text>
+  <text x="150" y="698" fill="#1f2528" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="800">Zollhaus Becher</text>
+  <text x="150" y="766" fill="#46585f" font-family="Arial, Helvetica, sans-serif" font-size="36">Keramikbecher fuer Kaffee, Tee und lange Kulturtage</text>
+</svg>

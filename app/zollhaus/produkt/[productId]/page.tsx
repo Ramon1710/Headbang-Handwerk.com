@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getPublicZollhausProductById } from '@/lib/zollhaus/public-catalog';
 import { getResolvedZollhausShopSettings } from '@/lib/zollhaus/settings';
 import { ZollhausAddToCartPanel } from '@/components/zollhaus/add-to-cart-panel';
+import { resolveZollhausNotice } from '@/components/zollhaus/public-copy';
 import { zollhausShellStyles as shellStyles } from '@/components/zollhaus/zollhaus-shell';
 import shopStyles from '@/components/zollhaus/public-shop.module.css';
 import cardStyles from '@/components/zollhaus/product-card.module.css';
@@ -32,6 +33,11 @@ export default async function ZollhausProductDetailPage({ params }: { params: Pr
   if (!product) {
     notFound();
   }
+
+  const invoiceNotice = resolveZollhausNotice(
+    settings.checkoutInvoiceNotice,
+    'Bestellungen werden im Zollhaus-Shop auf Rechnung entgegengenommen. Alle weiteren Informationen folgen nach Ihrer Anfrage.'
+  );
 
   return (
     <div className={shopStyles.stack}>
@@ -78,7 +84,7 @@ export default async function ZollhausProductDetailPage({ params }: { params: Pr
             </div>
 
             <div className={shopStyles.noticePanel}>
-              {settings.checkoutInvoiceNotice}
+              {invoiceNotice}
             </div>
           </aside>
         </div>

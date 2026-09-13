@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 import { useZollhausCart } from '@/components/zollhaus/cart-provider';
 import { ZollhausAddToCartPanel } from '@/components/zollhaus/add-to-cart-panel';
+import { resolveZollhausNotice } from '@/components/zollhaus/public-copy';
 import { ZollhausProductCard } from '@/components/zollhaus/product-card';
 import { calculateZollhausCartTotal } from '@/lib/zollhaus/cart';
 import { formatPriceCentsForDisplay } from '@/lib/zollhaus/product-admin';
@@ -20,6 +21,14 @@ interface ShopClientProps {
 export function ZollhausShopClient(props: ShopClientProps) {
   const { items, updateQuantity, removeItem, ready } = useZollhausCart();
   const productMap = useMemo(() => new Map(props.products.map((product) => [product.id, product])), [props.products]);
+  const invoiceNotice = resolveZollhausNotice(
+    props.checkoutInvoiceNotice,
+    'Bestellungen werden im Zollhaus-Shop auf Rechnung entgegengenommen.'
+  );
+  const shippingNotice = resolveZollhausNotice(
+    props.checkoutShippingNotice,
+    'Vor dem Absenden wird die Verfügbarkeit aller Artikel noch einmal geprüft.'
+  );
 
   const totalPriceCents = calculateZollhausCartTotal(items, props.products);
   const missingItems = items.filter((item) => !productMap.has(item.productId));
@@ -30,10 +39,10 @@ export function ZollhausShopClient(props: ShopClientProps) {
         <div className={styles.noticeStack}>
           <div className={styles.warningCard}>
             <div className={styles.checkoutBadge}>Bestellung auf Rechnung</div>
-            <p className={styles.muted}>{props.checkoutInvoiceNotice}</p>
+            <p className={styles.muted}>{invoiceNotice}</p>
           </div>
           <div className={styles.warningCard}>
-            <p className={styles.muted}>{props.checkoutShippingNotice}</p>
+            <p className={styles.muted}>{shippingNotice}</p>
           </div>
         </div>
 
@@ -41,7 +50,7 @@ export function ZollhausShopClient(props: ShopClientProps) {
           <section className={styles.cardStack}>
             {props.products.map((product) => (
               <article key={product.id} className={styles.productCardWrap}>
-                <ZollhausProductCard product={product} detailHint="Produktdetails und spätere Bestellprüfung sind auf Rechnung vorbereitet." />
+                <ZollhausProductCard product={product} detailHint="Auf der Produktseite findest du weitere Eindrücke und alle wichtigen Details." />
                 <ZollhausAddToCartPanel product={product} />
               </article>
             ))}
@@ -110,7 +119,7 @@ export function ZollhausShopClient(props: ShopClientProps) {
             </div>
           ) : (
             <div className={styles.emptyState}>
-              <p className={styles.emptyText}>Noch kein Artikel im Warenkorb. Verfügbare Produkte lassen sich direkt hier hinzufügen.</p>
+              <p className={styles.emptyText}>Noch kein Artikel im Warenkorb. Entdecke zuerst die Produkte im Shop.</p>
             </div>
           )}
 

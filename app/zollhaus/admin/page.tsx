@@ -168,12 +168,13 @@ export default async function ZollhausAdminPage({
   const savedMessage = getSavedMessage(params.saved);
 
   return (
-    <div className={adminStyles.stack}>
+    <div className={adminStyles.adminPage}>
       <section className={styles.panel}>
         <div className={adminStyles.adminNav}>
           <div>
             <p className={styles.placeholderNote}>Zollhaus-Administration</p>
-            <h2 className={styles.panelTitle}>Geschuetzte Verwaltung und Vorschau</h2>
+            <h2 className={styles.panelTitle}>Verwaltung und Vorschau</h2>
+            <div className={adminStyles.roleLine}>Angemeldete Rolle: {session.role}</div>
           </div>
 
           <div className={adminStyles.adminNavLinks}>
@@ -187,23 +188,6 @@ export default async function ZollhausAdminPage({
         </div>
       </section>
 
-      <section className={styles.panel}>
-        <div className={adminStyles.summaryGrid}>
-          <div className={adminStyles.summaryCard}>
-            <span className={adminStyles.summaryLabel}>Produkte gesamt</span>
-            <span className={adminStyles.summaryValue}>{products.length}</span>
-          </div>
-          <div className={adminStyles.summaryCard}>
-            <span className={adminStyles.summaryLabel}>Bestellungen gesamt</span>
-            <span className={adminStyles.summaryValue}>{orders.length}</span>
-          </div>
-          <div className={adminStyles.summaryCard}>
-            <span className={adminStyles.summaryLabel}>Angemeldete Rolle</span>
-            <span className={adminStyles.summaryValue}>{session.role}</span>
-          </div>
-        </div>
-      </section>
-
       {savedMessage ? <div className={adminStyles.noticeSuccess}>{savedMessage}</div> : null}
       {params.error ? <div className={adminStyles.noticeError}>{params.error}</div> : null}
 
@@ -211,9 +195,9 @@ export default async function ZollhausAdminPage({
         <div className={adminStyles.toolbar}>
           <div>
             <p className={styles.placeholderNote}>Bestellverwaltung</p>
-            <h2 className={styles.panelTitle}>Bestellungen</h2>
+            <h2 className={styles.panelTitle}>Bestellübersicht</h2>
             <div className={styles.panelBody}>
-              <p>Alle Abfragen laufen ausschließlich über die getrennte Zollhaus-Bestelldomäne und sind serverseitig geschützt.</p>
+              <p>Hier behalten Sie Bestellungen, Status und Versandstand im Blick.</p>
             </div>
           </div>
           <div className={adminStyles.summaryCard}>
@@ -241,6 +225,49 @@ export default async function ZollhausAdminPage({
         {dataUnavailable ? (
           <div className={adminStyles.noticeWarning}>Die Zollhaus-Bestelldaten konnten gerade nicht geladen werden. Bitte Konfiguration und Berechtigungen prüfen.</div>
         ) : null}
+
+        <div className={adminStyles.orderCardList}>
+          {pagedOrders.length ? pagedOrders.map((order) => (
+            <article key={`${order.id}-card`} className={adminStyles.orderCard}>
+              <div className={adminStyles.orderCardHeader}>
+                <div>
+                  <h3 className={adminStyles.productTitle}>{order.orderNumber}</h3>
+                  <div className={adminStyles.orderMeta}>{new Date(order.createdAt).toLocaleString('de-DE')}</div>
+                </div>
+                <Link href={`/zollhaus/admin/orders/${encodeURIComponent(order.id)}`} className={adminStyles.secondaryButton}>Öffnen</Link>
+              </div>
+
+              <div className={adminStyles.orderCardGrid}>
+                <div className={adminStyles.detailCard}>
+                  <div className={adminStyles.detailTerm}>Name</div>
+                  <div className={adminStyles.detailValue}>{order.customer.firstName} {order.customer.lastName}</div>
+                </div>
+                <div className={adminStyles.detailCard}>
+                  <div className={adminStyles.detailTerm}>Artikelanzahl</div>
+                  <div className={adminStyles.detailValue}>{order.items.reduce((sum, item) => sum + item.quantity, 0)}</div>
+                </div>
+                <div className={adminStyles.detailCard}>
+                  <div className={adminStyles.detailTerm}>Gesamtpreis</div>
+                  <div className={adminStyles.detailValue}>{formatPriceCentsForDisplay(order.totalPriceCents)}</div>
+                </div>
+                <div className={adminStyles.detailCard}>
+                  <div className={adminStyles.detailTerm}>Bestellstatus</div>
+                  <div className={adminStyles.detailValue}>
+                    <span className={`${adminStyles.statusBadge} ${getOrderStatusClassName(order.status)}`}>{getZollhausOrderStatusLabel(order.status)}</span>
+                  </div>
+                </div>
+                <div className={adminStyles.detailCard}>
+                  <div className={adminStyles.detailTerm}>E-Mail-Status</div>
+                  <div className={adminStyles.detailValue}>
+                    <span className={`${adminStyles.statusBadge} ${getEmailStatusClassName(order)}`}>{getZollhausOrderEmailStatusLabel(order.email.state)}</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          )) : (
+            <div className={styles.mutedCard}>Für den aktuellen Filter liegen noch keine Zollhaus-Bestellungen vor.</div>
+          )}
+        </div>
 
         <div className={adminStyles.orderTableWrap}>
           <table className={adminStyles.orderTable}>
@@ -300,115 +327,118 @@ export default async function ZollhausAdminPage({
         ) : null}
       </section>
 
-      <div className={adminStyles.layout}>
+      <section id="produkte" className={styles.panel}>
+        <div className={adminStyles.toolbar}>
+          <div>
+            <p className={styles.placeholderNote}>Produktverwaltung</p>
+            <h2 className={styles.panelTitle}>Produktverwaltung</h2>
+            <div className={styles.panelBody}>
+              <p>Pflegen Sie hier die sichtbaren Artikel für den Zollhaus-Shop.</p>
+              <p>Aktive Produkte erscheinen automatisch in der öffentlichen Shopansicht.</p>
+            </div>
+          </div>
+
+          <div className={adminStyles.toolbarActions}>
+            <Link href={buildAdminHref({ filter: orderFilter, page: activePage, isNew: true })} className={adminStyles.primaryButton}>
+              Neues Produkt
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.panel}>
         <div className={adminStyles.stack}>
-          <section id="produkte" className={styles.panel}>
-            <div className={adminStyles.toolbar}>
-              <div>
-                <p className={styles.placeholderNote}>Produktverwaltung</p>
-                <h2 className={styles.panelTitle}>Zollhaus-Produkte</h2>
-                <div className={styles.panelBody}>
-                  <p>Produkte werden ausschließlich in der getrennten Zollhaus-Datenbasis gepflegt.</p>
-                  <p>Headbang-Shop, CMS, Navigation, Footer und bestehende Zahlungswege bleiben hiervon unberührt.</p>
+          <div>
+            <p className={styles.placeholderNote}>Produktstatistik</p>
+            <h2 className={styles.panelTitle}>Produktstatistik</h2>
+          </div>
+
+          <div className={adminStyles.summaryGrid}>
+            <div className={adminStyles.summaryCard}>
+              <span className={adminStyles.summaryLabel}>Produkte gesamt</span>
+              <span className={adminStyles.summaryValue}>{products.length}</span>
+            </div>
+            <div className={adminStyles.summaryCard}>
+              <span className={adminStyles.summaryLabel}>Aktiv</span>
+              <span className={adminStyles.summaryValue}>{activeCount}</span>
+            </div>
+            <div className={adminStyles.summaryCard}>
+              <span className={adminStyles.summaryLabel}>Archiviert / Ausverkauft</span>
+              <span className={adminStyles.summaryValue}>{archivedCount + soldOutCount}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.panel}>
+        <div className={adminStyles.toolbar}>
+          <div>
+            <p className={styles.placeholderNote}>Produktübersicht</p>
+            <h2 className={styles.panelTitle}>Produktübersicht</h2>
+            <div className={styles.panelBody}>
+              <p>Alle angelegten Produkte, Bestände und Bilder auf einen Blick.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className={adminStyles.productList}>
+          {products.length ? (
+            products.map((product) => (
+              <article key={product.id} className={adminStyles.productCard}>
+                <div className={adminStyles.productHeader}>
+                  <div>
+                    <h3 className={adminStyles.productTitle}>{product.name}</h3>
+                    <p className={styles.panelBody}>{product.description}</p>
+                  </div>
+                  <span className={`${adminStyles.statusBadge} ${getStatusClassName(product)}`}>
+                    {getZollhausProductDisplayStatus(product)}
+                  </span>
                 </div>
-              </div>
 
-              <div className={adminStyles.toolbarActions}>
-                <Link href={buildAdminHref({ filter: orderFilter, page: activePage, isNew: true })} className={adminStyles.primaryButton}>
-                  Neues Produkt
-                </Link>
-              </div>
-            </div>
-          </section>
+                <div className={adminStyles.metaGrid}>
+                  <div className={adminStyles.metaItem}>
+                    <span className={adminStyles.metaTitle}>Preis</span>
+                    <span className={adminStyles.metaValue}>{formatPriceCentsForDisplay(product.priceCents)}</span>
+                  </div>
+                  <div className={adminStyles.metaItem}>
+                    <span className={adminStyles.metaTitle}>Menge</span>
+                    <span className={adminStyles.metaValue}>{product.stockQuantity}</span>
+                  </div>
+                  <div className={adminStyles.metaItem}>
+                    <span className={adminStyles.metaTitle}>Bilder</span>
+                    <span className={adminStyles.metaValue}>{product.images.length}</span>
+                  </div>
+                  <div className={adminStyles.metaItem}>
+                    <span className={adminStyles.metaTitle}>Zuletzt geändert</span>
+                    <span className={adminStyles.metaValue}>{new Date(product.updatedAt).toLocaleDateString('de-DE')}</span>
+                  </div>
+                </div>
 
-          <section className={styles.panel}>
-            <div className={adminStyles.summaryGrid}>
-              <div className={adminStyles.summaryCard}>
-                <span className={adminStyles.summaryLabel}>Produkte gesamt</span>
-                <span className={adminStyles.summaryValue}>{products.length}</span>
-              </div>
-              <div className={adminStyles.summaryCard}>
-                <span className={adminStyles.summaryLabel}>Aktiv</span>
-                <span className={adminStyles.summaryValue}>{activeCount}</span>
-              </div>
-              <div className={adminStyles.summaryCard}>
-                <span className={adminStyles.summaryLabel}>Archiviert / Ausverkauft</span>
-                <span className={adminStyles.summaryValue}>{archivedCount + soldOutCount}</span>
-              </div>
-            </div>
-          </section>
+                <div className={adminStyles.buttonRow}>
+                  <Link href={buildAdminHref({ filter: orderFilter, page: activePage, product: product.id })} className={adminStyles.secondaryButton}>
+                    Bearbeiten
+                  </Link>
+                </div>
+              </article>
+            ))
+          ) : (
+            <div className={styles.mutedCard}>Noch keine Zollhaus-Produkte vorhanden. Über „Neues Produkt“ kann der erste Datensatz angelegt werden.</div>
+          )}
+        </div>
+      </section>
 
-        <section className={styles.panel}>
-          <div className={adminStyles.toolbar}>
-            <div>
-              <h2 className={styles.panelTitle}>Produktübersicht</h2>
-              <div className={styles.panelBody}>
-                <p>Status, Bestand und Pflegezugriff laufen ausschließlich über Produkte unter partnerSites/zollhaus/products.</p>
-              </div>
+      <section className={styles.panel}>
+        <div className={adminStyles.stack}>
+          <div>
+            <p className={styles.placeholderNote}>{selectedProduct ? 'Produkt bearbeiten' : 'Neues Produkt'}</p>
+            <h2 className={styles.panelTitle}>{selectedProduct ? selectedProduct.name : 'Produkteditor'}</h2>
+            <div className={styles.panelBody}>
+              <p>Pflegen Sie hier Name, Beschreibung, Preis, Bestand und Bilder Ihres Produkts.</p>
+              <p>Für eine öffentliche Darstellung wird mindestens ein Produktbild benötigt.</p>
             </div>
           </div>
 
-          <div className={adminStyles.productList}>
-            {products.length ? (
-              products.map((product) => (
-                <article key={product.id} className={adminStyles.productCard}>
-                  <div className={adminStyles.productHeader}>
-                    <div>
-                      <h3 className={adminStyles.productTitle}>{product.name}</h3>
-                      <p className={styles.panelBody}>{product.description}</p>
-                    </div>
-                    <span className={`${adminStyles.statusBadge} ${getStatusClassName(product)}`}>
-                      {getZollhausProductDisplayStatus(product)}
-                    </span>
-                  </div>
-
-                  <div className={adminStyles.metaGrid}>
-                    <div className={adminStyles.metaItem}>
-                      <span className={adminStyles.metaTitle}>Preis</span>
-                      <span className={adminStyles.metaValue}>{formatPriceCentsForDisplay(product.priceCents)}</span>
-                    </div>
-                    <div className={adminStyles.metaItem}>
-                      <span className={adminStyles.metaTitle}>Menge</span>
-                      <span className={adminStyles.metaValue}>{product.stockQuantity}</span>
-                    </div>
-                    <div className={adminStyles.metaItem}>
-                      <span className={adminStyles.metaTitle}>Bilder</span>
-                      <span className={adminStyles.metaValue}>{product.images.length}</span>
-                    </div>
-                    <div className={adminStyles.metaItem}>
-                      <span className={adminStyles.metaTitle}>Zuletzt geändert</span>
-                      <span className={adminStyles.metaValue}>{new Date(product.updatedAt).toLocaleDateString('de-DE')}</span>
-                    </div>
-                  </div>
-
-                  <div className={adminStyles.buttonRow}>
-                    <Link href={buildAdminHref({ filter: orderFilter, page: activePage, product: product.id })} className={adminStyles.secondaryButton}>
-                      Bearbeiten
-                    </Link>
-                  </div>
-                </article>
-              ))
-            ) : (
-              <div className={styles.mutedCard}>Noch keine Zollhaus-Produkte vorhanden. Über „Neues Produkt“ kann der erste Datensatz angelegt werden.</div>
-            )}
-          </div>
-        </section>
-      </div>
-
-      <div className={adminStyles.stack}>
-        <section className={styles.panel}>
-          <div className={adminStyles.twoColumnLayout}>
-            <div className={adminStyles.stack}>
-              <div>
-                <p className={styles.placeholderNote}>{selectedProduct ? 'Produkt bearbeiten' : 'Neues Produkt'}</p>
-                <h2 className={styles.panelTitle}>{selectedProduct ? selectedProduct.name : 'Produkteditor'}</h2>
-                <div className={styles.panelBody}>
-                  <p>Preis wird im Formular als Eurobetrag gepflegt und serverseitig sicher in Integer-Cent gespeichert.</p>
-                  <p>Aktivierung ist nur mit mindestens einem gueltigen Produktbild moeglich.</p>
-                </div>
-              </div>
-
-              <form action={saveProductAction} className={adminStyles.editorLayout}>
+          <form action={saveProductAction} className={adminStyles.editorLayout}>
                 <input type="hidden" name="productId" value={selectedProduct?.id || ''} />
 
                 <div className={adminStyles.fieldGrid}>
@@ -451,7 +481,7 @@ export default async function ZollhausAdminPage({
                 <section className={adminStyles.stack}>
                   <div>
                     <h3 className={adminStyles.productTitle}>Produktbilder</h3>
-                    <p className={styles.panelBody}>Erlaubt sind JPG, PNG und WEBP bis 5 MB. Prüfung erfolgt serverseitig inklusive Dateisignatur.</p>
+                    <p className={styles.panelBody}>Erlaubt sind JPG, PNG und WEBP bis 5 MB.</p>
                   </div>
 
                   {selectedProduct?.images.length ? (
@@ -493,7 +523,7 @@ export default async function ZollhausAdminPage({
                   <div className={adminStyles.field}>
                     <label htmlFor="zollhaus-new-images" className={adminStyles.fieldLabel}>Neue Bilder hochladen</label>
                     <input id="zollhaus-new-images" name="newImages" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple />
-                    <span className={adminStyles.fieldHint}>Neue Bilder werden serverseitig validiert und automatisch unter zollhaus/products/{'{productId}'}/{'{imageId}'} gespeichert.</span>
+                    <span className={adminStyles.fieldHint}>Neue Bilder werden nach dem Speichern direkt dem Produkt zugeordnet.</span>
                   </div>
 
                   <div className={adminStyles.field}>
@@ -522,46 +552,44 @@ export default async function ZollhausAdminPage({
                     </Link>
                   ) : null}
                 </div>
-              </form>
+          </form>
 
-              {selectedProduct && selectedProduct.status !== 'archived' ? (
-                <form action={archiveProductAction} className={adminStyles.stack}>
-                  <input type="hidden" name="productId" value={selectedProduct.id} />
-                  <label className={adminStyles.checkboxOption}>
-                    <input type="checkbox" name="archiveConfirmed" />
-                    Ja, dieses Produkt soll archiviert werden
-                  </label>
-                  <div className={adminStyles.buttonRow}>
-                    <button type="submit" className={`${adminStyles.dangerButton} ${!firebaseConfigured || dataUnavailable ? adminStyles.buttonDisabled : ''}`}>
-                      Produkt archivieren
-                    </button>
-                  </div>
-                </form>
-              ) : null}
-            </div>
+          {selectedProduct && selectedProduct.status !== 'archived' ? (
+            <form action={archiveProductAction} className={adminStyles.stack}>
+              <input type="hidden" name="productId" value={selectedProduct.id} />
+              <label className={adminStyles.checkboxOption}>
+                <input type="checkbox" name="archiveConfirmed" />
+                Ja, dieses Produkt soll archiviert werden
+              </label>
+              <div className={adminStyles.buttonRow}>
+                <button type="submit" className={`${adminStyles.dangerButton} ${!firebaseConfigured || dataUnavailable ? adminStyles.buttonDisabled : ''}`}>
+                  Produkt archivieren
+                </button>
+              </div>
+            </form>
+          ) : null}
 
-            <aside className={adminStyles.stack}>
-              <section className={styles.panel}>
-                <h3 className={adminStyles.productTitle}>Produktkartenvorschau</h3>
-                <div className={styles.panelBody}>
-                  <p>Die Vorschau nutzt das aktuell ausgewählte Produkt und zeigt die mobile oder Desktop-Karte im Zollhaus-Design.</p>
-                </div>
-                <ProductPreviewSwitcher product={previewProduct} />
-              </section>
-
-              <section className={styles.panel}>
-                <h3 className={adminStyles.productTitle}>Aktive Regeln</h3>
-                <div className={styles.panelBody}>
-                  <p>Pflichtfelder: Name, Beschreibung, Preis und verfügbare Menge.</p>
-                  <p>Aktive Produkte benötigen mindestens ein Bild. Ausverkauft wird ausschließlich aus Menge 0 abgeleitet.</p>
-                  <p>Endgültiges Löschen ist in diesem Arbeitspaket bewusst nicht vorhanden. Produkte werden stattdessen archiviert.</p>
-                </div>
-              </section>
-            </aside>
+          <div className={styles.mutedCard}>
+            <p>Pflichtfelder: Name, Beschreibung, Preis und verfügbare Menge.</p>
+            <p>Aktive Produkte benötigen mindestens ein Bild. Produkte mit Bestand 0 erscheinen als ausverkauft.</p>
+            <p>Produkte werden bei Bedarf archiviert und bleiben so nachvollziehbar.</p>
           </div>
-        </section>
-      </div>
-      </div>
+        </div>
+      </section>
+
+      <section className={styles.panel}>
+        <div className={adminStyles.stack}>
+          <div>
+            <p className={styles.placeholderNote}>Produktvorschau</p>
+            <h2 className={styles.panelTitle}>Produktkartenvorschau</h2>
+            <div className={styles.panelBody}>
+              <p>Die Vorschau zeigt die aktuelle Produktkarte in der Desktop- und Mobilansicht.</p>
+            </div>
+          </div>
+
+          <ProductPreviewSwitcher product={previewProduct} />
+        </div>
+      </section>
 
       <section id="shopvorschau" className={styles.panel}>
         <div className={adminStyles.stack}>
@@ -569,8 +597,8 @@ export default async function ZollhausAdminPage({
             <p className={styles.placeholderNote}>Vollständige Shopvorschau</p>
             <h2 className={styles.panelTitle}>Öffentliche Zollhaus-Shopseite</h2>
             <div className={styles.panelBody}>
-              <p>Die Vorschau verwendet ausschließlich die tatsächlich öffentlich sichtbaren aktiven Zollhaus-Produkte.</p>
-              <p>Horizontales Scrollen bleibt auf das Vorschaufenster begrenzt, nicht auf die Adminseite selbst.</p>
+              <p>Die Vorschau zeigt die aktuelle öffentliche Darstellung des Shops direkt im Verwaltungsbereich.</p>
+              <p>Zwischen Desktop, Tablet und Smartphone kann direkt umgeschaltet werden.</p>
             </div>
           </div>
 
