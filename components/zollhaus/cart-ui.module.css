@@ -1,0 +1,245 @@
+.layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.productsColumn,
+.summaryColumn,
+.cardStack,
+.summaryStack,
+.fieldGrid,
+.checkoutGrid,
+.lineList,
+.lineMeta,
+.emptyState,
+.noticeStack {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.productCardWrap,
+.summaryCard,
+.actionPanel,
+.lineCard,
+.formCard,
+.confirmationCard,
+.warningCard {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.4rem;
+  background: rgba(2, 11, 15, 0.52);
+  padding: 1rem;
+  min-width: 0;
+}
+
+.productCardWrap {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.actionPanel {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.quantityRow,
+.summaryHeader,
+.lineHeader,
+.buttonRow,
+.totalsRow {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.quantityControls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quantityInput,
+.textInput {
+  width: 100%;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.22);
+  color: #effbfd;
+  padding: 0.8rem 0.9rem;
+  box-sizing: border-box;
+}
+
+.quantityInput {
+  width: 5.5rem;
+  text-align: center;
+}
+
+.primaryButton,
+.secondaryButton,
+.dangerButton,
+.disabledButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  border-radius: 999px;
+  padding: 0.75rem 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.primaryButton {
+  border: 1px solid rgba(96, 233, 244, 0.38);
+  background: rgba(96, 233, 244, 0.16);
+  color: #9df2fa;
+}
+
+.secondaryButton {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #effbfd;
+}
+
+.dangerButton {
+  border: 1px solid rgba(255, 155, 155, 0.24);
+  background: rgba(120, 20, 20, 0.22);
+  color: #ffd2d2;
+}
+
+.disabledButton {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(239, 251, 253, 0.45);
+  cursor: not-allowed;
+}
+
+.buttonRow > * {
+  flex: 1 1 12rem;
+}
+
+.muted,
+.smallText,
+.emptyText,
+.helperText {
+  color: rgba(239, 251, 253, 0.72);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.smallText {
+  font-size: 0.9rem;
+}
+
+.sectionTitle,
+.lineTitle,
+.priceValue,
+.totalValue {
+  font-family: var(--font-sora), 'Segoe UI', sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.sectionTitle {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.lineTitle {
+  font-size: 1.05rem;
+}
+
+.priceValue,
+.totalValue {
+  font-size: 1.05rem;
+  font-weight: 760;
+}
+
+.totalValue {
+  font-size: 1.25rem;
+}
+
+.fieldLabel {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #effbfd;
+}
+
+.fieldGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.fieldSpan {
+  grid-column: 1 / -1;
+}
+
+.hiddenField {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.checkoutBadge {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 201, 107, 0.38);
+  background: rgba(255, 201, 107, 0.12);
+  color: #ffe09e;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.errorMessage {
+  border: 1px solid rgba(255, 155, 155, 0.3);
+  background: rgba(120, 20, 20, 0.22);
+  color: #ffd2d2;
+  border-radius: 1rem;
+  padding: 0.9rem 1rem;
+}
+
+.successNumber {
+  font-family: var(--font-sora), 'Segoe UI', sans-serif;
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  color: #9df2fa;
+}
+
+@media (min-width: 960px) {
+  .layout {
+    grid-template-columns: minmax(0, 1.2fr) minmax(22rem, 0.8fr);
+    align-items: start;
+  }
+
+  .summaryColumn {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .fieldGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .quantityInput {
+    width: 4.5rem;
+  }
+
+  .productCardWrap,
+  .summaryCard,
+  .actionPanel,
+  .lineCard,
+  .formCard,
+  .confirmationCard,
+  .warningCard {
+    padding: 0.9rem;
+  }
+}

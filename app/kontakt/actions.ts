@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { requireHeadbangAdminAction } from '@/lib/cms/auth';
 import { getCmsContent, saveCmsContent } from '@/lib/cms/storage';
 
 function sanitizeText(value: FormDataEntryValue | null) {
@@ -10,9 +10,7 @@ function sanitizeText(value: FormDataEntryValue | null) {
 }
 
 export async function updateContactInfoAction(formData: FormData) {
-  if (!(await isAdminAuthenticated())) {
-    redirect('/admin-login?next=/kontakt');
-  }
+  await requireHeadbangAdminAction('/kontakt');
 
   const current = await getCmsContent();
   const instagramUrl = sanitizeText(formData.get('instagramUrl')) || 'https://www.instagram.com/headbang.handwerk/';

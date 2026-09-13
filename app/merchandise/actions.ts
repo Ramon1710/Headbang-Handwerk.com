@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { requireHeadbangAdminAction } from '@/lib/cms/auth';
 import {
   isFirebaseStorageBucketNotFoundError,
   isFirebaseStoragePermissionError,
@@ -112,9 +112,7 @@ async function uploadMerchandiseGalleryImages(files: File[]) {
 }
 
 async function assertAdmin() {
-  if (!(await isAdminAuthenticated())) {
-    redirect('/admin-login?next=/merchandise');
-  }
+  await requireHeadbangAdminAction('/merchandise');
 }
 
 async function persistMerchandise(updater: (current: CmsContent) => CmsContent | Promise<CmsContent>) {

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { requireHeadbangAdminAction } from '@/lib/cms/auth';
 import {
   isFirebaseStorageBucketNotFoundError,
   isFirebaseStoragePermissionError,
@@ -159,9 +159,7 @@ function parseEventFromFormData(formData: FormData, existingId?: string, existin
 }
 
 async function assertAdmin() {
-  if (!(await isAdminAuthenticated())) {
-    redirect('/admin-login?next=/veranstaltungen');
-  }
+  await requireHeadbangAdminAction('/veranstaltungen');
 }
 
 async function persistEvents(events: Event[]) {

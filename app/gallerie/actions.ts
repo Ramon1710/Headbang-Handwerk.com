@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { randomUUID } from 'node:crypto';
-import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { requireHeadbangAdminAction } from '@/lib/cms/auth';
 import {
   isFirebaseStorageBucketNotFoundError,
   isFirebaseStoragePermissionError,
@@ -70,9 +70,7 @@ function ensureFolderId(folders: GalleryFolder[], requestedId: string, title: st
 }
 
 async function assertAdmin() {
-  if (!(await isAdminAuthenticated())) {
-    redirect('/admin-login?next=/gallerie');
-  }
+  await requireHeadbangAdminAction('/gallerie');
 }
 
 function redirectForGalleryUploadError(error: unknown): never {

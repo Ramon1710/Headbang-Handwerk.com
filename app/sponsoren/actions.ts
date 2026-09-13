@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { requireHeadbangAdminAction } from '@/lib/cms/auth';
 import { getCmsContent, saveCmsContent } from '@/lib/cms/storage';
 import type { SponsorPackage } from '@/lib/types';
 
@@ -74,9 +74,7 @@ function parsePackageFromFormData(formData: FormData, existingId?: string): Spon
 }
 
 async function assertAdmin() {
-  if (!(await isAdminAuthenticated())) {
-    redirect('/admin-login?next=/sponsoren');
-  }
+  await requireHeadbangAdminAction('/sponsoren');
 }
 
 async function persistSponsorPackages(sponsorPackages: SponsorPackage[]) {

@@ -1,6 +1,7 @@
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
-import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { getAuthenticatedAdminSessionFromRequest, hasTrustedRequestOrigin } from '@/lib/cms/auth';
+import { canAccessHeadbangAdmin } from '@/lib/cms/auth-core';
 import {
   isFirebaseStorageBucketNotFoundError,
   isFirebaseStoragePermissionError,
@@ -39,8 +40,14 @@ function uploadErrorResponse(error: unknown) {
 }
 
 export async function POST(request: Request) {
-  if (!(await isAdminAuthenticated())) {
+  const session = await getAuthenticatedAdminSessionFromRequest(request);
+
+  if (!canAccessHeadbangAdmin(session)) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+
+  if (!hasTrustedRequestOrigin(request)) {
+    return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   }
 
   const formData = await request.formData();

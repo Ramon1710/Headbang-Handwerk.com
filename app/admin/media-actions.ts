@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { requireHeadbangAdminAction } from '@/lib/cms/auth';
 import {
   isFirebaseStorageBucketNotFoundError,
   isFirebaseStoragePermissionError,
@@ -22,9 +22,7 @@ function emptyAsset(): MediaAsset {
 }
 
 async function assertAdmin(nextPath: string) {
-  if (!(await isAdminAuthenticated())) {
-    redirect(`/admin-login?next=${encodeURIComponent(nextPath)}`);
-  }
+  await requireHeadbangAdminAction(nextPath);
 }
 
 function redirectForUploadError(basePath: string, code: string, error: unknown): never {

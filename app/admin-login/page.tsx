@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { loginAction } from '@/app/admin/actions';
-import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { getAuthenticatedAdminSession, isAdminAuthenticated } from '@/lib/cms/auth';
 
 export const metadata: Metadata = {
   title: 'Admin Login – Headbang Handwerk',
@@ -10,10 +10,11 @@ export const metadata: Metadata = {
 export default async function AdminLoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; next?: string }>;
+  searchParams: Promise<{ error?: string; denied?: string; next?: string }>;
 }) {
   const params = await searchParams;
-  const redirectTo = params.next && params.next.startsWith('/') ? params.next : '/';
+  const redirectTo = params.next && params.next.startsWith('/') ? params.next : '/admin';
+  const activeSession = await getAuthenticatedAdminSession();
 
   if (await isAdminAuthenticated()) {
     redirect(redirectTo);
@@ -28,9 +29,11 @@ export default async function AdminLoginPage({
           Die Website ist wieder öffentlich. Nach dem Login kannst du die freigegebenen Inhalte direkt auf der Website bearbeiten.
         </p>
 
-        {params.error ? (
+        {params.error || params.denied ? (
           <div className="mt-6 rounded-2xl border border-red-500/40 bg-red-950/30 px-4 py-3 text-sm text-red-200">
-            Login fehlgeschlagen. Prüfe Benutzername und Passwort.
+            {params.denied && activeSession?.role === 'zollhaus-admin'
+              ? 'Für diesen Bereich fehlen die erforderlichen Berechtigungen.'
+              : 'Anmeldung fehlgeschlagen. Bitte Eingaben prüfen und erneut versuchen.'}
           </div>
         ) : null}
 

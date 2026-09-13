@@ -17,32 +17,45 @@ import {
   isReadonlyFallbackError,
   saveCmsContent,
 } from '@/lib/cms/storage';
-import { isAdminAuthenticated, loginAdmin, logoutAdmin } from '@/lib/cms/auth';
+import { loginHeadbangAdmin, logoutAdmin, requireHeadbangAdminAction, requireTrustedOrigin } from '@/lib/cms/auth';
 import { mergeCmsContentFromForm } from '@/lib/cms/form-data';
 
-export async function loginAction(formData: FormData) {
-  const username = String(formData.get('username') || '');
-  const password = String(formData.get('password') || '');
-  const redirectTo = String(formData.get('redirectTo') || '/');
-  const success = await loginAdmin(username, password);
+function normalizeRedirectTo(value: string, fallback: string) {
+  return value.startsWith('/') && !value.startsWith('//') ? value : fallback;
+}
 
-  if (!success) {
-    const target = redirectTo.startsWith('/') ? redirectTo : '/';
-    redirect(`/admin-login?error=1&next=${encodeURIComponent(target)}`);
+export async function loginAction(formData: FormData) {
+  try {
+    await requireTrustedOrigin();
+  } catch {
+    redirect('/admin-login?error=1');
   }
 
-  redirect(redirectTo.startsWith('/') ? redirectTo : '/');
+  const username = String(formData.get('username') || '');
+  const password = String(formData.get('password') || '');
+  const redirectTo = normalizeRedirectTo(String(formData.get('redirectTo') || '/admin'), '/admin');
+  const result = await loginHeadbangAdmin(username, password);
+
+  if (!result.ok) {
+    redirect(`/admin-login?error=1&next=${encodeURIComponent(redirectTo)}`);
+  }
+
+  redirect(redirectTo);
 }
 
 export async function logoutAction() {
+  try {
+    await requireTrustedOrigin();
+  } catch {
+    redirect('/admin-login');
+  }
+
   await logoutAdmin();
   redirect('/admin-login');
 }
 
 export async function updateCmsAction(formData: FormData) {
-  if (!(await isAdminAuthenticated())) {
-    redirect('/admin-login');
-  }
+  await requireHeadbangAdminAction('/admin');
 
   const current = await getCmsContent();
   let next = mergeCmsContentFromForm(formData, current);

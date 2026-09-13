@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 import { logoutAction, updateCmsAction } from './actions';
 import { cmsContentToFormValues } from '@/lib/cms/form-data';
-import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { requireHeadbangAdmin } from '@/lib/cms/auth';
 import { cmsStorageMode, getCmsContent } from '@/lib/cms/storage';
 
 export const metadata: Metadata = {
@@ -89,11 +88,7 @@ export default async function AdminPage({
       | string;
   }>;
 }) {
-  if (!(await isAdminAuthenticated())) {
-    redirect('/admin-login');
-  }
-
-  redirect('/');
+  await requireHeadbangAdmin('/admin');
 
   const cms = await getCmsContent();
   const params = await searchParams;

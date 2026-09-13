@@ -1,6 +1,7 @@
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
-import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { getAuthenticatedAdminSessionFromRequest, hasTrustedRequestOrigin } from '@/lib/cms/auth';
+import { canAccessHeadbangAdmin } from '@/lib/cms/auth-core';
 import type { CmsAssetUploadTarget } from '@/lib/cms/file-storage';
 import { getCmsContent, isFirebaseAuthSaveError, isInvalidFirebaseSaveError, isReadonlyFallbackError, saveCmsContent } from '@/lib/cms/storage';
 import type { GalleryFolder, GalleryImage, MediaAsset } from '@/lib/cms/schema';
@@ -58,8 +59,14 @@ async function persistGallery(updater: (folders: GalleryFolder[]) => GalleryFold
 }
 
 export async function POST(request: Request) {
-  if (!(await isAdminAuthenticated())) {
+  const session = await getAuthenticatedAdminSessionFromRequest(request);
+
+  if (!canAccessHeadbangAdmin(session)) {
     return NextResponse.json({ redirectTo: '/admin-login?next=/gallerie' }, { status: 401 });
+  }
+
+  if (!hasTrustedRequestOrigin(request)) {
+    return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   }
 
   const payload = (await request.json()) as {

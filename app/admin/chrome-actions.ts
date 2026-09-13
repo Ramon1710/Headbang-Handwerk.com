@@ -3,7 +3,7 @@
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { isAdminAuthenticated } from '@/lib/cms/auth';
+import { requireHeadbangAdminAction } from '@/lib/cms/auth';
 import { getCmsContent, saveCmsContent } from '@/lib/cms/storage';
 import {
   NAVIGATION_ITEM_IDS,
@@ -59,9 +59,7 @@ function withStatus(basePath: string, status: { chromeSaved?: string; chromeErro
 }
 
 async function assertAdmin() {
-  if (!(await isAdminAuthenticated())) {
-    redirect('/admin-login');
-  }
+  await requireHeadbangAdminAction('/admin');
 }
 
 function parseNavigationLinks(formData: FormData) {

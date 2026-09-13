@@ -31,14 +31,31 @@ async function getTransporter() {
   return transporterPromise;
 }
 
-export async function sendMail(options: { to: string; subject: string; text: string; html?: string }) {
+export async function sendMailWithMetadata(options: {
+  to: string;
+  subject: string;
+  text: string;
+  html?: string;
+  messageId?: string;
+  headers?: Record<string, string>;
+}) {
   const transporter = await getTransporter();
 
-  await transporter.sendMail({
+  const result = await transporter.sendMail({
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
     to: options.to,
     subject: options.subject,
     text: options.text,
     html: options.html,
+    ...(options.messageId ? { messageId: options.messageId } : {}),
+    ...(options.headers ? { headers: options.headers } : {}),
   });
+
+  return {
+    messageId: result.messageId || null,
+  };
+}
+
+export async function sendMail(options: { to: string; subject: string; text: string; html?: string }) {
+  await sendMailWithMetadata(options);
 }
