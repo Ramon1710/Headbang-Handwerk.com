@@ -31,7 +31,7 @@ import {
 import { submitZollhausCheckout, type ZollhausCheckoutStore, type ZollhausCheckoutTransaction } from '@/lib/zollhaus/checkout';
 import { getZollhausManagedOrderById, hasZollhausProductOrderReference, restoreZollhausOrderStock, retryFailedOrPendingZollhausOrderEmail, updateZollhausManagedOrderStatus } from '@/lib/zollhaus/order-management';
 import { buildZollhausOrderEmailContent, createZollhausOrderEmailMessageId, sendZollhausOrderEmail } from '@/lib/zollhaus/order-email';
-import { clearZollhausCartAfterSuccess } from '@/lib/zollhaus/cart';
+import { clearZollhausCartAfterSuccess, removeUnavailableZollhausCartItems } from '@/lib/zollhaus/cart';
 import type { ZollhausOrder, ZollhausOrderRequest, ZollhausProduct, ZollhausShopSettings } from '@/lib/zollhaus/types';
 
 test('Produktdaten werden getrimmt und Bildreihenfolge wird eindeutig normalisiert', () => {
@@ -658,6 +658,15 @@ test('Warenkorb wird nur nach erfolgreicher Bestellung geleert', () => {
 
   assert.deepEqual(clearZollhausCartAfterSuccess(false, currentCart), currentCart);
   assert.deepEqual(clearZollhausCartAfterSuccess(true, currentCart), []);
+});
+
+test('veraltete Warenkorbpositionen werden gegen den aktuellen Katalog bereinigt', () => {
+  const currentCart = [
+    { productId: 'checkout-product', quantity: 2 },
+    { productId: 'archived-product', quantity: 1 },
+  ];
+
+  assert.deepEqual(removeUnavailableZollhausCartItems(currentCart, ['checkout-product']), [{ productId: 'checkout-product', quantity: 2 }]);
 });
 
 test('interne Zollhaus-Bestellmail wird genau einmal versendet und Status wird fortgeschrieben', async () => {

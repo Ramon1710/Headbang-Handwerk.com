@@ -65,6 +65,11 @@ export function removeZollhausCartItem(items: ZollhausCartItem[], productId: str
   return items.filter((item) => item.productId !== productId);
 }
 
+export function removeUnavailableZollhausCartItems(items: ZollhausCartItem[], availableProductIds: Iterable<string>) {
+  const available = new Set(availableProductIds);
+  return items.filter((item) => available.has(item.productId));
+}
+
 export function calculateZollhausCartTotal(items: ZollhausCartItem[], products: PublicZollhausProduct[]) {
   const productMap = new Map(products.map((product) => [product.id, product]));
   return items.reduce((sum, item) => {

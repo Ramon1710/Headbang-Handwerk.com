@@ -34,7 +34,7 @@ const initialCustomer = {
 
 export function ZollhausCheckoutClient({ products, settings }: CheckoutClientProps) {
   const router = useRouter();
-  const { items, updateQuantity, removeItem, clearCart, ready } = useZollhausCart();
+  const { items, updateQuantity, removeItem, removeUnavailableItems, clearCart, ready } = useZollhausCart();
   const [customer, setCustomer] = useState(initialCustomer);
   const [honeypot, setHoneypot] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,6 +65,14 @@ export function ZollhausCheckoutClient({ products, settings }: CheckoutClientPro
   );
   const missingItems = items.filter((item) => !productMap.has(item.productId));
   const totalPriceCents = calculateZollhausCartTotal(items, products);
+
+  useEffect(() => {
+    if (!ready || !missingItems.length) {
+      return;
+    }
+
+    removeUnavailableItems(productMap.keys());
+  }, [missingItems.length, productMap, ready, removeUnavailableItems]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

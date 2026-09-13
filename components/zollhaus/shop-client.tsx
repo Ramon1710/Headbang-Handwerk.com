@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useZollhausCart } from '@/components/zollhaus/cart-provider';
 import { ZollhausAddToCartPanel } from '@/components/zollhaus/add-to-cart-panel';
 import { resolveZollhausNotice } from '@/components/zollhaus/public-copy';
@@ -19,7 +19,7 @@ interface ShopClientProps {
 }
 
 export function ZollhausShopClient(props: ShopClientProps) {
-  const { items, updateQuantity, removeItem, ready } = useZollhausCart();
+  const { items, updateQuantity, removeItem, removeUnavailableItems, ready } = useZollhausCart();
   const productMap = useMemo(() => new Map(props.products.map((product) => [product.id, product])), [props.products]);
   const invoiceNotice = resolveZollhausNotice(
     props.checkoutInvoiceNotice,
@@ -32,6 +32,14 @@ export function ZollhausShopClient(props: ShopClientProps) {
 
   const totalPriceCents = calculateZollhausCartTotal(items, props.products);
   const missingItems = items.filter((item) => !productMap.has(item.productId));
+
+  useEffect(() => {
+    if (!ready || !missingItems.length) {
+      return;
+    }
+
+    removeUnavailableItems(productMap.keys());
+  }, [missingItems.length, productMap, ready, removeUnavailableItems]);
 
   return (
     <div className={styles.layout}>

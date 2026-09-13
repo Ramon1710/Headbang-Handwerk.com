@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import {
   addZollhausCartItem,
   parseZollhausCart,
+  removeUnavailableZollhausCartItems,
   removeZollhausCartItem,
   updateZollhausCartItemQuantity,
   ZOLLHAUS_CART_STORAGE_KEY,
@@ -16,6 +17,7 @@ interface ZollhausCartContextValue {
   addItem: (productId: string, quantity: number, maxStock: number) => void;
   updateQuantity: (productId: string, quantity: number, maxStock: number) => void;
   removeItem: (productId: string) => void;
+  removeUnavailableItems: (availableProductIds: Iterable<string>) => void;
   clearCart: () => void;
 }
 
@@ -58,6 +60,10 @@ export function ZollhausCartProvider({ children }: { children: React.ReactNode }
         addItem: (productId, quantity, maxStock) => setItems((current) => addZollhausCartItem(current, productId, quantity, maxStock)),
         updateQuantity: (productId, quantity, maxStock) => setItems((current) => updateZollhausCartItemQuantity(current, productId, quantity, maxStock)),
         removeItem: (productId) => setItems((current) => removeZollhausCartItem(current, productId)),
+        removeUnavailableItems: (availableProductIds) => {
+          const stableProductIds = Array.from(availableProductIds);
+          setItems((current) => removeUnavailableZollhausCartItems(current, stableProductIds));
+        },
         clearCart: () => setItems([]),
       }}
     >
