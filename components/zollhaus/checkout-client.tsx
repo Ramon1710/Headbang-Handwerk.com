@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { calculateZollhausCartTotal, clearZollhausCartAfterSuccess } from '@/lib/zollhaus/cart';
+import { createZollhausCheckoutIdempotencyKey } from '@/lib/zollhaus/checkout';
 import { resolveZollhausNotice } from '@/components/zollhaus/public-copy';
 import { formatPriceCentsForDisplay } from '@/lib/zollhaus/product-admin';
 import type { PublicZollhausProduct } from '@/lib/zollhaus/public-products';
@@ -39,15 +40,10 @@ export function ZollhausCheckoutClient({ products, settings }: CheckoutClientPro
   const [honeypot, setHoneypot] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [idempotencyKey, setIdempotencyKey] = useState('');
+  const [idempotencyKey, setIdempotencyKey] = useState(() => createZollhausCheckoutIdempotencyKey());
 
   useEffect(() => {
-    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-      setIdempotencyKey(crypto.randomUUID());
-      return;
-    }
-
-    setIdempotencyKey(`zollhaus-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`);
+    setIdempotencyKey((current) => current || createZollhausCheckoutIdempotencyKey());
   }, []);
 
   const productMap = useMemo(() => new Map(products.map((product) => [product.id, product])), [products]);
@@ -63,6 +59,10 @@ export function ZollhausCheckoutClient({ products, settings }: CheckoutClientPro
     settings.checkoutLegalNotice,
     'Mit dem Absenden geben Sie eine verbindliche Bestellung auf Rechnung ab.'
   );
+  const submitButtonLabel = resolveZollhausNotice(
+    settings.checkoutSubmitButtonLabel,
+    'Zahlungspflichtig auf Rechnung bestellen'
+  );
   const missingItems = items.filter((item) => !productMap.has(item.productId));
   const totalPriceCents = calculateZollhausCartTotal(items, products);
 
@@ -77,7 +77,7 @@ export function ZollhausCheckoutClient({ products, settings }: CheckoutClientPro
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!settings.checkoutEnabled || !items.length || missingItems.length || isSubmitting) {
+    if (!settings.checkoutEnabled || !items.length || missingItems.length || isSubmitting || idempotencyKey.trim().length < 8) {
       return;
     }
 
@@ -162,7 +162,7 @@ export function ZollhausCheckoutClient({ products, settings }: CheckoutClientPro
 
           <div className={styles.buttonRow}>
             <button type="submit" className={settings.checkoutEnabled && items.length && !missingItems.length && !isSubmitting ? styles.primaryButton : styles.disabledButton} disabled={!settings.checkoutEnabled || !items.length || Boolean(missingItems.length) || isSubmitting || !ready}>
-              {isSubmitting ? 'Bestellung wird gespeichert…' : settings.checkoutSubmitButtonLabel}
+              {isSubmitting ? 'Bestellung wird gespeichert…' : submitButtonLabel}
             </button>
             <Link href="/zollhaus" className={styles.secondaryButton}>Zurück zum Shop</Link>
           </div>

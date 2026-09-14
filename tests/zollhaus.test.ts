@@ -28,7 +28,7 @@ import {
   normalizeZollhausProduct,
   normalizeZollhausShopSettings,
 } from '@/lib/zollhaus/validation';
-import { submitZollhausCheckout, type ZollhausCheckoutStore, type ZollhausCheckoutTransaction } from '@/lib/zollhaus/checkout';
+import { createZollhausCheckoutIdempotencyKey, submitZollhausCheckout, type ZollhausCheckoutStore, type ZollhausCheckoutTransaction } from '@/lib/zollhaus/checkout';
 import { getZollhausManagedOrderById, hasZollhausProductOrderReference, restoreZollhausOrderStock, retryFailedOrPendingZollhausOrderEmail, updateZollhausManagedOrderStatus } from '@/lib/zollhaus/order-management';
 import { buildZollhausOrderEmailContent, createZollhausOrderEmailMessageId, sendZollhausOrderEmail } from '@/lib/zollhaus/order-email';
 import { clearZollhausCartAfterSuccess, removeUnavailableZollhausCartItems } from '@/lib/zollhaus/cart';
@@ -178,6 +178,13 @@ test('Shop-Einstellungen werden strikt normalisiert', () => {
   assert.equal(settings.shopName, 'Zollhaus Merchandise');
   assert.equal(settings.orderNumberPrefix, 'ZH');
   assert.equal(settings.currencyCode, 'EUR');
+});
+
+test('Checkout-Idempotency-Key ist sofort lang genug fuer den ersten Submit', () => {
+  const key = createZollhausCheckoutIdempotencyKey();
+
+  assert.equal(typeof key, 'string');
+  assert.equal(key.trim().length >= 8, true);
 });
 
 test('Idempotente Bestellanfragen erlauben nur definierte Stati', () => {

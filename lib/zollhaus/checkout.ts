@@ -34,6 +34,14 @@ export interface ZollhausCheckoutResult {
   items: ZollhausOrder['items'];
 }
 
+export function createZollhausCheckoutIdempotencyKey() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+
+  return `zollhaus-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
 export interface ZollhausCheckoutTransaction {
   getSettings(): Promise<ZollhausShopSettings | null>;
   getOrderRequest(idempotencyKey: string): Promise<ZollhausOrderRequest | null>;
