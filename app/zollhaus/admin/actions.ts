@@ -8,9 +8,11 @@ import { loginZollhausAdmin, logoutAdmin, requireTrustedOrigin, requireZollhausA
 import { getZollhausOrderStatusLabel, isValidZollhausOrderId, restoreZollhausOrderStock, retryFailedOrPendingZollhausOrderEmail, updateZollhausManagedOrderStatus } from '@/lib/zollhaus/order-management';
 import { parseEuroAmountToCents, parseNonNegativeInteger } from '@/lib/zollhaus/product-admin';
 import { deleteZollhausProductImages, uploadZollhausProductImage } from '@/lib/zollhaus/product-image-storage';
-import { createZollhausProduct, getZollhausProduct, updateZollhausProduct } from '@/lib/zollhaus/products';
+import { createZollhausProduct, deleteZollhausProduct, getZollhausProduct, updateZollhausProduct } from '@/lib/zollhaus/products';
 import { normalizeZollhausProduct } from '@/lib/zollhaus/validation';
 import type { ZollhausProduct, ZollhausProductImage, ZollhausProductStatus } from '@/lib/zollhaus/types';
+
+const ZOLLHAUS_PRODUCT_IMAGE_LIMIT = 5;
 
 export async function loginAction(formData: FormData) {
   try {
@@ -157,6 +159,16 @@ async function buildProductImagesFromFormData(
   const nextImages: ZollhausProductImage[] = [];
   const uploadedImages: ZollhausProductImage[] = [];
   const obsoleteImages: ZollhausProductImage[] = [];
+  const newImageFiles = formData
+    .getAll('newImages')
+    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+  const keptExistingImages = currentProduct
+    ? currentProduct.images.filter((image) => formData.get(`imageRemove:${image.id}`) !== 'on')
+    : [];
+
+  if (keptExistingImages.length + newImageFiles.length > ZOLLHAUS_PRODUCT_IMAGE_LIMIT) {
+    throw new Error(`Pro Produkt sind maximal ${ZOLLHAUS_PRODUCT_IMAGE_LIMIT} Bilder erlaubt.`);
+  }
 
   if (currentProduct) {
     for (const [index, image] of currentProduct.images.entries()) {
@@ -189,10 +201,6 @@ async function buildProductImagesFromFormData(
       });
     }
   }
-
-  const newImageFiles = formData
-    .getAll('newImages')
-    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
   const newImageAlts = parseNewImageAltLines(formData);
 
   for (const [index, file] of newImageFiles.entries()) {
@@ -235,16 +243,11 @@ export async function saveProductAction(formData: FormData) {
     }
 
     const productId = currentProduct?.id || randomUUID();
-    const status = parseStatus(formData.get('status'));
     const name = parseText(formData.get('name'));
     const description = parseTextArea(formData.get('description'));
     const priceCents = parseEuroAmountToCents(formData.get('priceEuro'));
     const stockQuantity = parseNonNegativeInteger(formData.get('stockQuantity'), 'Die verfuegbare Menge');
-    const archiveConfirmed = formData.get('archiveConfirmed') === 'on';
-
-    if (currentProduct && currentProduct.status !== 'archived' && status === 'archived' && !archiveConfirmed) {
-      throw new Error('Bitte die Archivierung vor dem Speichern bestaetigen.');
-    }
+    const status = 'active';
 
     const imageMutation = await buildProductImagesFromFormData(formData, productId, name, currentProduct);
 
@@ -262,7 +265,6 @@ export async function saveProductAction(formData: FormData) {
         images: imageMutation.nextImages,
         status,
         ...(currentProduct?.createdAt ? { createdAt: currentProduct.createdAt } : {}),
-        ...(status === 'archived' && currentProduct?.status !== 'archived' ? { archivedAt: new Date().toISOString() } : {}),
       },
       currentProduct ? { existing: currentProduct } : undefined,
     );
@@ -284,12 +286,51 @@ export async function saveProductAction(formData: FormData) {
     redirect(
       buildAdminRedirect({
         productId,
-        saved: currentProduct ? (status === 'archived' && currentProduct.status !== 'archived' ? 'archived' : status === 'active' && currentProduct.status === 'archived' ? 'reactivated' : 'updated') : 'created',
+        saved: currentProduct ? 'updated' : 'created',
       }),
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Das Produkt konnte nicht gespeichert werden.';
     redirect(buildAdminRedirect({ productId: requestedProductId || undefined, createMode, error: message }));
+  }
+}
+
+export async function deleteProductAction(formData: FormData) {
+  await requireZollhausAccess('/zollhaus/admin');
+
+  try {
+    await requireTrustedOrigin();
+  } catch {
+    redirect(buildAdminRedirect({ error: 'Die Anfrage konnte nicht bestaetigt werden.' }));
+  }
+
+  const productId = parseText(formData.get('productId'));
+
+  try {
+    ensureFirebaseAvailable();
+
+    if (!productId) {
+      throw new Error('Es wurde kein Produkt ausgewaehlt.');
+    }
+
+    const currentProduct = await getZollhausProduct(productId);
+
+    if (!currentProduct) {
+      throw new Error('Das ausgewaehlte Produkt wurde nicht gefunden.');
+    }
+
+    if (currentProduct.stockQuantity > 0) {
+      throw new Error('Produkte koennen nur geloescht werden, wenn sie ausverkauft sind.');
+    }
+
+    await deleteZollhausProduct(productId);
+    await deleteZollhausProductImages(currentProduct.images);
+
+    revalidateZollhausProductPages(productId);
+    redirect(buildAdminRedirect({ createMode: true, saved: 'deleted' }));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Das Produkt konnte nicht geloescht werden.';
+    redirect(buildAdminRedirect({ productId: productId || undefined, error: message }));
   }
 }
 

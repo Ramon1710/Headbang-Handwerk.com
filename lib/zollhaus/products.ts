@@ -61,6 +61,16 @@ export async function updateZollhausProduct(productId: string, input: Partial<Zo
   return product;
 }
 
+export async function deleteZollhausProduct(productId: string, db?: Firestore) {
+  const current = await getZollhausProduct(productId, db);
+
+  if (!current) {
+    throw new Error('Zollhaus-Produkt wurde nicht gefunden.');
+  }
+
+  await getProductsCollection(db).doc(productId).delete();
+}
+
 export async function archiveZollhausProduct(productId: string, db?: Firestore) {
   return updateZollhausProduct(
     productId,
