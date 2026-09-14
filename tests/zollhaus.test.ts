@@ -781,6 +781,47 @@ test('fehlende Mail-Konfiguration markiert Bestellung neutral als fehlgeschlagen
   assert.equal(JSON.stringify(logs[0]).includes('Erika'), false);
 });
 
+test('interne Zollhaus-Bestellmail nutzt supportEmail aus den Shop-Einstellungen, wenn kein Empfänger per Env gesetzt ist', async () => {
+  const store = new InMemoryCheckoutStore({
+    products: [buildCheckoutProduct()],
+    settings: normalizeZollhausShopSettings({
+      shopName: 'Zollhaus Shop',
+      orderNumberPrefix: 'ZH',
+      checkoutEnabled: true,
+      supportEmail: 'support@zollhaus.test',
+    }),
+  });
+
+  await submitZollhausCheckout(
+    { idempotencyKey: 'mail-support-12345', customer: buildCheckoutCustomer(), items: [{ productId: 'checkout-product', quantity: 1 }] },
+    { store, createOrderId: () => 'order-mail-support', createOrderNumber: () => 'ZH-20260914-SUPRT23A' },
+  );
+
+  const deliveries: Array<{ to: string }> = [];
+
+  await withOrderEmailEnv(async () => {
+    const result = await sendZollhausOrderEmail('order-mail-support', {
+      store,
+      transport: {
+        async send(input) {
+          deliveries.push({ to: input.to });
+          return { messageId: input.messageId };
+        },
+      },
+    });
+
+    assert.equal(result.status, 'sent');
+  }, {
+    SMTP_HOST: 'smtp.example.com',
+    SMTP_USER: 'mailer@example.com',
+    SMTP_PASS: 'secret',
+    SMTP_FROM: 'Zollhaus <bestellungen@example.com>',
+    ZOLLHAUS_ORDER_EMAIL: undefined,
+  });
+
+  assert.deepEqual(deliveries, [{ to: 'support@zollhaus.test' }]);
+});
+
 test('parallele Versandversuche fuehren hoechstens einen realen Mailtransport aus', async () => {
   const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct()] });
 

@@ -46,8 +46,25 @@ function getDefaultLogger(): ZollhausOrderEmailLogger {
   };
 }
 
-function getRecipientAddress() {
-  return String(process.env.ZOLLHAUS_ORDER_EMAIL || '').trim();
+async function getRecipientAddress(store?: ZollhausCheckoutStore) {
+  const explicitRecipient = String(process.env.ZOLLHAUS_ORDER_EMAIL || '').trim();
+
+  if (explicitRecipient) {
+    return explicitRecipient;
+  }
+
+  try {
+    if (store) {
+      const settings = await store.runTransaction(async (transaction) => transaction.getSettings());
+      return String(settings?.supportEmail || '').trim();
+    }
+
+    const { getResolvedZollhausShopSettings } = await import('@/lib/zollhaus/settings');
+    const settings = await getResolvedZollhausShopSettings();
+    return String(settings.supportEmail || '').trim();
+  } catch {
+    return '';
+  }
 }
 
 function isSmtpConfigured() {
@@ -305,7 +322,7 @@ export async function sendZollhausOrderEmail(
     } satisfies ZollhausOrderEmailOutcome;
   }
 
-  const recipient = getRecipientAddress();
+  const recipient = await getRecipientAddress(store);
 
   if (!recipient || !isSmtpConfigured()) {
     const category = 'not_configured' as const;

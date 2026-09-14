@@ -77,8 +77,14 @@ export function ZollhausCheckoutClient({ products, settings }: CheckoutClientPro
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!settings.checkoutEnabled || !items.length || missingItems.length || isSubmitting || idempotencyKey.trim().length < 8) {
+    const requestIdempotencyKey = idempotencyKey.trim().length >= 8 ? idempotencyKey : createZollhausCheckoutIdempotencyKey();
+
+    if (!settings.checkoutEnabled || !items.length || missingItems.length || isSubmitting) {
       return;
+    }
+
+    if (requestIdempotencyKey !== idempotencyKey) {
+      setIdempotencyKey(requestIdempotencyKey);
     }
 
     setIsSubmitting(true);
@@ -89,7 +95,7 @@ export function ZollhausCheckoutClient({ products, settings }: CheckoutClientPro
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          idempotencyKey,
+          idempotencyKey: requestIdempotencyKey,
           customer,
           items,
           website: honeypot,
