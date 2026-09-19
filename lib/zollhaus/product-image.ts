@@ -11,6 +11,21 @@ export interface ValidatedZollhausProductImageUpload {
   sizeBytes: number;
 }
 
+function ensureSafeProductPathSegment(value: string) {
+  const normalized = value.trim();
+
+  if (!/^[A-Za-z0-9_-]{8,120}$/.test(normalized)) {
+    throw new Error('Produkt-ID ist ungueltig.');
+  }
+
+  return normalized;
+}
+
+export function isOwnedZollhausProductImagePath(storagePath: string, productId: string) {
+  const safeProductId = ensureSafeProductPathSegment(productId);
+  return new RegExp(`^zollhaus/products/${safeProductId}/[A-Za-z0-9_-]{8,120}$`).test(String(storagePath || '').trim());
+}
+
 function detectImageKind(bytes: Uint8Array): ZollhausProductImageKind | null {
   if (bytes.length >= JPEG_SIGNATURE.length && JPEG_SIGNATURE.every((value, index) => bytes[index] === value)) {
     return 'jpg';

@@ -53,6 +53,10 @@ export function getZollhausProductDisplayStatus(product: Pick<ZollhausProduct, '
     return 'Archiviert';
   }
 
+  if (product.status === 'inactive') {
+    return 'Inaktiv';
+  }
+
   if (product.stockQuantity === 0) {
     return 'Ausverkauft';
   }
@@ -79,9 +83,14 @@ export function buildProductPreviewModel(product?: Partial<ZollhausProduct> | nu
     priceCents: typeof product?.priceCents === 'number' ? product.priceCents : 0,
     stockQuantity: typeof product?.stockQuantity === 'number' ? product.stockQuantity : 0,
     images: Array.isArray(product?.images) ? product.images : [],
-    status: product?.status === 'active' || product?.status === 'archived' ? product.status : 'archived',
+    status: product?.status === 'active' || product?.status === 'inactive' || product?.status === 'archived' ? product.status : 'inactive',
     createdAt: product?.createdAt || now,
     updatedAt: product?.updatedAt || now,
     ...(product?.archivedAt ? { archivedAt: product.archivedAt } : {}),
+    ...(product?.archivedBy ? { archivedBy: product.archivedBy } : {}),
+    ...(product?.archivedByRole ? { archivedByRole: product.archivedByRole } : {}),
+    ...(product?.restoredAt ? { restoredAt: product.restoredAt } : {}),
+    ...(product?.restoredBy ? { restoredBy: product.restoredBy } : {}),
+    ...(product?.restoredByRole ? { restoredByRole: product.restoredByRole } : {}),
   };
 }

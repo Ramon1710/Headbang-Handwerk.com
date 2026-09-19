@@ -6,6 +6,10 @@ import {
   buildEventSponsoringPublicPageView,
   resolveEventSponsoringPublicAccess,
 } from '@/lib/event-sponsoring/public';
+import {
+  normalizeEventSponsoringConfigDocument,
+  normalizeEventSponsoringPackageDocument,
+} from '@/lib/event-sponsoring/store';
 import { normalizeEventSponsoringConfig, normalizeEventSponsoringPackage } from '@/lib/event-sponsoring/validation';
 import { getEventSponsoringHref, getEventStandHref, resolveEventDetailHref } from '@/lib/site';
 import type { Event } from '@/lib/types';
@@ -130,6 +134,8 @@ test('oeffentliches View-Model zeigt nur aktive Pakete sortiert und formatiert P
   assert.equal(view.packages[0].priceLabel, '250,00 €');
   assert.match(view.packages[0].actionHref || '', /\/veranstaltungen\/wacken-2027\/sponsoring\/anfrage\?package=/);
   assert.equal(Array.isArray((view as { banners?: unknown }).banners), false);
+  assert.equal('createdAt' in view.packages[0], false);
+  assert.equal('updatedAt' in view.packages[0], false);
 });
 
 test('Weiterer Ablauf und anonyme Mindestbetraege werden fuer den Anfragefluss abgebildet', () => {
@@ -149,10 +155,77 @@ test('Weiterer Ablauf und anonyme Mindestbetraege werden fuer den Anfragefluss a
   assert.equal(view.packages.find((pkg) => pkg.kind === 'anonymous_support')?.priceLabel, 'ab 25,00 €');
 });
 
+test('alte oder unvollstaendige Config- und Paketdokumente werden fuer die oeffentliche Seite kontrolliert normalisiert', () => {
+  const config = normalizeEventSponsoringConfigDocument('legacy-event', {
+    enabled: true,
+  });
+
+  const pkg = normalizeEventSponsoringPackageDocument('legacy-package', {
+    eventId: 'legacy-event',
+    name: 'Legacy Paket',
+    kind: 'small_logo',
+    active: true,
+    grantsBannerPlacement: true,
+    logoSlotSize: 'small',
+  });
+
+  assert.equal(config.publicTitle, 'Veranstaltungs-Sponsoring');
+  assert.equal(config.publicDescription, 'Weitere Informationen folgen.');
+  assert.deepEqual(pkg.features, []);
+  assert.equal(pkg.description, 'Weitere Informationen folgen.');
+  assert.equal(pkg.sortOrder, 0);
+  assert.equal(pkg.priceCents, 0);
+});
+
+test('oeffentliches View-Model rendert Legacy-Pakete ohne Features oder Beschreibung kontrolliert', () => {
+  const view = buildEventSponsoringPublicPageView({
+    event: buildEvent(),
+    config: normalizeEventSponsoringConfigDocument('wacken-2027', {
+      enabled: true,
+    }),
+    packages: [normalizeEventSponsoringPackageDocument('legacy-package', {
+      eventId: 'wacken-2027',
+      name: 'Legacy Paket',
+      kind: 'small_logo',
+      active: true,
+      grantsBannerPlacement: true,
+      logoSlotSize: 'small',
+    })],
+    isAdminPreview: false,
+  });
+
+  assert.equal(view.packages[0].description, 'Weitere Informationen folgen.');
+  assert.deepEqual(view.packages[0].features, []);
+  assert.equal(view.packages[0].priceLabel, 'Preis auf Anfrage');
+});
+
 test('die öffentliche UI verweist nicht mehr auf Stripe oder Bannerdarstellungen', () => {
   const source = readFileSync(new URL('../components/event-sponsoring-public-page.tsx', import.meta.url), 'utf8');
 
   assert.doesNotMatch(source, /Stripe/);
   assert.doesNotMatch(source, /Bannerflächen/);
   assert.match(source, /Anfrage absenden|Pakete für Sponsoringanfragen|manuell per Rechnung/);
+});
+
+test('fehlende oder nicht veroeffentlichte Angebote fuehren zu einer sichtbaren Reaktion statt zu einer weissen Default-404', () => {
+  const source = readFileSync(new URL('../app/veranstaltungen/[eventId]/sponsoring/not-found.tsx', import.meta.url), 'utf8');
+
+  assert.match(source, /Die Sponsoringangebote konnten momentan nicht geladen werden/);
+  assert.match(source, /Zurueck zu den Veranstaltungen/);
+  assert.match(source, /Erneut laden/);
+});
+
+test('unerwartete Laufzeitfehler haben in der Sponsoringroute eine sichtbare Error Boundary', () => {
+  const source = readFileSync(new URL('../app/veranstaltungen/[eventId]/sponsoring/error.tsx', import.meta.url), 'utf8');
+
+  assert.match(source, /Die Sponsoringangebote konnten momentan nicht geladen werden/);
+  assert.match(source, /reset/);
+  assert.match(source, /Zurueck zu den Veranstaltungen/);
+});
+
+test('die Sponsoringroute enthaelt keine Redirect-Schleife', () => {
+  const source = readFileSync(new URL('../app/veranstaltungen/[eventId]/sponsoring/page.tsx', import.meta.url), 'utf8');
+
+  assert.doesNotMatch(source, /redirect\(/);
+  assert.match(source, /notFound\(/);
 });

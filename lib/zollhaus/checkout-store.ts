@@ -112,6 +112,9 @@ class LocalFixtureCheckoutStore implements ZollhausCheckoutStore {
       saveProduct: async (product) => {
         draftProducts.set(product.id, product);
       },
+      deleteProduct: async (productId) => {
+        draftProducts.delete(productId);
+      },
       saveOrder: async (order) => {
         draftOrders.set(order.id, order);
       },
@@ -177,6 +180,9 @@ class FirestoreCheckoutStore implements ZollhausCheckoutStore {
         },
         saveProduct: async (product) => {
           firestoreTransaction.set(db.doc(`${ZOLLHAUS_PRODUCTS_COLLECTION_PATH}/${product.id}`), product, { merge: false });
+        },
+        deleteProduct: async (productId) => {
+          firestoreTransaction.delete(db.doc(`${ZOLLHAUS_PRODUCTS_COLLECTION_PATH}/${productId}`));
         },
         saveOrder: async (order) => {
           firestoreTransaction.set(db.doc(`${ZOLLHAUS_ORDERS_COLLECTION_PATH}/${order.id}`), order, { merge: false });

@@ -121,6 +121,12 @@
   color: #5d6f75;
 }
 
+.statusInactive {
+  border: 1px solid #c9d8ee;
+  background: #edf4ff;
+  color: #314c78;
+}
+
 .statusSoldOut {
   border: 1px solid #ead17c;
   background: #fff2bf;
@@ -253,6 +259,20 @@
   display: grid;
   gap: 1.25rem;
   min-width: 0;
+}
+
+.actionPanel,
+.actionForm {
+  display: grid;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.actionPanel {
+  border: 1px solid #eadfc6;
+  border-radius: 1.2rem;
+  padding: 1rem;
+  background: #fffaf1;
 }
 
 .fieldGrid {

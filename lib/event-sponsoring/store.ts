@@ -44,6 +44,127 @@ function normalizeStoredDocumentId<T extends { id?: string; eventId?: string }>(
   return snapshotId;
 }
 
+function getOptionalTrimmedString(value: unknown) {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function getOptionalStringArray(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map((entry) => String(entry ?? '').trim()).filter(Boolean);
+}
+
+function getOptionalNonNegativeInteger(value: unknown, fallback = 0) {
+  const parsed = typeof value === 'number' ? value : Number.parseInt(String(value ?? ''), 10);
+
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return fallback;
+  }
+
+  return parsed;
+}
+
+function getOptionalBoolean(value: unknown, fallback = false) {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  if (value === 'true') {
+    return true;
+  }
+
+  if (value === 'false') {
+    return false;
+  }
+
+  return fallback;
+}
+
+function normalizeLegacyPackageKind(value: unknown): EventSponsoringPackage['kind'] {
+  const candidate = getOptionalTrimmedString(value);
+
+  if (
+    candidate === 'small_logo'
+    || candidate === 'medium_logo'
+    || candidate === 'large_logo'
+    || candidate === 'custom_request'
+    || candidate === 'anonymous_support'
+  ) {
+    return candidate;
+  }
+
+  throw new Error('Ungueltige Paketart in Legacy-Dokument.');
+}
+
+function getExpectedLegacyLogoSlotSize(kind: EventSponsoringPackage['kind']): EventSponsoringPackage['logoSlotSize'] {
+  if (kind === 'small_logo') {
+    return 'small';
+  }
+
+  if (kind === 'medium_logo') {
+    return 'medium';
+  }
+
+  if (kind === 'large_logo') {
+    return 'large';
+  }
+
+  return 'none';
+}
+
+function buildSafeEventSponsoringConfigDocument(snapshotId: string, data: Record<string, unknown>) {
+  return {
+    eventId: normalizeStoredDocumentId(snapshotId, data, 'eventId'),
+    enabled: getOptionalBoolean(data.enabled, false),
+    publicTitle: getOptionalTrimmedString(data.publicTitle) || 'Veranstaltungs-Sponsoring',
+    publicDescription: getOptionalTrimmedString(data.publicDescription) || 'Weitere Informationen folgen.',
+    currencyCode: getOptionalTrimmedString(data.currencyCode) || 'EUR',
+    anonymousSupportEnabled: getOptionalBoolean(data.anonymousSupportEnabled, false),
+    anonymousMinimumAmountCents: getOptionalNonNegativeInteger(data.anonymousMinimumAmountCents, 0),
+    customSponsoringEnabled: getOptionalBoolean(data.customSponsoringEnabled, false),
+    showOccupiedLogosPublicly: getOptionalBoolean(data.showOccupiedLogosPublicly, false),
+    ...(getOptionalTrimmedString(data.createdAt) ? { createdAt: getOptionalTrimmedString(data.createdAt) } : {}),
+    ...(getOptionalTrimmedString(data.updatedAt) ? { updatedAt: getOptionalTrimmedString(data.updatedAt) } : {}),
+  } satisfies Partial<EventSponsoringConfig> & { eventId: string };
+}
+
+function buildSafeEventSponsoringPackageDocument(snapshotId: string, data: Record<string, unknown>) {
+  const eventId = getOptionalTrimmedString(data.eventId);
+  const kind = normalizeLegacyPackageKind(data.kind);
+
+  if (!eventId) {
+    throw new Error('Legacy-Paket ohne Veranstaltungs-ID kann nicht gelesen werden.');
+  }
+
+  return {
+    id: normalizeStoredDocumentId(snapshotId, data, 'id'),
+    eventId,
+    name: getOptionalTrimmedString(data.name) || 'Sponsoringpaket',
+    kind,
+    description: getOptionalTrimmedString(data.description) || 'Weitere Informationen folgen.',
+    features: getOptionalStringArray(data.features),
+    priceCents: getOptionalNonNegativeInteger(data.priceCents, 0),
+    currencyCode: getOptionalTrimmedString(data.currencyCode) || 'EUR',
+    active: getOptionalBoolean(data.active, true),
+    sortOrder: getOptionalNonNegativeInteger(data.sortOrder, 0),
+    grantsBannerPlacement: kind === 'small_logo' || kind === 'medium_logo' || kind === 'large_logo',
+    logoSlotSize: getExpectedLegacyLogoSlotSize(kind),
+    isPaidOnline: kind !== 'custom_request',
+    ...(getOptionalTrimmedString(data.createdAt) ? { createdAt: getOptionalTrimmedString(data.createdAt) } : {}),
+    ...(getOptionalTrimmedString(data.updatedAt) ? { updatedAt: getOptionalTrimmedString(data.updatedAt) } : {}),
+  } satisfies Partial<EventSponsoringPackage> & { id: string; eventId: string };
+}
+
+function normalizeEventSponsoringPackageDocumentOrNull(snapshotId: string, data: Record<string, unknown>) {
+  try {
+    return normalizeEventSponsoringPackage(buildSafeEventSponsoringPackageDocument(snapshotId, data));
+  } catch {
+    return null;
+  }
+}
+
 type EventSponsoringDocument =
   | EventSponsoringConfig
   | EventSponsoringPackage
@@ -312,9 +433,25 @@ class FirestoreEventSponsoringStore implements EventSponsoringStore {
       };
 
       return callback({
-        getConfig: readConfig,
+        getConfig: async (eventId) => {
+          const snapshot = await firestoreTransaction.get(db.collection(getEventSponsoringCollectionName('configs')).doc(eventId));
+
+          if (!snapshot.exists) {
+            return null;
+          }
+
+          return normalizeEventSponsoringConfig(buildSafeEventSponsoringConfigDocument(snapshot.id, snapshot.data() || {}));
+        },
         async listPackages(eventId) {
-          return sortByOrderAndId(await listByEvent('packages', (input) => normalizeEventSponsoringPackage(input), eventId));
+          const snapshot = await firestoreTransaction.get(
+            db.collection(getEventSponsoringCollectionName('packages')).where('eventId', '==', eventId),
+          );
+
+          const packages = snapshot.docs
+            .map((entry) => normalizeEventSponsoringPackageDocumentOrNull(entry.id, entry.data() || {}))
+            .filter((entry): entry is EventSponsoringPackage => Boolean(entry));
+
+          return sortByOrderAndId(packages);
         },
         async getBanner(bannerId) {
           return getById('banners', bannerId, (input) => normalizeEventSponsoringBanner(input));
@@ -540,11 +677,30 @@ export async function saveEventSponsoringLogoUpload(logoUpload: EventSponsoringL
 }
 
 export function normalizeEventSponsoringConfigDocument(snapshotId: string, data: Record<string, unknown>) {
-  return normalizeEventSponsoringConfig({ eventId: normalizeStoredDocumentId(snapshotId, data, 'eventId'), ...data });
+  return normalizeEventSponsoringConfig(buildSafeEventSponsoringConfigDocument(snapshotId, data));
 }
 
 export function normalizeEventSponsoringPackageDocument(snapshotId: string, data: Record<string, unknown>) {
-  return normalizeEventSponsoringPackage({ id: normalizeStoredDocumentId(snapshotId, data, 'id'), ...data });
+  const candidate = buildSafeEventSponsoringPackageDocument(snapshotId, data);
+  const now = new Date().toISOString();
+
+  return {
+    id: candidate.id,
+    eventId: candidate.eventId,
+    name: candidate.name || 'Sponsoringpaket',
+    kind: candidate.kind,
+    description: candidate.description || 'Weitere Informationen folgen.',
+    features: Array.isArray(candidate.features) ? candidate.features : [],
+    priceCents: typeof candidate.priceCents === 'number' ? candidate.priceCents : 0,
+    currencyCode: candidate.currencyCode || 'EUR',
+    active: typeof candidate.active === 'boolean' ? candidate.active : true,
+    sortOrder: typeof candidate.sortOrder === 'number' ? candidate.sortOrder : 0,
+    grantsBannerPlacement: Boolean(candidate.grantsBannerPlacement),
+    logoSlotSize: candidate.logoSlotSize || 'none',
+    isPaidOnline: typeof candidate.isPaidOnline === 'boolean' ? candidate.isPaidOnline : candidate.kind !== 'custom_request',
+    createdAt: candidate.createdAt || now,
+    updatedAt: candidate.updatedAt || candidate.createdAt || now,
+  } satisfies EventSponsoringPackage;
 }
 
 export function normalizeEventSponsoringBannerDocument(snapshotId: string, data: Record<string, unknown>) {

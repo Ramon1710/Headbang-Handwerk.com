@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { deleteProductAction, logoutAction, saveProductAction } from './actions';
+import { archiveProductAction, deleteProductAction, logoutAction, restoreProductAction, saveProductAction } from './actions';
 import { hasFirebaseConfig } from '@/lib/cms/firebase';
 import { requireZollhausAccess } from '@/lib/cms/auth';
 import { ShopPreviewSwitcher } from '@/components/zollhaus/shop-preview-switcher';
@@ -17,6 +17,10 @@ function getStatusClassName(product: ZollhausProduct) {
 
   if (label === 'Archiviert') {
     return adminStyles.statusArchived;
+  }
+
+  if (label === 'Inaktiv') {
+    return adminStyles.statusInactive;
   }
 
   if (label === 'Ausverkauft') {
@@ -37,6 +41,14 @@ function getSavedMessage(saved?: string) {
 
   if (saved === 'deleted') {
     return 'Produkt geloescht.';
+  }
+
+  if (saved === 'archived') {
+    return 'Produkt archiviert.';
+  }
+
+  if (saved === 'restored') {
+    return 'Produkt als inaktiv wiederhergestellt.';
   }
 
   return null;
@@ -81,15 +93,17 @@ export default async function ZollhausAdminPage({
 
   if (firebaseConfigured) {
     try {
-      products = await listZollhausProducts();
+      products = await listZollhausProducts({ includeArchived: true });
     } catch {
       dataUnavailable = true;
     }
   }
 
+  const editableProducts = products.filter((product) => product.status !== 'archived');
+  const archivedProducts = products.filter((product) => product.status === 'archived');
   const selectedProduct = params.new === '1'
     ? null
-    : (products.find((product) => product.id === params.product) || products[0] || null);
+    : (editableProducts.find((product) => product.id === params.product) || editableProducts[0] || null);
   const savedMessage = getSavedMessage(params.saved);
 
   return (
@@ -121,8 +135,8 @@ export default async function ZollhausAdminPage({
             <p className={styles.placeholderNote}>Produktverwaltung</p>
             <h2 className={styles.panelTitle}>Produktverwaltung</h2>
             <div className={styles.panelBody}>
-              <p>Pflegen Sie hier die sichtbaren Artikel für den Zollhaus-Shop.</p>
-              <p>Aktive Produkte erscheinen automatisch in der öffentlichen Shopansicht.</p>
+              <p>Pflegen Sie hier aktive und inaktive Artikel für den Zollhaus-Shop.</p>
+              <p>Nur aktive Produkte erscheinen automatisch in der öffentlichen Shopansicht.</p>
             </div>
           </div>
 
@@ -143,8 +157,8 @@ export default async function ZollhausAdminPage({
         </div>
 
         <div className={adminStyles.productList}>
-          {products.length ? (
-            products.map((product) => (
+          {editableProducts.length ? (
+            editableProducts.map((product) => (
               <article key={product.id} className={adminStyles.productCard}>
                 <div className={adminStyles.productHeader}>
                   <div>
@@ -179,17 +193,69 @@ export default async function ZollhausAdminPage({
                   <Link href={buildAdminHref({ product: product.id })} className={adminStyles.secondaryButton}>
                     Bearbeiten
                   </Link>
-                  {product.stockQuantity === 0 ? (
-                    <form action={deleteProductAction}>
-                      <input type="hidden" name="productId" value={product.id} />
-                      <button type="submit" className={adminStyles.dangerButton}>Produkt löschen</button>
-                    </form>
-                  ) : null}
                 </div>
               </article>
             ))
           ) : (
-            <div className={styles.mutedCard}>Noch keine Zollhaus-Produkte vorhanden. Über „Neues Produkt“ kann der erste Datensatz angelegt werden.</div>
+            <div className={styles.mutedCard}>Noch keine aktiven oder inaktiven Zollhaus-Produkte vorhanden. Über „Neues Produkt“ kann der erste Datensatz angelegt werden.</div>
+          )}
+        </div>
+
+        <div className={adminStyles.toolbar}>
+          <div>
+            <p className={styles.placeholderNote}>Archiv</p>
+            <h2 className={styles.panelTitle}>Archivierte Produkte</h2>
+            <div className={styles.panelBody}>
+              <p>Archivierte Produkte bleiben für bestehende Bestellungen erhalten, sind aber öffentlich und im Checkout gesperrt.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className={adminStyles.productList}>
+          {archivedProducts.length ? (
+            archivedProducts.map((product) => (
+              <article key={product.id} className={adminStyles.productCard}>
+                <div className={adminStyles.productHeader}>
+                  <div>
+                    <h3 className={adminStyles.productTitle}>{product.name}</h3>
+                    <p className={styles.panelBody}>{product.description}</p>
+                  </div>
+                  <span className={`${adminStyles.statusBadge} ${getStatusClassName(product)}`}>
+                    {getZollhausProductDisplayStatus(product)}
+                  </span>
+                </div>
+
+                <div className={adminStyles.metaGrid}>
+                  <div className={adminStyles.metaItem}>
+                    <span className={adminStyles.metaTitle}>Preis</span>
+                    <span className={adminStyles.metaValue}>{formatPriceCentsForDisplay(product.priceCents)}</span>
+                  </div>
+                  <div className={adminStyles.metaItem}>
+                    <span className={adminStyles.metaTitle}>Menge</span>
+                    <span className={adminStyles.metaValue}>{product.stockQuantity}</span>
+                  </div>
+                  <div className={adminStyles.metaItem}>
+                    <span className={adminStyles.metaTitle}>Archiviert</span>
+                    <span className={adminStyles.metaValue}>{product.archivedAt ? new Date(product.archivedAt).toLocaleDateString('de-DE') : 'Unbekannt'}</span>
+                  </div>
+                  <div className={adminStyles.metaItem}>
+                    <span className={adminStyles.metaTitle}>Wiederherstellung</span>
+                    <span className={adminStyles.metaValue}>{product.restoredAt ? new Date(product.restoredAt).toLocaleDateString('de-DE') : 'Noch nicht erfolgt'}</span>
+                  </div>
+                </div>
+
+                <form action={restoreProductAction} className={adminStyles.actionForm}>
+                  <input type="hidden" name="productId" value={product.id} />
+                  <label className={adminStyles.checkboxOption}>
+                    <input type="checkbox" name="restoreConfirmed" />
+                    Produkt als inaktiv wiederherstellen
+                  </label>
+                  <button type="submit" className={adminStyles.secondaryButton}>Wiederherstellen</button>
+                </form>
+              </article>
+            ))
+          ) : (
+            <div className={styles.mutedCard}>Derzeit sind keine archivierten Produkte vorhanden.</div>
           )}
         </div>
       </section>
@@ -225,8 +291,15 @@ export default async function ZollhausAdminPage({
                     <input id="zollhaus-product-stock" name="stockQuantity" type="number" min={0} step={1} defaultValue={selectedProduct?.stockQuantity ?? 0} required />
                   </div>
                   <div className={adminStyles.field}>
+                    <label htmlFor="zollhaus-product-status" className={adminStyles.fieldLabel}>Status</label>
+                    <select id="zollhaus-product-status" name="status" defaultValue={selectedProduct?.status === 'inactive' ? 'inactive' : 'active'}>
+                      <option value="active">Aktiv und öffentlich sichtbar</option>
+                      <option value="inactive">Inaktiv und nicht öffentlich sichtbar</option>
+                    </select>
+                  </div>
+                  <div className={adminStyles.field}>
                     <span className={adminStyles.fieldLabel}>Hinweis</span>
-                    <span className={adminStyles.fieldHint}>Bei Menge 0 zeigt die Vorschau automatisch „Ausverkauft“.</span>
+                    <span className={adminStyles.fieldHint}>Nur aktive Produkte sind öffentlich sichtbar. Bei Menge 0 zeigt die Vorschau automatisch „Ausverkauft“.</span>
                   </div>
                 </div>
 
@@ -308,9 +381,42 @@ export default async function ZollhausAdminPage({
 
           <div className={styles.mutedCard}>
             <p>Pflichtfelder: Name, Beschreibung, Preis und verfügbare Menge.</p>
-            <p>Jedes Produkt benötigt mindestens ein Bild und kann maximal 5 Bilder enthalten.</p>
-            <p>Produkte mit Bestand 0 erscheinen als ausverkauft und koennen bei Bedarf geloescht oder wieder auf Bestand gesetzt werden.</p>
+            <p>Nur aktive Produkte benötigen mindestens ein Bild und können maximal 5 Bilder enthalten.</p>
+            <p>Inaktive Produkte bleiben intern bearbeitbar, erscheinen aber weder im Shop noch im Checkout.</p>
           </div>
+
+          {selectedProduct ? (
+            <section className={adminStyles.actionPanel}>
+              <div className={adminStyles.noticeWarning}>
+                Beim Entfernen entscheidet der Server selbstständig: Produkte ohne Bestellbezug werden endgültig inklusive aktueller Bilddateien gelöscht, Produkte mit Bestellbezug werden stattdessen archiviert. Bestell-Snapshots bleiben unverändert erhalten.
+              </div>
+
+              <div className={adminStyles.stack}>
+                <form action={archiveProductAction} className={adminStyles.actionForm}>
+                  <input type="hidden" name="productId" value={selectedProduct.id} />
+                  <label className={adminStyles.checkboxOption}>
+                    <input type="checkbox" name="archiveConfirmed" />
+                    Produkt sofort aus Shop und Checkout ausblenden
+                  </label>
+                  <button type="submit" className={adminStyles.secondaryButton}>Produkt archivieren</button>
+                </form>
+
+                <form action={deleteProductAction} className={adminStyles.actionForm}>
+                  <input type="hidden" name="productId" value={selectedProduct.id} />
+                  <div className={adminStyles.field}>
+                    <label htmlFor="zollhaus-delete-product-name" className={adminStyles.fieldLabel}>Produktname zur Bestätigung erneut eingeben</label>
+                    <input id="zollhaus-delete-product-name" name="deleteProductNameConfirmation" type="text" defaultValue="" required />
+                    <span className={adminStyles.fieldHint}>Exakt eingeben: {selectedProduct.name}</span>
+                  </div>
+                  <label className={adminStyles.checkboxOption}>
+                    <input type="checkbox" name="deleteConfirmed" />
+                    Ich bestätige das endgültige Entfernen oder die automatische Archivierung dieses Produkts.
+                  </label>
+                  <button type="submit" className={adminStyles.dangerButton}>Produkt löschen oder archivieren</button>
+                </form>
+              </div>
+            </section>
+          ) : null}
         </div>
       </section>
 

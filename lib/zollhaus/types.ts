@@ -5,7 +5,7 @@ export const ZOLLHAUS_ORDERS_COLLECTION_PATH = `${ZOLLHAUS_FIRESTORE_ROOT_PATH}/
 export const ZOLLHAUS_SETTINGS_DOCUMENT_PATH = `${ZOLLHAUS_FIRESTORE_ROOT_PATH}/settings/shop`;
 export const ZOLLHAUS_ORDER_REQUESTS_COLLECTION_PATH = `${ZOLLHAUS_FIRESTORE_ROOT_PATH}/orderRequests`;
 
-export type ZollhausProductStatus = 'active' | 'archived';
+export type ZollhausProductStatus = 'active' | 'inactive' | 'archived';
 export type ZollhausOrderStatus = 'new' | 'email_sent' | 'email_failed' | 'invoiced' | 'shipped' | 'cancelled';
 export type ZollhausManagedOrderStatus = 'new' | 'invoiced' | 'shipped' | 'cancelled';
 export type ZollhausOrderEmailState = 'pending' | 'sending' | 'sent' | 'failed';
@@ -35,6 +35,11 @@ export interface ZollhausProduct {
   createdAt: string;
   updatedAt: string;
   archivedAt?: string;
+  archivedBy?: string;
+  archivedByRole?: ZollhausAdminActorRole;
+  restoredAt?: string;
+  restoredBy?: string;
+  restoredByRole?: ZollhausAdminActorRole;
 }
 
 export interface ZollhausShopSettings {

@@ -3,7 +3,7 @@ import 'server-only';
 import { randomUUID } from 'node:crypto';
 import { getStorage } from 'firebase-admin/storage';
 import { getFirebaseDb, getFirebaseStorageBucketCandidates, hasFirebaseConfig } from '@/lib/cms/firebase';
-import { validateZollhausProductImageUpload } from '@/lib/zollhaus/product-image';
+import { isOwnedZollhausProductImagePath, validateZollhausProductImageUpload } from '@/lib/zollhaus/product-image';
 import type { ZollhausProductImage } from '@/lib/zollhaus/types';
 
 function createFirebaseDownloadUrl(bucketName: string, objectName: string, token: string) {
@@ -90,7 +90,10 @@ export async function uploadZollhausProductImage(file: File, productId: string, 
   throw lastError instanceof Error ? lastError : new Error('Das Produktbild konnte nicht gespeichert werden.');
 }
 
-export async function deleteZollhausProductImages(images: Array<Pick<ZollhausProductImage, 'storagePath' | 'url'>>) {
+export async function deleteZollhausProductImages(
+  images: Array<Pick<ZollhausProductImage, 'storagePath' | 'url'>>,
+  options?: { productId?: string },
+) {
   if (!images.length || !hasFirebaseConfig()) {
     return;
   }
@@ -98,6 +101,14 @@ export async function deleteZollhausProductImages(images: Array<Pick<ZollhausPro
   getFirebaseDb();
 
   for (const image of images) {
+    if (!/^zollhaus\/products\//.test(String(image.storagePath || '').trim())) {
+      continue;
+    }
+
+    if (options?.productId && !isOwnedZollhausProductImagePath(image.storagePath, options.productId)) {
+      continue;
+    }
+
     const bucketCandidates = Array.from(
       new Set([extractBucketNameFromUrl(image.url), ...getFirebaseStorageBucketCandidates()].filter(Boolean) as string[]),
     );

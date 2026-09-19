@@ -15,7 +15,12 @@ import {
 } from '@/lib/zollhaus/order-management';
 import { parseEuroAmountToCents, parseNonNegativeInteger } from '@/lib/zollhaus/product-admin';
 import { deleteZollhausProductImages, uploadZollhausProductImage } from '@/lib/zollhaus/product-image-storage';
-import { createZollhausProduct, deleteZollhausProduct, getZollhausProduct, updateZollhausProduct } from '@/lib/zollhaus/products';
+import { archiveZollhausProductForAdmin, removeOrArchiveZollhausProduct, restoreZollhausProductForAdmin } from '@/lib/zollhaus/product-lifecycle';
+import {
+  createZollhausProduct,
+  getZollhausProduct,
+  updateZollhausProduct,
+} from '@/lib/zollhaus/products';
 import { normalizeZollhausProduct } from '@/lib/zollhaus/validation';
 import type { ZollhausProduct, ZollhausProductImage, ZollhausProductStatus } from '@/lib/zollhaus/types';
 
@@ -112,7 +117,7 @@ function buildOrderDetailRedirect(orderId: string, options?: { saved?: string; e
 }
 
 function parseStatus(input: FormDataEntryValue | null): ZollhausProductStatus {
-  return input === 'archived' ? 'archived' : 'active';
+  return input === 'inactive' ? 'inactive' : 'active';
 }
 
 function parseText(input: FormDataEntryValue | null) {
@@ -254,7 +259,7 @@ export async function saveProductAction(formData: FormData) {
     const description = parseTextArea(formData.get('description'));
     const priceCents = parseEuroAmountToCents(formData.get('priceEuro'));
     const stockQuantity = parseNonNegativeInteger(formData.get('stockQuantity'), 'Die verfuegbare Menge');
-    const status = 'active';
+    const status = parseStatus(formData.get('status'));
 
     const imageMutation = await buildProductImagesFromFormData(formData, productId, name, currentProduct);
 
@@ -287,7 +292,7 @@ export async function saveProductAction(formData: FormData) {
       throw error;
     }
 
-    await deleteZollhausProductImages(imageMutation.obsoleteImages);
+    await deleteZollhausProductImages(imageMutation.obsoleteImages, { productId });
     revalidateZollhausProductPages(productId);
 
     redirect(
@@ -303,7 +308,7 @@ export async function saveProductAction(formData: FormData) {
 }
 
 export async function deleteProductAction(formData: FormData) {
-  await requireZollhausAccess('/zollhaus/admin');
+  const session = await requireZollhausAccess('/zollhaus/admin');
 
   try {
     await requireTrustedOrigin();
@@ -326,15 +331,33 @@ export async function deleteProductAction(formData: FormData) {
       throw new Error('Das ausgewaehlte Produkt wurde nicht gefunden.');
     }
 
-    if (currentProduct.stockQuantity > 0) {
-      throw new Error('Produkte koennen nur geloescht werden, wenn sie ausverkauft sind.');
+    if (currentProduct.status === 'archived') {
+      throw new Error('Archivierte Produkte koennen nicht ueber diese Aktion entfernt werden.');
     }
 
-    await deleteZollhausProduct(productId);
-    await deleteZollhausProductImages(currentProduct.images);
+    if (formData.get('deleteConfirmed') !== 'on') {
+      throw new Error('Bitte die Produktentfernung bestaetigen.');
+    }
+
+    const typedProductName = parseText(formData.get('deleteProductNameConfirmation'));
+
+    if (typedProductName !== currentProduct.name) {
+      throw new Error('Bitte den Produktnamen exakt zur Bestaetigung eingeben.');
+    }
+
+    const result = await removeOrArchiveZollhausProduct(productId, {
+      username: session.username,
+      role: session.role,
+    });
+
+    if (result.action === 'deleted') {
+      await deleteZollhausProductImages(result.imagesToDelete, { productId });
+    }
 
     revalidateZollhausProductPages(productId);
-    redirect(buildAdminRedirect({ createMode: true, saved: 'deleted' }));
+    redirect(buildAdminRedirect(result.action === 'deleted'
+      ? { createMode: true, saved: 'deleted' }
+      : { saved: 'archived' }));
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Das Produkt konnte nicht geloescht werden.';
     redirect(buildAdminRedirect({ productId: productId || undefined, error: message }));
@@ -342,7 +365,7 @@ export async function deleteProductAction(formData: FormData) {
 }
 
 export async function archiveProductAction(formData: FormData) {
-  await requireZollhausAccess('/zollhaus/admin');
+  const session = await requireZollhausAccess('/zollhaus/admin');
 
   try {
     await requireTrustedOrigin();
@@ -369,16 +392,50 @@ export async function archiveProductAction(formData: FormData) {
       throw new Error('Das ausgewaehlte Produkt wurde nicht gefunden.');
     }
 
-    await updateZollhausProduct(productId, {
-      ...currentProduct,
-      status: 'archived',
-      archivedAt: new Date().toISOString(),
+    await archiveZollhausProductForAdmin(productId, {
+      username: session.username,
+      role: session.role,
     });
 
     revalidateZollhausProductPages(productId);
     redirect(buildAdminRedirect({ productId, saved: 'archived' }));
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Das Produkt konnte nicht archiviert werden.';
+    redirect(buildAdminRedirect({ productId: productId || undefined, error: message }));
+  }
+}
+
+export async function restoreProductAction(formData: FormData) {
+  const session = await requireZollhausAccess('/zollhaus/admin');
+
+  try {
+    await requireTrustedOrigin();
+  } catch {
+    redirect(buildAdminRedirect({ error: 'Die Anfrage konnte nicht bestaetigt werden.' }));
+  }
+
+  const productId = parseText(formData.get('productId'));
+
+  try {
+    ensureFirebaseAvailable();
+
+    if (!productId) {
+      throw new Error('Es wurde kein Produkt ausgewaehlt.');
+    }
+
+    if (formData.get('restoreConfirmed') !== 'on') {
+      throw new Error('Bitte die Wiederherstellung bestaetigen.');
+    }
+
+    const product = await restoreZollhausProductForAdmin(productId, {
+      username: session.username,
+      role: session.role,
+    });
+
+    revalidateZollhausProductPages(product.id);
+    redirect(buildAdminRedirect({ productId: product.id, saved: 'restored' }));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Das Produkt konnte nicht wiederhergestellt werden.';
     redirect(buildAdminRedirect({ productId: productId || undefined, error: message }));
   }
 }

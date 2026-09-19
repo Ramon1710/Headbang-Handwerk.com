@@ -49,6 +49,7 @@ export interface ZollhausCheckoutTransaction {
   listOrders(): Promise<ZollhausOrder[]>;
   getProducts(productIds: string[]): Promise<Map<string, ZollhausProduct | null>>;
   saveProduct(product: ZollhausProduct): Promise<void>;
+  deleteProduct(productId: string): Promise<void>;
   saveOrder(order: ZollhausOrder): Promise<void>;
   createOrder(order: ZollhausOrder): Promise<void>;
   createOrderRequest(orderRequest: ZollhausOrderRequest): Promise<void>;

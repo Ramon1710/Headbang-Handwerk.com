@@ -78,10 +78,34 @@ function normalizeOptionalText(input: unknown, label: string, maxLength: number)
   return normalizeBoundedText(input, label, { allowEmpty: true, maxLength });
 }
 
+function normalizeOptionalIsoTimestamp(input: unknown, fallback?: string) {
+  try {
+    return String(input || '').trim() ? normalizeIsoTimestamp(input, fallback || new Date().toISOString()) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function normalizeOptionalAdminActorRole(input: unknown) {
+  try {
+    return String(input || '').trim() ? normalizeAdminActorRole(input) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function normalizeOptionalActorName(input: unknown, label: string) {
+  try {
+    return String(input || '').trim() ? normalizeOptionalText(input, label, 160) || undefined : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function normalizeProductStatus(input: unknown): ZollhausProductStatus {
   const value = String(input || '').trim();
 
-  if (value === 'active' || value === 'archived') {
+  if (value === 'active' || value === 'inactive' || value === 'archived') {
     return value;
   }
 
@@ -260,7 +284,12 @@ export function normalizeZollhausProduct(input: unknown, options?: { now?: strin
   const existing = options?.existing;
   const status = normalizeProductStatus(candidate.status ?? existing?.status ?? 'active');
   const createdAt = normalizeIsoTimestamp(candidate.createdAt ?? existing?.createdAt, now);
-  const archivedAt = candidate.archivedAt ?? existing?.archivedAt;
+  const archivedAt = normalizeOptionalIsoTimestamp(candidate.archivedAt ?? existing?.archivedAt, now);
+  const archivedBy = normalizeOptionalActorName(candidate.archivedBy ?? existing?.archivedBy, 'Archiviert von');
+  const archivedByRole = normalizeOptionalAdminActorRole(candidate.archivedByRole ?? existing?.archivedByRole);
+  const restoredAt = normalizeOptionalIsoTimestamp(candidate.restoredAt ?? existing?.restoredAt, now);
+  const restoredBy = normalizeOptionalActorName(candidate.restoredBy ?? existing?.restoredBy, 'Wiederhergestellt von');
+  const restoredByRole = normalizeOptionalAdminActorRole(candidate.restoredByRole ?? existing?.restoredByRole);
 
   return {
     id: normalizeBoundedText(candidate.id ?? existing?.id, 'Produkt-ID', { maxLength: 120 }),
@@ -275,9 +304,12 @@ export function normalizeZollhausProduct(input: unknown, options?: { now?: strin
     status,
     createdAt,
     updatedAt: now,
-    ...(status === 'archived' || archivedAt
-      ? { archivedAt: normalizeIsoTimestamp(archivedAt, now) }
-      : {}),
+    ...(status === 'archived' || archivedAt ? { archivedAt: archivedAt || now } : {}),
+    ...(archivedBy ? { archivedBy } : {}),
+    ...(archivedByRole ? { archivedByRole } : {}),
+    ...(restoredAt ? { restoredAt } : {}),
+    ...(restoredBy ? { restoredBy } : {}),
+    ...(restoredByRole ? { restoredByRole } : {}),
   } satisfies ZollhausProduct;
 }
 

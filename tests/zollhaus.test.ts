@@ -8,7 +8,7 @@ import {
   parseEuroAmountToCents,
   parseNonNegativeInteger,
 } from '@/lib/zollhaus/product-admin';
-import { validateZollhausProductImageUpload } from '@/lib/zollhaus/product-image';
+import { isOwnedZollhausProductImagePath, validateZollhausProductImageUpload } from '@/lib/zollhaus/product-image';
 import {
   buildPublicDescriptionExcerpt,
   getPublicAvailabilityLabel,
@@ -46,6 +46,11 @@ import {
   sendZollhausOrderEmails,
 } from '@/lib/zollhaus/order-email';
 import { clearZollhausCartAfterSuccess, removeUnavailableZollhausCartItems } from '@/lib/zollhaus/cart';
+import {
+  archiveZollhausProductForAdmin,
+  removeOrArchiveZollhausProduct,
+  restoreZollhausProductForAdmin,
+} from '@/lib/zollhaus/product-lifecycle';
 import type { ZollhausOrder, ZollhausOrderRequest, ZollhausProduct, ZollhausShopSettings } from '@/lib/zollhaus/types';
 
 test('Produktdaten werden getrimmt und Bildreihenfolge wird eindeutig normalisiert', () => {
@@ -281,6 +286,22 @@ test('Archivierung veraendert keine Headbang-Daten', () => {
   assert.equal(headbangSnapshot.merchandise[0]?.id, 'festival-shirt-black');
 });
 
+test('inaktive Produkte werden normalisiert und als inaktiv gekennzeichnet', () => {
+  const product = normalizeZollhausProduct({
+    id: 'inactive-product',
+    name: 'Zwischengespeichert',
+    description: 'Noch nicht sichtbar',
+    priceCents: 1000,
+    stockQuantity: 2,
+    status: 'inactive',
+    images: [],
+  });
+
+  assert.equal(product.status, 'inactive');
+  assert.equal(getZollhausProductDisplayStatus(product), 'Inaktiv');
+  assert.equal(getPublicAvailabilityLabel(product), 'Nicht öffentlich verfügbar');
+});
+
 test('Zollhaus-Admin kann keine Headbang-Action ausfuehren', () => {
   const session = buildAdminSession({ username: 'zollhaus', role: 'zollhaus-admin' });
 
@@ -463,6 +484,9 @@ class InMemoryCheckoutStore implements ZollhausCheckoutStore {
       getProducts: async (productIds) => new Map(productIds.map((productId) => [productId, draftProducts.get(productId) ? structuredClone(draftProducts.get(productId)!) : null])),
       saveProduct: async (product) => {
         draftProducts.set(product.id, structuredClone(product));
+      },
+      deleteProduct: async (productId) => {
+        draftProducts.delete(productId);
       },
       saveOrder: async (order) => {
         draftOrders.set(order.id, structuredClone(order));
@@ -694,6 +718,128 @@ test('archivierte Produkte werden im Checkout abgewiesen', async () => {
     () => submitZollhausCheckout({ idempotencyKey: 'archived-12345', customer: buildCheckoutCustomer(), items: [{ productId: 'checkout-product', quantity: 1 }] }, { store }),
     /nicht mehr verfuegbar/,
   );
+});
+
+test('inaktive Produkte werden im Checkout ebenfalls abgewiesen', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct({ status: 'inactive' })] });
+
+  await assert.rejects(
+    () => submitZollhausCheckout({ idempotencyKey: 'inactive-12345', customer: buildCheckoutCustomer(), items: [{ productId: 'checkout-product', quantity: 1 }] }, { store }),
+    /nicht mehr verfuegbar/,
+  );
+});
+
+test('Produkte ohne Bestellbezug werden endgültig gelöscht', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct({ id: 'delete-no-order' })] });
+
+  const result = await removeOrArchiveZollhausProduct(
+    'delete-no-order',
+    { username: 'admin', role: 'zollhaus-admin' },
+    { store, now: () => new Date('2026-09-19T12:00:00.000Z') },
+  );
+
+  assert.equal(result.action, 'deleted');
+  assert.equal(result.imagesToDelete.length, 1);
+  assert.equal(store.products.has('delete-no-order'), false);
+  assert.equal(store.orders.size, 0);
+});
+
+test('Produkte mit Bestellbezug werden serverseitig archiviert statt gelöscht', async () => {
+  const product = buildCheckoutProduct({ id: 'archive-with-order', stockQuantity: 5, name: 'Archivprodukt' });
+  const store = new InMemoryCheckoutStore({ products: [product] });
+
+  await submitZollhausCheckout(
+    { idempotencyKey: 'archive-order-12345', customer: buildCheckoutCustomer(), items: [{ productId: 'archive-with-order', quantity: 1 }] },
+    { store, createOrderId: () => 'order-archive-product', createOrderNumber: () => 'ZH-20260919-ARCHV234' },
+  );
+
+  const result = await removeOrArchiveZollhausProduct(
+    'archive-with-order',
+    { username: 'headbang', role: 'headbang-admin' },
+    { store, now: () => new Date('2026-09-19T12:30:00.000Z') },
+  );
+
+  const storedProduct = store.products.get('archive-with-order');
+  const storedOrder = store.orders.get('order-archive-product');
+
+  assert.equal(result.action, 'archived');
+  assert.equal(result.imagesToDelete.length, 0);
+  assert.equal(storedProduct?.status, 'archived');
+  assert.equal(storedProduct?.archivedBy, 'headbang');
+  assert.equal(storedProduct?.archivedByRole, 'headbang-admin');
+  assert.equal(storedOrder?.items[0]?.productSnapshot.name, 'Archivprodukt');
+});
+
+test('archivierte Produkte lassen sich als inaktiv wiederherstellen', async () => {
+  const store = new InMemoryCheckoutStore({
+    products: [buildCheckoutProduct({ id: 'restore-product', status: 'archived', archivedAt: '2026-09-18T10:00:00.000Z' })],
+  });
+
+  const restored = await restoreZollhausProductForAdmin(
+    'restore-product',
+    { username: 'z-admin', role: 'zollhaus-admin' },
+    { store, now: () => new Date('2026-09-19T13:00:00.000Z') },
+  );
+
+  assert.equal(restored.status, 'inactive');
+  assert.equal(restored.restoredBy, 'z-admin');
+  assert.equal(restored.restoredByRole, 'zollhaus-admin');
+  assert.equal(store.products.get('restore-product')?.status, 'inactive');
+  assert.equal(toPublicZollhausProducts([store.products.get('restore-product')!]).length, 0);
+});
+
+test('manuelle Archivierung schreibt Auditfelder', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct({ id: 'archive-direct' })] });
+
+  const archived = await archiveZollhausProductForAdmin(
+    'archive-direct',
+    { username: 'z-admin', role: 'zollhaus-admin' },
+    { store, now: () => new Date('2026-09-19T13:15:00.000Z') },
+  );
+
+  assert.equal(archived.status, 'archived');
+  assert.equal(archived.archivedBy, 'z-admin');
+  assert.equal(archived.archivedByRole, 'zollhaus-admin');
+});
+
+test('gleichzeitiger Checkout und Entfernen führen bei bestehender Bestellung nicht zur Hard-Delete-Lücke', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct({ id: 'race-product', stockQuantity: 1 })] });
+
+  const checkoutPromise = submitZollhausCheckout(
+    { idempotencyKey: 'race-checkout-12345', customer: buildCheckoutCustomer(), items: [{ productId: 'race-product', quantity: 1 }] },
+    { store, createOrderId: () => 'order-race-product', createOrderNumber: () => 'ZH-20260919-RACEX234' },
+  );
+
+  const lifecyclePromise = removeOrArchiveZollhausProduct(
+    'race-product',
+    { username: 'z-admin', role: 'zollhaus-admin' },
+    { store, now: () => new Date('2026-09-19T14:00:00.000Z') },
+  );
+
+  const [checkoutResult, lifecycleResult] = await Promise.all([checkoutPromise, lifecyclePromise]);
+
+  assert.equal(checkoutResult.created, true);
+  assert.equal(lifecycleResult.action, 'archived');
+  assert.equal(store.orders.has('order-race-product'), true);
+  assert.equal(store.products.get('race-product')?.status, 'archived');
+});
+
+test('Produktbild-Löschpfade werden nur für das passende Produkt akzeptiert', () => {
+  assert.equal(isOwnedZollhausProductImagePath('zollhaus/products/product-1234/ABCDEFGH', 'product-1234'), true);
+  assert.equal(isOwnedZollhausProductImagePath('zollhaus/products/other-product/ABCDEFGH', 'product-1234'), false);
+  assert.equal(isOwnedZollhausProductImagePath('partnerSites/zollhaus/products/product-1234/ABCDEFGH', 'product-1234'), false);
+});
+
+test('Adminseite enthält starke Bestätigungen für Entfernen und Wiederherstellen', () => {
+  const adminPageSource = readFileSync('/workspaces/Headbang-Handwerk.com/app/zollhaus/admin/page.tsx', 'utf8');
+  const adminActionSource = readFileSync('/workspaces/Headbang-Handwerk.com/app/zollhaus/admin/actions.ts', 'utf8');
+
+  assert.equal(adminPageSource.includes('deleteProductNameConfirmation'), true);
+  assert.equal(adminPageSource.includes('Produkt als inaktiv wiederherstellen'), true);
+  assert.equal(adminPageSource.includes('option value="inactive"'), true);
+  assert.equal(adminActionSource.includes("formData.get('deleteConfirmed') !== 'on'"), true);
+  assert.equal(adminActionSource.includes("formData.get('restoreConfirmed') !== 'on'"), true);
+  assert.equal(adminActionSource.includes('removeOrArchiveZollhausProduct'), true);
 });
 
 test('Bestand 0 und Mengen groesser als Bestand werden abgewiesen', async () => {

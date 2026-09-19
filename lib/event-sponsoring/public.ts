@@ -69,6 +69,18 @@ function sortPackages(packages: EventSponsoringPackage[]) {
   });
 }
 
+function getPublicPackagePriceLabel(pkg: EventSponsoringPackage, config: EventSponsoringConfig) {
+  if (pkg.kind === 'anonymous_support' && pkg.priceCents <= 0) {
+    return `ab ${formatEuroCents(config.anonymousMinimumAmountCents)}`;
+  }
+
+  if (pkg.priceCents <= 0) {
+    return 'Preis auf Anfrage';
+  }
+
+  return formatEuroCents(pkg.priceCents);
+}
+
 export function resolveEventSponsoringPublicAccess(args: {
   event: Event;
   config: EventSponsoringConfig | null;
@@ -129,10 +141,7 @@ export function buildEventSponsoringPublicPageView(args: {
       name: pkg.name,
       description: pkg.description,
       features: [...pkg.features],
-      priceLabel:
-        pkg.kind === 'anonymous_support' && pkg.priceCents <= 0
-          ? `ab ${formatEuroCents(args.config.anonymousMinimumAmountCents)}`
-          : formatEuroCents(pkg.priceCents),
+      priceLabel: getPublicPackagePriceLabel(pkg, args.config),
       ...(pkg.logoSlotSize !== 'none' ? { logoSizeLabel: getLogoSizeLabel(pkg.logoSlotSize) } : {}),
       actionLabel: 'Paket auswählen',
       actionHref: `/veranstaltungen/${encodeURIComponent(args.event.id)}/sponsoring/anfrage?package=${encodeURIComponent(pkg.id)}`,
