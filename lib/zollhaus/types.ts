@@ -9,7 +9,7 @@ export type ZollhausProductStatus = 'active' | 'archived';
 export type ZollhausOrderStatus = 'new' | 'email_sent' | 'email_failed' | 'invoiced' | 'shipped' | 'cancelled';
 export type ZollhausManagedOrderStatus = 'new' | 'invoiced' | 'shipped' | 'cancelled';
 export type ZollhausOrderEmailState = 'pending' | 'sending' | 'sent' | 'failed';
-export type ZollhausOrderEmailErrorCategory = 'not_configured' | 'transport_error' | 'unknown';
+export type ZollhausOrderEmailErrorCategory = 'not_configured' | 'transport_error' | 'invalid_recipient' | 'unknown';
 export type ZollhausOrderRequestState = 'started' | 'completed' | 'failed';
 export type ZollhausAdminActorRole = 'headbang-admin' | 'zollhaus-admin';
 
@@ -88,6 +88,7 @@ export interface ZollhausOrderEmailStatus {
   lastAttemptAt?: string;
   sentAt?: string;
   lastErrorCategory?: ZollhausOrderEmailErrorCategory;
+  lastErrorMessage?: string;
   providerMessageId?: string;
   sendingClaimId?: string;
   sendingClaimedAt?: string;
@@ -102,6 +103,7 @@ export interface ZollhausOrder {
   totalPriceCents: number;
   idempotencyKey: string;
   email: ZollhausOrderEmailStatus;
+  customerEmail: ZollhausOrderEmailStatus;
   createdAt: string;
   updatedAt: string;
   statusUpdatedAt?: string;

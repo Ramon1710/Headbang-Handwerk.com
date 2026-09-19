@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { StandPageContent } from '@/components/stand-page-content';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { getCmsContent } from '@/lib/cms/storage';
+import { resolveEventDetailViewMode } from '@/lib/events';
 
 interface EventStandPageProps {
   params: Promise<{ eventId: string }>;
@@ -38,7 +39,7 @@ export default async function EventStandPage({ params, searchParams }: EventStan
     notFound();
   }
 
-  if (!event.standEnabled && !isAdmin) {
+  if (resolveEventDetailViewMode(event) !== 'stand3d' && !isAdmin) {
     notFound();
   }
 

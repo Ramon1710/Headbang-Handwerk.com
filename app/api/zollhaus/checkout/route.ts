@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { hasTrustedRequestOrigin } from '@/lib/cms/auth';
 import {
@@ -7,9 +8,19 @@ import {
   ZollhausCheckoutError,
 } from '@/lib/zollhaus/checkout';
 import { createZollhausConfirmationToken } from '@/lib/zollhaus/confirmation-token';
-import { sendZollhausOrderEmail } from '@/lib/zollhaus/order-email';
+import { sendZollhausOrderEmails } from '@/lib/zollhaus/order-email';
 import { assertZollhausOrderAllowed, getPublicOrderClientIp, recordZollhausOrderAttempt } from '@/lib/zollhaus/public-order-rate-limit';
 import { submitPublicZollhausCheckout } from '@/lib/zollhaus/checkout-store';
+
+function revalidateSuccessfulZollhausCheckout(productIds: string[]) {
+  revalidatePath('/zollhaus');
+  revalidatePath('/zollhaus/bestellen');
+  revalidatePath('/zollhaus/admin');
+
+  for (const productId of new Set(productIds.map((value) => value.trim()).filter(Boolean))) {
+    revalidatePath(`/zollhaus/produkt/${encodeURIComponent(productId)}`);
+  }
+}
 
 export async function POST(request: Request) {
   if (!hasTrustedRequestOrigin(request)) {
@@ -56,9 +67,11 @@ export async function POST(request: Request) {
       items: items as never,
     });
 
+    revalidateSuccessfulZollhausCheckout(result.items.map((item) => item.productId));
+
     if (result.created) {
       try {
-        await sendZollhausOrderEmail(result.orderId);
+        await sendZollhausOrderEmails(result.orderId);
       } catch {
         console.error('Zollhaus order email dispatch failed unexpectedly', { orderNumber: result.orderNumber, category: 'unknown' });
       }

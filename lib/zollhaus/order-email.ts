@@ -5,6 +5,9 @@ import { normalizeZollhausOrder } from '@/lib/zollhaus/validation';
 import type { ZollhausOrder, ZollhausOrderEmailErrorCategory, ZollhausOrderEmailStatus } from '@/lib/zollhaus/types';
 
 const CLAIM_TIMEOUT_MS = 5 * 60 * 1000;
+const ZOLLHAUS_CUSTOMER_REPLY_TO = 'info@zollhaus-leer.com';
+
+type ZollhausOrderEmailKind = 'internal' | 'customer';
 
 export type ZollhausOrderEmailOutcome =
   | { status: 'sent'; order: ZollhausOrder; messageId: string | null }
@@ -17,6 +20,8 @@ export interface ZollhausOrderEmailTransport {
     subject: string;
     text: string;
     html: string;
+    from?: string;
+    replyTo?: string;
     messageId: string;
     headers: Record<string, string>;
   }): Promise<{ messageId?: string | null }>;
@@ -25,6 +30,21 @@ export interface ZollhausOrderEmailTransport {
 export interface ZollhausOrderEmailLogger {
   info(message: string, meta?: Record<string, unknown>): void;
   error(message: string, meta?: Record<string, unknown>): void;
+}
+
+interface ZollhausOrderEmailContent {
+  subject: string;
+  text: string;
+  html: string;
+  from?: string;
+  replyTo?: string;
+}
+
+interface ZollhausOrderEmailSendOptions {
+  store?: ZollhausCheckoutStore;
+  transport?: ZollhausOrderEmailTransport;
+  logger?: ZollhausOrderEmailLogger;
+  now?: () => Date;
 }
 
 function getDefaultTransport(): ZollhausOrderEmailTransport {
@@ -67,6 +87,47 @@ async function getRecipientAddress(store?: ZollhausCheckoutStore) {
   }
 }
 
+function sanitizeEmailHeaderValue(value: string, label: string) {
+  const normalized = sanitizeHeaderValue(value);
+
+  if (!normalized) {
+    throw new Error(`${label} fehlt.`);
+  }
+
+  if (/[\r\n]/.test(value)) {
+    throw new Error(`${label} ist ungueltig.`);
+  }
+
+  return normalized;
+}
+
+function isValidEmailAddress(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function sanitizeEmailAddress(value: string, label: string) {
+  const normalized = sanitizeEmailHeaderValue(value, label);
+
+  if (!isValidEmailAddress(normalized)) {
+    throw new Error(`${label} ist ungueltig.`);
+  }
+
+  return normalized;
+}
+
+function extractConfiguredSenderAddress() {
+  const configured = String(process.env.SMTP_FROM || process.env.SMTP_USER || '').trim();
+  const match = configured.match(/<([^>]+)>/);
+  const candidate = match?.[1] || configured;
+  return sanitizeEmailAddress(candidate, 'Absenderadresse');
+}
+
+function buildDisplaySender(displayName: string) {
+  const safeDisplayName = sanitizeHeaderValue(displayName).replace(/[<>]/g, '');
+  const address = extractConfiguredSenderAddress();
+  return `${safeDisplayName} <${address}>`;
+}
+
 function isSmtpConfigured() {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
 }
@@ -102,6 +163,10 @@ function categorizeEmailError(error: unknown): ZollhausOrderEmailErrorCategory {
     return 'not_configured';
   }
 
+  if (message.includes('Empfaengeradresse ist ungueltig') || message.includes('Kundenadresse ist ungueltig') || message.includes('Reply-To ist ungueltig') || message.includes('Absenderadresse ist ungueltig')) {
+    return 'invalid_recipient';
+  }
+
   if (message) {
     return 'transport_error';
   }
@@ -134,9 +199,32 @@ function canClaimEmailSend(email: ZollhausOrderEmailStatus, nowMs: number) {
   return { allowed: true as const };
 }
 
-export function createZollhausOrderEmailMessageId(order: Pick<ZollhausOrder, 'id' | 'orderNumber'>) {
-  const digest = createHash('sha256').update(order.id).update(':').update(order.orderNumber).digest('hex').slice(0, 24);
-  return `<zollhaus-order-${digest}@${getMessageIdDomain()}>`;
+function getEmailStatusForKind(order: ZollhausOrder, kind: ZollhausOrderEmailKind) {
+  return kind === 'internal' ? order.email : order.customerEmail;
+}
+
+function getSafeEmailErrorMessage(category: ZollhausOrderEmailErrorCategory) {
+  switch (category) {
+    case 'not_configured':
+      return 'Mailversand ist nicht konfiguriert.';
+    case 'invalid_recipient':
+      return 'Empfaengeradresse ist ungueltig.';
+    case 'transport_error':
+      return 'Mailversand fehlgeschlagen.';
+    default:
+      return 'Unbekannter Mailfehler.';
+  }
+}
+
+function applyEmailStatusForKind(order: ZollhausOrder, kind: ZollhausOrderEmailKind, emailStatus: ZollhausOrderEmailStatus) {
+  return kind === 'internal'
+    ? { ...order, email: emailStatus }
+    : { ...order, customerEmail: emailStatus };
+}
+
+export function createZollhausOrderEmailMessageId(order: Pick<ZollhausOrder, 'id' | 'orderNumber'>, kind: ZollhausOrderEmailKind = 'internal') {
+  const digest = createHash('sha256').update(order.id).update(':').update(order.orderNumber).update(':').update(kind).digest('hex').slice(0, 24);
+  return `<zollhaus-order-${kind}-${digest}@${getMessageIdDomain()}>`;
 }
 
 export function buildZollhausOrderEmailContent(order: ZollhausOrder) {
@@ -195,7 +283,132 @@ export function buildZollhausOrderEmailContent(order: ZollhausOrder) {
   return { subject, text, html };
 }
 
-async function claimZollhausOrderEmailSend(orderId: string, now: Date, store: ZollhausCheckoutStore) {
+function getOptionalItemVariant(item: ZollhausOrder['items'][number]) {
+  const itemRecord = item as unknown as Record<string, unknown>;
+  const snapshotRecord = item.productSnapshot as unknown as Record<string, unknown>;
+  const candidates = [
+    itemRecord.variantLabel,
+    itemRecord.variant,
+    snapshotRecord.variantLabel,
+    snapshotRecord.variant,
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  return null;
+}
+
+function buildCustomerOrderConfirmationContent(order: ZollhausOrder): ZollhausOrderEmailContent {
+  const subject = sanitizeHeaderValue(`Bestellbestätigung – Bestellung ${order.orderNumber}`);
+  const orderDate = new Date(order.createdAt).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
+  const replyTo = sanitizeEmailAddress(ZOLLHAUS_CUSTOMER_REPLY_TO, 'Reply-To');
+  const from = buildDisplaySender('Zollhaus Shop');
+  const itemLines = order.items.map((item) => {
+    const variant = getOptionalItemVariant(item);
+    const lineTotal = formatEuro(item.unitPriceCents * item.quantity);
+    return {
+      name: item.productName,
+      variant,
+      quantity: String(item.quantity),
+      unitPrice: formatEuro(item.unitPriceCents),
+      lineTotal,
+    };
+  });
+
+  const customerDetails = [
+    ['Vorname', order.customer.firstName],
+    ['Nachname', order.customer.lastName],
+    ['E-Mail-Adresse', order.customer.email],
+    ['Telefonnummer', order.customer.phone],
+    ['Straße', order.customer.street],
+    ['Hausnummer', order.customer.houseNumber],
+    ['Postleitzahl', order.customer.postalCode],
+    ['Ort', order.customer.city],
+  ].filter(([, value]) => Boolean(String(value || '').trim()));
+
+  const text = [
+    `Guten Tag ${order.customer.firstName} ${order.customer.lastName},`,
+    '',
+    'vielen Dank für Ihre Bestellung im Zollhaus-Shop. Das Zollhaus-Team bedankt sich für Ihr Vertrauen.',
+    '',
+    'Wir haben den Eingang Ihrer Bestellung bestätigt. Das Zollhaus-Team wird Ihre Bestellung nun bearbeiten, die Rechnung erstellen und Ihnen diese in Kürze separat per E-Mail zusenden.',
+    '',
+    'Bitte verwenden Sie für die Zahlung ausschließlich die Zahlungsinformationen aus der Rechnung, die Sie direkt vom Zollhaus-Team erhalten. Nach Eingang Ihrer Zahlung wird die Ware durch das Zollhaus-Team an die von Ihnen angegebene Lieferadresse versandt.',
+    '',
+    'Nachfolgend finden Sie eine Zusammenfassung Ihrer Bestellung.',
+    '',
+    `Bestellnummer: ${order.orderNumber}`,
+    `Bestelldatum: ${orderDate}`,
+    '',
+    'Bestellübersicht',
+    ...itemLines.flatMap((item) => [
+      `- Produktname: ${item.name}`,
+      ...(item.variant ? [`  Variante: ${item.variant}`] : []),
+      `  Menge: ${item.quantity}`,
+      `  Einzelpreis: ${item.unitPrice}`,
+      `  Positionssumme: ${item.lineTotal}`,
+    ]),
+    `Zwischensumme: ${formatEuro(order.totalPriceCents)}`,
+    `Gesamtsumme: ${formatEuro(order.totalPriceCents)}`,
+    '',
+    'Ihre Angaben',
+    ...customerDetails.map(([label, value]) => `${label}: ${value}`),
+    '',
+    'Bitte beachten Sie: Diese E-Mail bestätigt ausschließlich den Eingang Ihrer Bestellung. Sie ist keine Rechnung und enthält noch keine Zahlungsaufforderung. Die Rechnung wird Ihnen separat durch das Zollhaus-Team zugesandt.',
+    '',
+    'Vielen Dank für Ihre Bestellung.',
+    '',
+    'Ihr Zollhaus-Team',
+    '',
+    'Falls Sie diese E-Mail irrtümlich erhalten haben, bitten wir Sie um eine kurze Rückmeldung an info@zollhaus-leer.com. Löschen Sie diese Nachricht anschließend bitte.',
+  ].join('\n');
+
+  const html = [
+    '<!doctype html>',
+    '<html><body style="margin:0;padding:24px;background:#f4fbfd;color:#1f2528;font-family:Segoe UI,Arial,sans-serif;line-height:1.6;">',
+    '<div style="max-width:720px;margin:0 auto;background:#ffffff;border:1px solid #d7e9ef;border-radius:20px;overflow:hidden;">',
+    '<div style="height:6px;background:linear-gradient(90deg,#ffd54d,#c7f1d8,#d9f0ff);"></div>',
+    '<div style="padding:28px 24px;">',
+    `<h1 style="margin:0 0 18px;font-size:28px;line-height:1.2;color:#1f2528;">${escapeHtml(subject)}</h1>`,
+    `<p style="margin:0 0 16px;">Guten Tag ${escapeHtml(order.customer.firstName)} ${escapeHtml(order.customer.lastName)},</p>`,
+    '<p style="margin:0 0 16px;">vielen Dank für Ihre Bestellung im Zollhaus-Shop. Das Zollhaus-Team bedankt sich für Ihr Vertrauen.</p>',
+    '<p style="margin:0 0 16px;">Wir haben den Eingang Ihrer Bestellung bestätigt. Das Zollhaus-Team wird Ihre Bestellung nun bearbeiten, die Rechnung erstellen und Ihnen diese in Kürze separat per E-Mail zusenden.</p>',
+    '<p style="margin:0 0 20px;">Bitte verwenden Sie für die Zahlung ausschließlich die Zahlungsinformationen aus der Rechnung, die Sie direkt vom Zollhaus-Team erhalten. Nach Eingang Ihrer Zahlung wird die Ware durch das Zollhaus-Team an die von Ihnen angegebene Lieferadresse versandt.</p>',
+    '<p style="margin:0 0 20px;">Nachfolgend finden Sie eine Zusammenfassung Ihrer Bestellung.</p>',
+    '<div style="border:1px solid #d7e9ef;border-radius:16px;padding:16px 18px;background:#f9fcff;margin:0 0 20px;">',
+    `<p style="margin:0 0 8px;"><strong>Bestellnummer:</strong> ${escapeHtml(order.orderNumber)}</p>`,
+    `<p style="margin:0;"><strong>Bestelldatum:</strong> ${escapeHtml(orderDate)}</p>`,
+    '</div>',
+    '<h2 style="margin:0 0 12px;font-size:20px;">Bestellübersicht</h2>',
+    '<div style="overflow-x:auto;margin:0 0 20px;">',
+    '<table style="width:100%;border-collapse:collapse;min-width:520px;">',
+    '<thead><tr><th align="left" style="padding:10px;border-bottom:2px solid #cfe4ef;">Produkt</th><th align="left" style="padding:10px;border-bottom:2px solid #cfe4ef;">Menge</th><th align="left" style="padding:10px;border-bottom:2px solid #cfe4ef;">Einzelpreis</th><th align="left" style="padding:10px;border-bottom:2px solid #cfe4ef;">Positionssumme</th></tr></thead>',
+    '<tbody>',
+    ...itemLines.map((item) => `<tr><td style="padding:10px;border-bottom:1px solid #e3eef2;overflow-wrap:anywhere;"><strong>${escapeHtml(item.name)}</strong>${item.variant ? `<div style="margin-top:4px;color:#5a6d73;">Variante: ${escapeHtml(item.variant)}</div>` : ''}</td><td style="padding:10px;border-bottom:1px solid #e3eef2;">${escapeHtml(item.quantity)}</td><td style="padding:10px;border-bottom:1px solid #e3eef2;">${escapeHtml(item.unitPrice)}</td><td style="padding:10px;border-bottom:1px solid #e3eef2;">${escapeHtml(item.lineTotal)}</td></tr>`),
+    `<tr><td colspan="3" style="padding:12px 10px;border-bottom:1px solid #e3eef2;"><strong>Zwischensumme</strong></td><td style="padding:12px 10px;border-bottom:1px solid #e3eef2;"><strong>${escapeHtml(formatEuro(order.totalPriceCents))}</strong></td></tr>`,
+    `<tr><td colspan="3" style="padding:12px 10px;"><strong>Gesamtsumme</strong></td><td style="padding:12px 10px;"><strong>${escapeHtml(formatEuro(order.totalPriceCents))}</strong></td></tr>`,
+    '</tbody></table></div>',
+    '<h2 style="margin:0 0 12px;font-size:20px;">Ihre Angaben</h2>',
+    '<div style="border:1px solid #d7e9ef;border-radius:16px;padding:16px 18px;background:#f9fcff;margin:0 0 20px;">',
+    ...customerDetails.map(([label, value]) => `<p style="margin:0 0 8px;overflow-wrap:anywhere;"><strong>${escapeHtml(label)}:</strong> ${escapeHtml(String(value))}</p>`),
+    '</div>',
+    '<div style="border:1px solid #f1d7b8;border-radius:16px;padding:16px 18px;background:#fff7ef;margin:0 0 20px;">',
+    '<strong>Bitte beachten Sie:</strong> Diese E-Mail bestätigt ausschließlich den Eingang Ihrer Bestellung. Sie ist keine Rechnung und enthält noch keine Zahlungsaufforderung. Die Rechnung wird Ihnen separat durch das Zollhaus-Team zugesandt.',
+    '</div>',
+    '<p style="margin:0 0 6px;">Vielen Dank für Ihre Bestellung.</p>',
+    '<p style="margin:0 0 18px;">Ihr Zollhaus-Team</p>',
+    '<p style="margin:0;color:#5a6d73;font-size:14px;">Falls Sie diese E-Mail irrtümlich erhalten haben, bitten wir Sie um eine kurze Rückmeldung an <a href="mailto:info@zollhaus-leer.com" style="color:#2b6f8f;">info@zollhaus-leer.com</a>. Löschen Sie diese Nachricht anschließend bitte.</p>',
+    '</div></div></body></html>',
+  ].join('');
+
+  return { subject, text, html, from, replyTo };
+}
+
+async function claimZollhausOrderEmailSend(orderId: string, kind: ZollhausOrderEmailKind, now: Date, store: ZollhausCheckoutStore) {
   const nowIso = now.toISOString();
   const claimId = randomUUID();
 
@@ -206,7 +419,8 @@ async function claimZollhausOrderEmailSend(orderId: string, now: Date, store: Zo
       throw new Error('ORDER_NOT_FOUND');
     }
 
-    const claimState = canClaimEmailSend(order.email, now.getTime());
+    const currentEmailStatus = getEmailStatusForKind(order, kind);
+    const claimState = canClaimEmailSend(currentEmailStatus, now.getTime());
 
     if (!claimState.allowed) {
       return {
@@ -216,20 +430,20 @@ async function claimZollhausOrderEmailSend(orderId: string, now: Date, store: Zo
       } as const;
     }
 
-    const nextOrder = normalizeZollhausOrder(
-      {
-        ...order,
-        email: {
-          ...order.email,
-          state: 'sending',
-          attemptCount: order.email.attemptCount + 1,
-          lastAttemptAt: nowIso,
-          sendingClaimId: claimId,
-          sendingClaimedAt: nowIso,
-        },
-      },
-      { existing: order, now: nowIso },
-    );
+    const nextEmailStatus: ZollhausOrderEmailStatus = {
+      ...currentEmailStatus,
+      state: 'sending',
+      attemptCount: currentEmailStatus.attemptCount + 1,
+      lastAttemptAt: nowIso,
+      sendingClaimId: claimId,
+      sendingClaimedAt: nowIso,
+    };
+
+    const nextOrder = normalizeZollhausOrder(applyEmailStatusForKind(order, kind, nextEmailStatus), {
+      existing: order,
+      now: nowIso,
+      tolerateInvalidCustomerEmail: true,
+    });
 
     await transaction.saveOrder(nextOrder);
 
@@ -243,6 +457,7 @@ async function claimZollhausOrderEmailSend(orderId: string, now: Date, store: Zo
 
 async function finalizeZollhausOrderEmailSend(params: {
   orderId: string;
+  kind: ZollhausOrderEmailKind;
   claimId: string;
   sent: boolean;
   now: Date;
@@ -259,27 +474,30 @@ async function finalizeZollhausOrderEmailSend(params: {
       throw new Error('ORDER_NOT_FOUND');
     }
 
-    if (order.email.sendingClaimId !== params.claimId) {
+    const currentEmailStatus = getEmailStatusForKind(order, params.kind);
+
+    if (currentEmailStatus.sendingClaimId !== params.claimId) {
       return order;
     }
 
-    const nextOrder = normalizeZollhausOrder(
-      {
-        ...order,
-        email: {
-          ...order.email,
-          state: params.sent ? 'sent' : 'failed',
-          ...(params.sent ? { sentAt: nowIso } : {}),
-          ...(params.providerMessageId ? { providerMessageId: params.providerMessageId } : {}),
-          ...(params.category ? { lastErrorCategory: params.category } : {}),
-          ...(!params.sent ? {} : { lastErrorCategory: undefined }),
-        },
-      },
-      { existing: order, now: nowIso },
-    );
+    const nextEmailStatus: ZollhausOrderEmailStatus = {
+      ...currentEmailStatus,
+      state: params.sent ? 'sent' : 'failed',
+      ...(params.sent ? { sentAt: nowIso } : {}),
+      ...(params.providerMessageId ? { providerMessageId: params.providerMessageId } : {}),
+      ...(params.category ? { lastErrorCategory: params.category } : {}),
+      ...(params.category ? { lastErrorMessage: getSafeEmailErrorMessage(params.category) } : {}),
+      ...(!params.sent ? {} : { lastErrorCategory: undefined, lastErrorMessage: undefined }),
+    };
 
-    delete (nextOrder.email as Partial<ZollhausOrder['email']>).sendingClaimId;
-    delete (nextOrder.email as Partial<ZollhausOrder['email']>).sendingClaimedAt;
+    delete (nextEmailStatus as Partial<ZollhausOrderEmailStatus>).sendingClaimId;
+    delete (nextEmailStatus as Partial<ZollhausOrderEmailStatus>).sendingClaimedAt;
+
+    const nextOrder = normalizeZollhausOrder(applyEmailStatusForKind(order, params.kind, nextEmailStatus), {
+      existing: order,
+      now: nowIso,
+      tolerateInvalidCustomerEmail: true,
+    });
 
     await transaction.saveOrder(nextOrder);
     return nextOrder;
@@ -299,20 +517,18 @@ export async function isZollhausOrderEmailSent(orderId: string) {
   return email?.state === 'sent';
 }
 
-export async function sendZollhausOrderEmail(
+async function sendZollhausOrderEmailByKind(
+  kind: ZollhausOrderEmailKind,
   orderId: string,
-  options?: {
-    store?: ZollhausCheckoutStore;
-    transport?: ZollhausOrderEmailTransport;
-    logger?: ZollhausOrderEmailLogger;
-    now?: () => Date;
-  },
+  options: ZollhausOrderEmailSendOptions | undefined,
+  resolveRecipient: (order: ZollhausOrder, store: ZollhausCheckoutStore) => Promise<string>,
+  buildContent: (order: ZollhausOrder) => ZollhausOrderEmailContent,
 ) {
   const now = options?.now?.() ?? new Date();
   const store = await resolveStore(options?.store);
   const transport = options?.transport || getDefaultTransport();
   const logger = options?.logger || getDefaultLogger();
-  const claim = await claimZollhausOrderEmailSend(orderId, now, store);
+  const claim = await claimZollhausOrderEmailSend(orderId, kind, now, store);
 
   if (!claim.claimed) {
     return {
@@ -322,70 +538,174 @@ export async function sendZollhausOrderEmail(
     } satisfies ZollhausOrderEmailOutcome;
   }
 
-  const recipient = await getRecipientAddress(store);
+  let recipient = '';
 
-  if (!recipient || !isSmtpConfigured()) {
-    const category = 'not_configured' as const;
+  try {
+    recipient = await resolveRecipient(claim.order, store);
+  } catch (error) {
+    const category = categorizeEmailError(error);
     const failedOrder = await finalizeZollhausOrderEmailSend({
       orderId,
+      kind,
       claimId: claim.claimId,
       sent: false,
       now,
       store,
       category,
     });
-    logger.error('Zollhaus order email failed', { orderNumber: claim.order.orderNumber, category });
+    logger.error(`Zollhaus ${kind} email failed`, { orderNumber: claim.order.orderNumber, category });
     return { status: 'failed', order: failedOrder, category } satisfies ZollhausOrderEmailOutcome;
   }
 
-  const content = buildZollhausOrderEmailContent(claim.order);
-  const messageId = createZollhausOrderEmailMessageId(claim.order);
+  if (!recipient || !isSmtpConfigured()) {
+    const category = 'not_configured' as const;
+    const failedOrder = await finalizeZollhausOrderEmailSend({
+      orderId,
+      kind,
+      claimId: claim.claimId,
+      sent: false,
+      now,
+      store,
+      category,
+    });
+    logger.error(`Zollhaus ${kind} email failed`, { orderNumber: claim.order.orderNumber, category });
+    return { status: 'failed', order: failedOrder, category } satisfies ZollhausOrderEmailOutcome;
+  }
+
+  const content = buildContent(claim.order);
+  const messageId = createZollhausOrderEmailMessageId(claim.order, kind);
 
   try {
     const result = await transport.send({
-      to: recipient,
+      to: sanitizeEmailAddress(recipient, kind === 'internal' ? 'Empfaengeradresse' : 'Kundenadresse'),
       subject: content.subject,
       text: content.text,
       html: content.html,
+      ...(content.from ? { from: sanitizeEmailHeaderValue(content.from, 'Absenderadresse') } : {}),
+      ...(content.replyTo ? { replyTo: sanitizeEmailAddress(content.replyTo, 'Reply-To') } : {}),
       messageId,
       headers: {
         'X-Zollhaus-Order-Number': claim.order.orderNumber,
+        'X-Zollhaus-Mail-Kind': kind,
       },
     });
 
     const sentOrder = await finalizeZollhausOrderEmailSend({
       orderId,
+      kind,
       claimId: claim.claimId,
       sent: true,
       now,
       store,
       providerMessageId: result.messageId || messageId,
     });
-    logger.info('Zollhaus order email sent', { orderNumber: claim.order.orderNumber });
+    logger.info(`Zollhaus ${kind} email sent`, { orderNumber: claim.order.orderNumber });
     return { status: 'sent', order: sentOrder, messageId: result.messageId || messageId } satisfies ZollhausOrderEmailOutcome;
   } catch (error) {
     const category = categorizeEmailError(error);
     const failedOrder = await finalizeZollhausOrderEmailSend({
       orderId,
+      kind,
       claimId: claim.claimId,
       sent: false,
       now,
       store,
       category,
     });
-    logger.error('Zollhaus order email failed', { orderNumber: claim.order.orderNumber, category });
+    logger.error(`Zollhaus ${kind} email failed`, { orderNumber: claim.order.orderNumber, category });
     return { status: 'failed', order: failedOrder, category } satisfies ZollhausOrderEmailOutcome;
   }
 }
 
-export async function retryZollhausOrderEmail(
+export async function getZollhausCustomerOrderEmailStatus(orderId: string) {
+  const store = await resolveStore();
+  return store.runTransaction(async (transaction) => {
+    const order = await transaction.getOrder(orderId);
+    return order?.customerEmail || null;
+  });
+}
+
+async function getRequiredOrder(store: ZollhausCheckoutStore, orderId: string) {
+  const order = await store.runTransaction(async (transaction) => transaction.getOrder(orderId));
+
+  if (!order) {
+    throw new Error('ORDER_NOT_FOUND');
+  }
+
+  return order;
+}
+
+export async function sendZollhausOrderEmail(orderId: string, options?: ZollhausOrderEmailSendOptions) {
+  return sendZollhausOrderEmailByKind(
+    'internal',
+    orderId,
+    options,
+    async (_, store) => getRecipientAddress(store),
+    buildZollhausOrderEmailContent,
+  );
+}
+
+export async function sendZollhausCustomerOrderConfirmation(orderId: string, options?: ZollhausOrderEmailSendOptions) {
+  return sendZollhausOrderEmailByKind(
+    'customer',
+    orderId,
+    options,
+    async (order) => sanitizeEmailAddress(order.customer.email, 'Kundenadresse'),
+    buildCustomerOrderConfirmationContent,
+  );
+}
+
+export async function sendZollhausOrderEmails(
   orderId: string,
   options?: {
     store?: ZollhausCheckoutStore;
-    transport?: ZollhausOrderEmailTransport;
+    internalTransport?: ZollhausOrderEmailTransport;
+    customerTransport?: ZollhausOrderEmailTransport;
     logger?: ZollhausOrderEmailLogger;
     now?: () => Date;
   },
 ) {
+  const logger = options?.logger || getDefaultLogger();
+
+  let internal: ZollhausOrderEmailOutcome;
+  try {
+    internal = await sendZollhausOrderEmail(orderId, {
+      store: options?.store,
+      transport: options?.internalTransport,
+      logger,
+      now: options?.now,
+    });
+  } catch {
+    logger.error('Zollhaus internal email failed unexpectedly', {});
+    internal = { status: 'failed', order: await getRequiredOrder(await resolveStore(options?.store), orderId), category: 'unknown' };
+  }
+
+  let customer: ZollhausOrderEmailOutcome;
+  try {
+    customer = await sendZollhausCustomerOrderConfirmation(orderId, {
+      store: options?.store,
+      transport: options?.customerTransport,
+      logger,
+      now: options?.now,
+    });
+  } catch {
+    logger.error('Zollhaus customer email failed unexpectedly', {});
+    customer = { status: 'failed', order: await getRequiredOrder(await resolveStore(options?.store), orderId), category: 'unknown' };
+  }
+
+  return { internal, customer };
+}
+
+export async function retryZollhausOrderEmail(
+  orderId: string,
+  options?: ZollhausOrderEmailSendOptions,
+) {
   return sendZollhausOrderEmail(orderId, options);
+}
+
+export async function retryZollhausCustomerOrderConfirmation(
+  orderId: string,
+  options?: ZollhausOrderEmailSendOptions,
+) {
+  return sendZollhausCustomerOrderConfirmation(orderId, options);
 }

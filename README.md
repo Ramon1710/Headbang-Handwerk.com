@@ -29,6 +29,7 @@ Dann die Werte in `.env.local` eintragen:
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` – Stripe Public Key
 - `STRIPE_WEBHOOK_SECRET` – Stripe Webhook Secret
 - `NEXT_PUBLIC_APP_URL` – URL der App (z.B. `https://headbang-handwerk.com`)
+- `EVENT_SPONSORING_RECIPIENT_EMAIL` – interne Empfaengeradresse fuer veranstaltungsbezogene Sponsoringanfragen
 - `ADMIN_SESSION_SECRET` – Secret zum Signieren der Admin-Session
 - `HEADBANG_ADMIN_USERNAME` – Loginname für den Headbang-Admin
 - `HEADBANG_ADMIN_PASSWORD_HASH` – scrypt-Hash für den Headbang-Admin
@@ -121,6 +122,7 @@ npx vercel env add STRIPE_SECRET_KEY
 npx vercel env add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 npx vercel env add STRIPE_WEBHOOK_SECRET
 npx vercel env add NEXT_PUBLIC_APP_URL
+npx vercel env add EVENT_SPONSORING_RECIPIENT_EMAIL
 npx vercel env add ADMIN_SESSION_SECRET
 npx vercel env add HEADBANG_ADMIN_USERNAME
 npx vercel env add HEADBANG_ADMIN_PASSWORD_HASH
@@ -175,6 +177,14 @@ Die Zollhaus-Datenebene ist bewusst vollstaendig von Headbang-CMS, Headbang-Merc
 - Bestellungen: `partnerSites/zollhaus/orders/{orderId}`
 - Shop-Einstellungen: `partnerSites/zollhaus/settings/shop`
 - Idempotente Bestellanfragen: `partnerSites/zollhaus/orderRequests/{idempotencyKey}`
+
+## Event-Sponsoring Anfragen
+
+- Oeffentliche Veranstaltungs-Sponsoringseiten verwenden einen Anfragefluss ohne Stripe-Checkout.
+- Sponsoringanfragen werden in Firestore unter `eventSponsoringRequests` gespeichert.
+- Optionale Logo- oder PDF-Dateien werden ueber Firebase Storage abgelegt.
+- Die interne Benachrichtigung laeuft ueber `EVENT_SPONSORING_RECIPIENT_EMAIL` und SMTP.
+- Die Abrechnung erfolgt nach Pruefung manuell per Rechnung.
 
 Die serverseitigen Module dafuer liegen unter `lib/zollhaus/`:
 

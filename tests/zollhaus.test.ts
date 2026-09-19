@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { buildAdminSession, canAccessHeadbangAdmin, canAccessZollhausAdmin } from '@/lib/cms/auth-core';
 import {
   buildArchivedZollhausProduct,
@@ -29,8 +30,21 @@ import {
   normalizeZollhausShopSettings,
 } from '@/lib/zollhaus/validation';
 import { createZollhausCheckoutIdempotencyKey, submitZollhausCheckout, type ZollhausCheckoutStore, type ZollhausCheckoutTransaction } from '@/lib/zollhaus/checkout';
-import { getZollhausManagedOrderById, hasZollhausProductOrderReference, restoreZollhausOrderStock, retryFailedOrPendingZollhausOrderEmail, updateZollhausManagedOrderStatus } from '@/lib/zollhaus/order-management';
-import { buildZollhausOrderEmailContent, createZollhausOrderEmailMessageId, sendZollhausOrderEmail } from '@/lib/zollhaus/order-email';
+import {
+  getZollhausManagedOrderById,
+  hasZollhausProductOrderReference,
+  restoreZollhausOrderStock,
+  retryFailedOrPendingZollhausCustomerOrderEmail,
+  retryFailedOrPendingZollhausOrderEmail,
+  updateZollhausManagedOrderStatus,
+} from '@/lib/zollhaus/order-management';
+import {
+  buildZollhausOrderEmailContent,
+  createZollhausOrderEmailMessageId,
+  sendZollhausCustomerOrderConfirmation,
+  sendZollhausOrderEmail,
+  sendZollhausOrderEmails,
+} from '@/lib/zollhaus/order-email';
 import { clearZollhausCartAfterSuccess, removeUnavailableZollhausCartItems } from '@/lib/zollhaus/cart';
 import type { ZollhausOrder, ZollhausOrderRequest, ZollhausProduct, ZollhausShopSettings } from '@/lib/zollhaus/types';
 
@@ -559,6 +573,120 @@ test('serverseitige Preisberechnung ignoriert manipulierte Browserpreise', async
   assert.equal(store.orders.get('order-price')?.items[0]?.unitPriceCents, 2490);
 });
 
+test('produktive Checkout-Route invalidiert nach erfolgreicher Bestellung die Zollhaus-Ansichten', () => {
+  const routeSource = readFileSync('/workspaces/Headbang-Handwerk.com/app/api/zollhaus/checkout/route.ts', 'utf8');
+
+  assert.equal(routeSource.includes('revalidatePath'), true);
+  assert.equal(routeSource.includes('/zollhaus'), true);
+  assert.equal(routeSource.includes('/zollhaus/admin'), true);
+  assert.equal(routeSource.includes('/zollhaus/bestellen'), true);
+  assert.equal(routeSource.includes('/zollhaus/produkt/'), true);
+  assert.equal(routeSource.includes('sendZollhausOrderEmails'), true);
+});
+
+test('erfolgreiche Bestellung reduziert den Bestand korrekt', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct({ stockQuantity: 10 })] });
+
+  await submitZollhausCheckout(
+    { idempotencyKey: 'stock-success-12345', customer: buildCheckoutCustomer(), items: [{ productId: 'checkout-product', quantity: 3 }] },
+    { store, createOrderId: () => 'order-stock-success', createOrderNumber: () => 'ZH-20260918-STKCH234' },
+  );
+
+  assert.equal(store.products.get('checkout-product')?.stockQuantity, 7);
+});
+
+test('Bestellung mit mehreren Produkten reduziert jeden Bestand korrekt', async () => {
+  const store = new InMemoryCheckoutStore({
+    products: [
+      buildCheckoutProduct({ id: 'checkout-product-a', stockQuantity: 10 }),
+      buildCheckoutProduct({ id: 'checkout-product-b', stockQuantity: 5, name: 'Zweite Tasche' }),
+    ],
+  });
+
+  await submitZollhausCheckout(
+    {
+      idempotencyKey: 'multi-product-12345',
+      customer: buildCheckoutCustomer(),
+      items: [
+        { productId: 'checkout-product-a', quantity: 3 },
+        { productId: 'checkout-product-b', quantity: 2 },
+      ],
+    },
+    { store, createOrderId: () => 'order-multi-product', createOrderNumber: () => 'ZH-20260918-MULTA234' },
+  );
+
+  assert.equal(store.products.get('checkout-product-a')?.stockQuantity, 7);
+  assert.equal(store.products.get('checkout-product-b')?.stockQuantity, 3);
+});
+
+test('neuer Idempotency-Key reduziert den Bestand erneut', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct({ stockQuantity: 5 })] });
+
+  await submitZollhausCheckout(
+    { idempotencyKey: 'stock-repeat-a-12345', customer: buildCheckoutCustomer(), items: [{ productId: 'checkout-product', quantity: 1 }] },
+    { store, createOrderId: () => 'order-repeat-a', createOrderNumber: () => 'ZH-20260918-REPTA234' },
+  );
+  await submitZollhausCheckout(
+    { idempotencyKey: 'stock-repeat-b-12345', customer: buildCheckoutCustomer(), items: [{ productId: 'checkout-product', quantity: 1 }] },
+    { store, createOrderId: () => 'order-repeat-b', createOrderNumber: () => 'ZH-20260918-REPTB234' },
+  );
+
+  assert.equal(store.products.get('checkout-product')?.stockQuantity, 3);
+  assert.equal(store.orders.size, 2);
+});
+
+test('nachgelagerter Mail-Fehler verändert weder Bestellung noch Bestand', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct({ stockQuantity: 5 })] });
+
+  await submitZollhausCheckout(
+    { idempotencyKey: 'mail-stock-12345', customer: buildCheckoutCustomer(), items: [{ productId: 'checkout-product', quantity: 2 }] },
+    { store, createOrderId: () => 'order-mail-stock', createOrderNumber: () => 'ZH-20260918-MALKS234' },
+  );
+
+  await withOrderEmailEnv(
+    () => sendZollhausOrderEmail('order-mail-stock', { store }),
+    {
+      SMTP_HOST: undefined,
+      SMTP_USER: undefined,
+      SMTP_PASS: undefined,
+      SMTP_FROM: undefined,
+      ZOLLHAUS_ORDER_EMAIL: undefined,
+    },
+  );
+
+  assert.equal(store.orders.get('order-mail-stock')?.status, 'new');
+  assert.equal(store.orders.get('order-mail-stock')?.email.state, 'failed');
+  assert.equal(store.products.get('checkout-product')?.stockQuantity, 3);
+});
+
+test('Stornierung erhöht den Bestand nicht automatisch', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct({ stockQuantity: 5 })] });
+
+  await submitZollhausCheckout(
+    { idempotencyKey: 'cancel-stock-12345', customer: buildCheckoutCustomer(), items: [{ productId: 'checkout-product', quantity: 2 }] },
+    { store, createOrderId: () => 'order-cancel-stock', createOrderNumber: () => 'ZH-20260918-CNCLS234' },
+  );
+  await updateZollhausManagedOrderStatus('order-cancel-stock', 'cancelled', { username: 'z-admin', role: 'zollhaus-admin' }, { store });
+
+  assert.equal(store.products.get('checkout-product')?.stockQuantity, 3);
+});
+
+test('Admin-Bestand und öffentliche Verfügbarkeit folgen nach neuer Serverabfrage dem gespeicherten Bestand', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct({ stockQuantity: 1 })] });
+
+  await submitZollhausCheckout(
+    { idempotencyKey: 'display-stock-12345', customer: buildCheckoutCustomer(), items: [{ productId: 'checkout-product', quantity: 1 }] },
+    { store, createOrderId: () => 'order-display-stock', createOrderNumber: () => 'ZH-20260918-DSPLA234' },
+  );
+
+  const storedProduct = store.products.get('checkout-product');
+
+  assert.equal(storedProduct?.stockQuantity, 0);
+  assert.equal(getZollhausProductDisplayStatus(storedProduct!), 'Ausverkauft');
+  assert.equal(getPublicAvailabilityLabel(storedProduct!), 'Ausverkauft');
+  assert.equal(toPublicZollhausProducts([storedProduct!])[0]?.isSoldOut, true);
+});
+
 test('archivierte Produkte werden im Checkout abgewiesen', async () => {
   const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct({ status: 'archived', archivedAt: '2026-09-13T10:00:00.000Z' })] });
 
@@ -580,6 +708,28 @@ test('Bestand 0 und Mengen groesser als Bestand werden abgewiesen', async () => 
     () => submitZollhausCheckout({ idempotencyKey: 'stock-12345', customer: buildCheckoutCustomer(), items: [{ productId: 'checkout-product', quantity: 2 }] }, { store: limitedStore }),
     /nicht mehr vollstaendig verfuegbar/,
   );
+
+  assert.equal(limitedStore.products.get('checkout-product')?.stockQuantity, 1);
+  assert.equal((limitedStore.products.get('checkout-product')?.stockQuantity || 0) >= 0, true);
+});
+
+test('mehrere Positionen desselben Produktes werden serverseitig zusammengeführt und korrekt abgezogen', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct({ stockQuantity: 10 })] });
+
+  await submitZollhausCheckout(
+    {
+      idempotencyKey: 'merged-lines-12345',
+      customer: buildCheckoutCustomer(),
+      items: [
+        { productId: 'checkout-product', quantity: 2 },
+        { productId: 'checkout-product', quantity: 1 },
+      ],
+    },
+    { store, createOrderId: () => 'order-merged-lines', createOrderNumber: () => 'ZH-20260918-MRGED234' },
+  );
+
+  assert.equal(store.products.get('checkout-product')?.stockQuantity, 7);
+  assert.equal(store.orders.get('order-merged-lines')?.items[0]?.quantity, 3);
 });
 
 test('zwei parallele Kaeufe bei Bestand 1 lassen nur eine Bestellung durch', async () => {
@@ -637,6 +787,7 @@ test('doppelter Idempotency-Key erzeugt keine zweite Bestellung', async () => {
   assert.equal(second.created, false);
   assert.equal(second.orderId, 'order-dup');
   assert.equal(store.orders.size, 1);
+  assert.equal(store.products.get('checkout-product')?.stockQuantity, 3);
 });
 
 test('ungueltige Kundendaten werden abgewiesen', async () => {
@@ -731,6 +882,177 @@ test('interne Zollhaus-Bestellmail wird genau einmal versendet und Status wird f
 
   assert.equal(second.status, 'skipped');
   assert.equal(second.reason, 'already-sent');
+});
+
+test('Kundenbestaetigung nutzt Bestellsnapshot, sicheren Absender und Reply-To', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct({ name: 'Poster <b>XL</b>' })] });
+
+  await submitZollhausCheckout(
+    {
+      idempotencyKey: 'customer-mail-12345',
+      customer: buildCheckoutCustomer({ firstName: 'Mara <script>', email: 'kundin@example.com' }),
+      items: [{ productId: 'checkout-product', quantity: 2 }],
+    },
+    { store, createOrderId: () => 'order-customer-mail', createOrderNumber: () => 'ZH-20260918-CUSTM234' },
+  );
+
+  const deliveries: Array<{
+    to: string;
+    subject: string;
+    from?: string;
+    replyTo?: string;
+    messageId: string;
+    text: string;
+    html: string;
+  }> = [];
+
+  await withOrderEmailEnv(async () => {
+    const result = await sendZollhausCustomerOrderConfirmation('order-customer-mail', {
+      store,
+      transport: {
+        async send(input) {
+          deliveries.push(input);
+          return { messageId: input.messageId };
+        },
+      },
+    });
+
+    assert.equal(result.status, 'sent');
+  }, {
+    SMTP_HOST: 'smtp.example.com',
+    SMTP_USER: 'mailer@example.com',
+    SMTP_PASS: 'secret',
+    SMTP_FROM: 'Bestellungen <bestellungen@example.com>',
+    ZOLLHAUS_ORDER_EMAIL: 'intern@example.com',
+  });
+
+  const order = store.orders.get('order-customer-mail');
+  assert.equal(deliveries.length, 1);
+  assert.equal(deliveries[0]?.to, 'kundin@example.com');
+  assert.equal(deliveries[0]?.from, 'Zollhaus Shop <bestellungen@example.com>');
+  assert.equal(deliveries[0]?.replyTo, 'info@zollhaus-leer.com');
+  assert.equal(deliveries[0]?.subject, 'Bestellbestätigung – Bestellung ZH-20260918-CUSTM234');
+  assert.equal(deliveries[0]?.text.includes('Bestellnummer: ZH-20260918-CUSTM234'), true);
+  assert.equal(deliveries[0]?.text.includes('Produktname: Poster <b>XL</b>'), true);
+  assert.equal(deliveries[0]?.text.includes('IBAN'), false);
+  assert.equal(deliveries[0]?.text.includes('Bankverbindung'), false);
+  assert.equal(deliveries[0]?.text.includes('PDF'), false);
+  assert.equal(deliveries[0]?.html.includes('Mara &lt;script&gt;'), true);
+  assert.equal(deliveries[0]?.html.includes('Poster &lt;b&gt;XL&lt;/b&gt;'), true);
+  assert.equal(deliveries[0]?.html.includes('mailto:info@zollhaus-leer.com'), true);
+  assert.equal(order?.customerEmail.state, 'sent');
+  assert.equal(order?.customerEmail.attemptCount, 1);
+  assert.equal(order?.email.state, 'pending');
+});
+
+test('interne Mail und Kundenbestaetigung behandeln Fehler unabhaengig voneinander', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct()] });
+
+  await submitZollhausCheckout(
+    { idempotencyKey: 'dual-mail-12345', customer: buildCheckoutCustomer({ email: 'kundin@example.com' }), items: [{ productId: 'checkout-product', quantity: 1 }] },
+    { store, createOrderId: () => 'order-dual-mail', createOrderNumber: () => 'ZH-20260918-DUALM234' },
+  );
+
+  let customerSendCount = 0;
+
+  const result = await withOrderEmailEnv(
+    () => sendZollhausOrderEmails('order-dual-mail', {
+      store,
+      internalTransport: {
+        async send() {
+          throw new Error('smtp boom');
+        },
+      },
+      customerTransport: {
+        async send(input) {
+          customerSendCount += 1;
+          return { messageId: input.messageId };
+        },
+      },
+    }),
+    {
+      SMTP_HOST: 'smtp.example.com',
+      SMTP_USER: 'mailer@example.com',
+      SMTP_PASS: 'secret',
+      SMTP_FROM: 'Bestellungen <bestellungen@example.com>',
+      ZOLLHAUS_ORDER_EMAIL: 'intern@example.com',
+    },
+  );
+
+  const order = store.orders.get('order-dual-mail');
+  assert.equal(result.internal.status, 'failed');
+  assert.equal(result.customer.status, 'sent');
+  assert.equal(customerSendCount, 1);
+  assert.equal(order?.email.state, 'failed');
+  assert.equal(order?.email.attemptCount, 1);
+  assert.equal(order?.customerEmail.state, 'sent');
+  assert.equal(order?.customerEmail.attemptCount, 1);
+  assert.equal(order?.status, 'new');
+});
+
+test('kombinierter Zollhaus-Mailversand versendet pro Bestellung beide Mails hoechstens einmal', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct()] });
+
+  await submitZollhausCheckout(
+    { idempotencyKey: 'dual-once-12345', customer: buildCheckoutCustomer({ email: 'kundin@example.com' }), items: [{ productId: 'checkout-product', quantity: 1 }] },
+    { store, createOrderId: () => 'order-dual-once', createOrderNumber: () => 'ZH-20260918-NCEM234A' },
+  );
+
+  const deliveries: string[] = [];
+
+  await withOrderEmailEnv(
+    () => sendZollhausOrderEmails('order-dual-once', {
+      store,
+      internalTransport: {
+        async send(input) {
+          deliveries.push(`internal:${input.to}`);
+          return { messageId: input.messageId };
+        },
+      },
+      customerTransport: {
+        async send(input) {
+          deliveries.push(`customer:${input.to}`);
+          return { messageId: input.messageId };
+        },
+      },
+    }),
+    {
+      SMTP_HOST: 'smtp.example.com',
+      SMTP_USER: 'mailer@example.com',
+      SMTP_PASS: 'secret',
+      SMTP_FROM: 'Bestellungen <bestellungen@example.com>',
+      ZOLLHAUS_ORDER_EMAIL: 'intern@example.com',
+    },
+  );
+
+  const second = await withOrderEmailEnv(
+    () => sendZollhausOrderEmails('order-dual-once', {
+      store,
+      internalTransport: {
+        async send() {
+          throw new Error('internal should not send twice');
+        },
+      },
+      customerTransport: {
+        async send() {
+          throw new Error('customer should not send twice');
+        },
+      },
+    }),
+    {
+      SMTP_HOST: 'smtp.example.com',
+      SMTP_USER: 'mailer@example.com',
+      SMTP_PASS: 'secret',
+      SMTP_FROM: 'Bestellungen <bestellungen@example.com>',
+      ZOLLHAUS_ORDER_EMAIL: 'intern@example.com',
+    },
+  );
+
+  assert.deepEqual(deliveries, ['internal:intern@example.com', 'customer:kundin@example.com']);
+  assert.equal(second.internal.status, 'skipped');
+  assert.equal(second.customer.status, 'skipped');
+  assert.equal(second.internal.reason, 'already-sent');
+  assert.equal(second.customer.reason, 'already-sent');
 });
 
 test('fehlende Mail-Konfiguration markiert Bestellung neutral als fehlgeschlagen und loggt keine PII', async () => {
@@ -906,6 +1228,78 @@ test('unbekannte Bestell-ID wird sicher behandelt', async () => {
   assert.equal(await getZollhausManagedOrderById('missing-order-12345', { store }), null);
 });
 
+test('veraltete oder beschädigte Mailstatusfelder werden sicher auf Standardwerte normalisiert', () => {
+  const order = normalizeZollhausOrder({
+    id: 'order-legacy-status',
+    orderNumber: 'ZH-20260918-LGCYST24',
+    status: 'new',
+    customer: buildCheckoutCustomer(),
+    items: [buildZollhausOrderItemFromProduct(buildCheckoutProduct(), 1)],
+    totalPriceCents: 2490,
+    idempotencyKey: 'legacy-status-12345',
+    email: {
+      state: 'kaputt',
+      attemptCount: 'nein',
+      lastErrorCategory: 'broken',
+      lastAttemptAt: 'invalid-date',
+      sendingClaimedAt: 'invalid-date',
+    },
+    createdAt: '2026-09-18T12:00:00.000Z',
+  });
+
+  assert.equal(order.email.state, 'pending');
+  assert.equal(order.email.attemptCount, 0);
+  assert.equal(order.email.lastErrorCategory, undefined);
+  assert.equal(order.email.lastAttemptAt, undefined);
+  assert.equal(order.email.sendingClaimedAt, undefined);
+  assert.equal(order.customerEmail.state, 'pending');
+  assert.equal(order.customerEmail.attemptCount, 0);
+});
+
+test('beschädigte gespeicherte Kundenadresse markiert die Kundenmail sicher als fehlgeschlagen', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct()] });
+
+  store.orders.set('order-invalid-customer-mail', {
+    id: 'order-invalid-customer-mail',
+    orderNumber: 'ZH-20260918-NVLXD234',
+    status: 'new',
+    customer: {
+      ...buildCheckoutCustomer(),
+      email: 'bad\nmail@example.com',
+    },
+    items: [buildZollhausOrderItemFromProduct(buildCheckoutProduct(), 1)],
+    totalPriceCents: 2490,
+    idempotencyKey: 'invalid-customer-mail-12345',
+    email: { state: 'pending', attemptCount: 0 },
+    customerEmail: { state: 'pending', attemptCount: 0 },
+    createdAt: '2026-09-18T12:00:00.000Z',
+    updatedAt: '2026-09-18T12:00:00.000Z',
+  } as ZollhausOrder);
+
+  const result = await withOrderEmailEnv(
+    () => sendZollhausCustomerOrderConfirmation('order-invalid-customer-mail', {
+      store,
+      transport: {
+        async send() {
+          throw new Error('should-not-send');
+        },
+      },
+    }),
+    {
+      SMTP_HOST: 'smtp.example.com',
+      SMTP_USER: 'mailer@example.com',
+      SMTP_PASS: 'secret',
+      SMTP_FROM: 'Bestellungen <bestellungen@example.com>',
+      ZOLLHAUS_ORDER_EMAIL: 'intern@example.com',
+    },
+  );
+
+  assert.equal(result.status, 'failed');
+  assert.equal(result.category, 'invalid_recipient');
+  assert.equal(store.orders.get('order-invalid-customer-mail')?.customerEmail.state, 'failed');
+  assert.equal(store.orders.get('order-invalid-customer-mail')?.email.state, 'pending');
+});
+
 test('Statusänderungen werden serverseitig validiert und auditiert', async () => {
   const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct()] });
 
@@ -968,6 +1362,57 @@ test('fehlgeschlagene Mail kann erneut gesendet werden', async () => {
   assert.equal(result.status, 'sent');
   assert.equal(store.orders.get('order-retry-mail')?.email.state, 'sent');
   assert.equal(store.orders.get('order-retry-mail')?.email.attemptCount, 2);
+});
+
+test('fehlgeschlagene Kundenbestaetigung kann unabhaengig erneut gesendet werden', async () => {
+  const store = new InMemoryCheckoutStore({ products: [buildCheckoutProduct()] });
+
+  await submitZollhausCheckout(
+    { idempotencyKey: 'retry-customer-12345', customer: buildCheckoutCustomer({ email: 'kundin@example.com' }), items: [{ productId: 'checkout-product', quantity: 1 }] },
+    { store, createOrderId: () => 'order-retry-customer', createOrderNumber: () => 'ZH-20260918-CSTRY234' },
+  );
+
+  await withOrderEmailEnv(
+    () => sendZollhausCustomerOrderConfirmation('order-retry-customer', {
+      store,
+      transport: {
+        async send() {
+          throw new Error('smtp failed');
+        },
+      },
+    }),
+    {
+      SMTP_HOST: 'smtp.example.com',
+      SMTP_USER: 'mailer@example.com',
+      SMTP_PASS: 'secret',
+      SMTP_FROM: 'Bestellungen <bestellungen@example.com>',
+      ZOLLHAUS_ORDER_EMAIL: 'intern@example.com',
+    },
+  );
+
+  const result = await withOrderEmailEnv(
+    () => retryFailedOrPendingZollhausCustomerOrderEmail('order-retry-customer', { username: 'headbang', role: 'headbang-admin' }, {
+      store,
+      now: () => new Date('2026-09-18T14:00:00.000Z'),
+      transport: {
+        async send(input) {
+          return { messageId: input.messageId };
+        },
+      },
+    }),
+    {
+      SMTP_HOST: 'smtp.example.com',
+      SMTP_USER: 'mailer@example.com',
+      SMTP_PASS: 'secret',
+      SMTP_FROM: 'Bestellungen <bestellungen@example.com>',
+      ZOLLHAUS_ORDER_EMAIL: 'intern@example.com',
+    },
+  );
+
+  assert.equal(result.status, 'sent');
+  assert.equal(store.orders.get('order-retry-customer')?.customerEmail.state, 'sent');
+  assert.equal(store.orders.get('order-retry-customer')?.customerEmail.attemptCount, 2);
+  assert.equal(store.orders.get('order-retry-customer')?.email.state, 'pending');
 });
 
 test('versendete Mail wird nicht unbeabsichtigt erneut versendet', async () => {

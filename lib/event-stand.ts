@@ -1,5 +1,5 @@
 import type { BannerSlot, Event, EventStandConfig } from '@/lib/types';
-import { normalizeEventStatus, normalizeStructuredEventDate } from '@/lib/events';
+import { normalizeEventStatus, normalizeStructuredEventDate, resolveEventDetailViewMode } from '@/lib/events';
 
 const defaultBannerSlotTemplates: BannerSlot[] = [
   {
@@ -108,6 +108,7 @@ export function normalizeEvent(event: Event): Event {
   const startDate = normalizeStructuredEventDate(event.startDate);
   const endDate = normalizeStructuredEventDate(event.endDate);
   const status = normalizeEventStatus(event.status, 'planned');
+  const detailViewMode = resolveEventDetailViewMode(event);
   const normalizedImageUrl = typeof event.imageUrl === 'string' && event.imageUrl.trim() ? event.imageUrl.trim() : undefined;
   const normalizedImageAlt = typeof event.imageAlt === 'string' && event.imageAlt.trim() ? event.imageAlt.trim() : undefined;
   const normalizedCtaUrl = typeof event.ctaUrl === 'string' && event.ctaUrl.trim() ? event.ctaUrl.trim() : undefined;
@@ -115,7 +116,8 @@ export function normalizeEvent(event: Event): Event {
   return {
     ...baseEvent,
     status,
-    standEnabled: event.standEnabled ?? status === 'confirmed',
+    detailViewMode,
+    standEnabled: detailViewMode === 'stand3d',
     stand: normalizeEventStandConfig(event.stand),
     ...(startDate ? { startDate } : {}),
     ...(startDate && endDate && endDate >= startDate ? { endDate } : {}),

@@ -5,7 +5,14 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { hasFirebaseConfig } from '@/lib/cms/firebase';
 import { loginZollhausAdmin, logoutAdmin, requireTrustedOrigin, requireZollhausAccess } from '@/lib/cms/auth';
-import { getZollhausOrderStatusLabel, isValidZollhausOrderId, restoreZollhausOrderStock, retryFailedOrPendingZollhausOrderEmail, updateZollhausManagedOrderStatus } from '@/lib/zollhaus/order-management';
+import {
+  getZollhausOrderStatusLabel,
+  isValidZollhausOrderId,
+  restoreZollhausOrderStock,
+  retryFailedOrPendingZollhausCustomerOrderEmail,
+  retryFailedOrPendingZollhausOrderEmail,
+  updateZollhausManagedOrderStatus,
+} from '@/lib/zollhaus/order-management';
 import { parseEuroAmountToCents, parseNonNegativeInteger } from '@/lib/zollhaus/product-admin';
 import { deleteZollhausProductImages, uploadZollhausProductImage } from '@/lib/zollhaus/product-image-storage';
 import { createZollhausProduct, deleteZollhausProduct, getZollhausProduct, updateZollhausProduct } from '@/lib/zollhaus/products';
@@ -443,6 +450,39 @@ export async function retryOrderEmailAction(formData: FormData) {
     redirect(buildOrderDetailRedirect(orderId, { error }));
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Die interne Bestellmail konnte nicht erneut versendet werden.';
+    redirect(orderId ? buildOrderDetailRedirect(orderId, { error: message }) : buildAdminRedirect({ error: message }));
+  }
+}
+
+export async function retryCustomerOrderEmailAction(formData: FormData) {
+  const session = await requireZollhausAccess('/zollhaus/admin');
+
+  try {
+    await requireTrustedOrigin();
+  } catch {
+    redirect('/zollhaus/admin');
+  }
+
+  let orderId = '';
+
+  try {
+    orderId = readOrderId(formData);
+
+    if (formData.get('retryConfirmed') !== 'on') {
+      throw new Error('Bitte den erneuten Mailversand bestaetigen.');
+    }
+
+    const result = await retryFailedOrPendingZollhausCustomerOrderEmail(orderId, { username: session.username, role: session.role });
+    revalidateZollhausPages();
+
+    if (result.status === 'sent') {
+      redirect(buildOrderDetailRedirect(orderId, { saved: 'customer-email-resent' }));
+    }
+
+    const error = result.status === 'failed' ? 'Die Kundenbestätigung konnte nicht versendet werden.' : 'Die Kundenbestätigung wurde nicht erneut versendet.';
+    redirect(buildOrderDetailRedirect(orderId, { error }));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Die Kundenbestätigung konnte nicht erneut versendet werden.';
     redirect(orderId ? buildOrderDetailRedirect(orderId, { error: message }) : buildAdminRedirect({ error: message }));
   }
 }

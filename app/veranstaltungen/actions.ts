@@ -12,8 +12,10 @@ import {
 import { hasFirebaseConfig, isFirebaseAuthError, isInvalidFirebaseConfigError } from '@/lib/cms/firebase';
 import { getCmsContent, saveCmsContent } from '@/lib/cms/storage';
 import {
+  normalizeEventDetailViewMode,
   normalizeStructuredEventDate,
   normalizeEventStatus,
+  resolveEventDetailViewMode,
   validateEventImageFile,
   validateOptionalStructuredEventDates,
   validateStructuredEventDates,
@@ -24,6 +26,16 @@ import type { Event } from '@/lib/types';
 
 function sanitizeText(value: FormDataEntryValue | null) {
   return String(value || '').trim();
+}
+
+function resolveDetailViewModeFromFormData(formData: FormData, existingEvent?: Event) {
+  const rawDetailViewMode = sanitizeText(formData.get('detailViewMode'));
+
+  if (rawDetailViewMode) {
+    return normalizeEventDetailViewMode(rawDetailViewMode, resolveEventDetailViewMode(existingEvent || { standEnabled: false, detailViewMode: 'none' }));
+  }
+
+  return String(formData.get('standEnabled') || '') === 'on' ? 'stand3d' : 'none';
 }
 
 function redirectWithAdminError(message: string): never {
@@ -125,7 +137,7 @@ function parseEventFromFormData(formData: FormData, existingId?: string, existin
   const imageUrl = sanitizeText(formData.get('imageUrl'));
   const imageAlt = sanitizeText(formData.get('imageAlt'));
   const status = normalizeEventStatus(sanitizeText(formData.get('status')), 'planned');
-  const standEnabled = String(formData.get('standEnabled') || '') === 'on';
+  const detailViewMode = resolveDetailViewModeFromFormData(formData, existingEvent);
   const standAssetUrl = sanitizeText(formData.get('standAssetUrl'));
   const standAssetName = sanitizeText(formData.get('standAssetName'));
   const standAssetContentType = sanitizeText(formData.get('standAssetContentType'));
@@ -143,7 +155,8 @@ function parseEventFromFormData(formData: FormData, existingId?: string, existin
     festivalName,
     description,
     status,
-    standEnabled,
+    detailViewMode,
+    standEnabled: detailViewMode === 'stand3d',
     ctaText: ctaText || 'Mehr erfahren',
     ctaUrl: resolveEventCtaUrl(ctaUrl),
     imageUrl: imageUrl || existingEvent?.imageUrl,
@@ -179,6 +192,7 @@ async function persistEvents(events: Event[]) {
   revalidatePath('/drei-d-stand');
   for (const event of normalizedEvents) {
     revalidatePath(`/veranstaltungen/${event.id}/3d-stand`);
+    revalidatePath(`/veranstaltungen/${event.id}/sponsoring`);
   }
 }
 
@@ -290,6 +304,7 @@ export async function toggleEventStandAction(formData: FormData) {
 
       return {
         ...event,
+        detailViewMode: event.standEnabled ? 'none' : 'stand3d',
         standEnabled: !event.standEnabled,
       };
     })

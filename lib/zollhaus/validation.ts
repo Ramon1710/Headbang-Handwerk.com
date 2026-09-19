@@ -155,7 +155,7 @@ function normalizeImageList(input: unknown, now: string): ZollhausProductImage[]
     }));
 }
 
-function normalizeCustomer(input: unknown): ZollhausOrderCustomer {
+function normalizeCustomer(input: unknown, options?: { tolerateInvalidEmail?: boolean }): ZollhausOrderCustomer {
   if (!input || typeof input !== 'object') {
     throw new Error('Kundendaten fehlen.');
   }
@@ -163,7 +163,7 @@ function normalizeCustomer(input: unknown): ZollhausOrderCustomer {
   const candidate = input as Record<string, unknown>;
   const email = normalizeBoundedText(candidate.email, 'E-Mail', { maxLength: 320 });
 
-  if (!EMAIL_REGEX.test(email)) {
+  if (!EMAIL_REGEX.test(email) && !options?.tolerateInvalidEmail) {
     throw new Error('E-Mail ist ungueltig.');
   }
 
@@ -185,37 +185,65 @@ function normalizeEmailStatus(input: unknown, now: string): ZollhausOrderEmailSt
   }
 
   const candidate = input as Record<string, unknown>;
-  const state = String(candidate.state || '').trim();
+  const rawState = String(candidate.state || '').trim();
+  const state = rawState === 'pending' || rawState === 'sending' || rawState === 'sent' || rawState === 'failed'
+    ? rawState
+    : 'pending';
 
-  if (state !== 'pending' && state !== 'sending' && state !== 'sent' && state !== 'failed') {
-    throw new Error('E-Mail-Status ist ungueltig.');
+  let attemptCount = 0;
+
+  try {
+    attemptCount = normalizeInteger(candidate.attemptCount ?? 0, 'E-Mail-Versuche', { min: 0, max: 10_000 });
+  } catch {
+    attemptCount = 0;
   }
 
-  const attemptCount = normalizeInteger(candidate.attemptCount ?? 0, 'E-Mail-Versuche', { min: 0, max: 10_000 });
-  const lastErrorCategory = String(candidate.lastErrorCategory || '').trim();
+  const rawLastErrorCategory = String(candidate.lastErrorCategory || '').trim();
+  const lastErrorCategory = rawLastErrorCategory === 'not_configured'
+    || rawLastErrorCategory === 'transport_error'
+    || rawLastErrorCategory === 'invalid_recipient'
+    || rawLastErrorCategory === 'unknown'
+    ? rawLastErrorCategory
+    : '';
 
-  if (
-    lastErrorCategory
-    && lastErrorCategory !== 'not_configured'
-    && lastErrorCategory !== 'transport_error'
-    && lastErrorCategory !== 'unknown'
-  ) {
-    throw new Error('E-Mail-Fehlerkategorie ist ungueltig.');
+  let lastErrorMessage: string | undefined;
+
+  try {
+    lastErrorMessage = normalizeOptionalText(candidate.lastErrorMessage, 'E-Mail-Fehlermeldung', 240) || undefined;
+  } catch {
+    lastErrorMessage = undefined;
   }
+
+  const normalizeOptionalIsoValue = (value: unknown) => {
+    try {
+      return value ? normalizeIsoTimestamp(value, now) : undefined;
+    } catch {
+      return undefined;
+    }
+  };
+
+  const normalizeOptionalShortText = (value: unknown, label: string, maxLength: number) => {
+    try {
+      return String(value || '').trim() ? normalizeOptionalText(value, label, maxLength) || undefined : undefined;
+    } catch {
+      return undefined;
+    }
+  };
 
   return {
     state,
     attemptCount,
-    ...(candidate.lastAttemptAt ? { lastAttemptAt: normalizeIsoTimestamp(candidate.lastAttemptAt, now) } : {}),
-    ...(candidate.sentAt ? { sentAt: normalizeIsoTimestamp(candidate.sentAt, now) } : {}),
+    ...(normalizeOptionalIsoValue(candidate.lastAttemptAt) ? { lastAttemptAt: normalizeOptionalIsoValue(candidate.lastAttemptAt) } : {}),
+    ...(normalizeOptionalIsoValue(candidate.sentAt) ? { sentAt: normalizeOptionalIsoValue(candidate.sentAt) } : {}),
     ...(lastErrorCategory ? { lastErrorCategory: lastErrorCategory as ZollhausOrderEmailErrorCategory } : {}),
-    ...(String(candidate.providerMessageId || '').trim()
-      ? { providerMessageId: normalizeOptionalText(candidate.providerMessageId, 'Provider-Message-ID', 320) }
+    ...(lastErrorMessage ? { lastErrorMessage } : {}),
+    ...(normalizeOptionalShortText(candidate.providerMessageId, 'Provider-Message-ID', 320)
+      ? { providerMessageId: normalizeOptionalShortText(candidate.providerMessageId, 'Provider-Message-ID', 320) }
       : {}),
-    ...(String(candidate.sendingClaimId || '').trim()
-      ? { sendingClaimId: normalizeOptionalText(candidate.sendingClaimId, 'Versand-Claim-ID', 120) }
+    ...(normalizeOptionalShortText(candidate.sendingClaimId, 'Versand-Claim-ID', 120)
+      ? { sendingClaimId: normalizeOptionalShortText(candidate.sendingClaimId, 'Versand-Claim-ID', 120) }
       : {}),
-    ...(candidate.sendingClaimedAt ? { sendingClaimedAt: normalizeIsoTimestamp(candidate.sendingClaimedAt, now) } : {}),
+    ...(normalizeOptionalIsoValue(candidate.sendingClaimedAt) ? { sendingClaimedAt: normalizeOptionalIsoValue(candidate.sendingClaimedAt) } : {}),
     ...(!lastErrorCategory && String(candidate.errorMessage || '').trim()
       ? { lastErrorCategory: 'unknown' as ZollhausOrderEmailErrorCategory }
       : {}),
@@ -278,7 +306,7 @@ export function calculateZollhausOrderTotal(items: ZollhausOrderItem[]) {
   return items.reduce((sum, item) => sum + item.unitPriceCents * item.quantity, 0);
 }
 
-export function normalizeZollhausOrder(input: unknown, options?: { now?: string; existing?: Partial<ZollhausOrder> }) {
+export function normalizeZollhausOrder(input: unknown, options?: { now?: string; existing?: Partial<ZollhausOrder>; tolerateInvalidCustomerEmail?: boolean }) {
   if (!input || typeof input !== 'object') {
     throw new Error('Bestelldaten fehlen.');
   }
@@ -349,7 +377,9 @@ export function normalizeZollhausOrder(input: unknown, options?: { now?: string;
     id: normalizeBoundedText(candidate.id ?? existing?.id, 'Bestell-ID', { maxLength: 120 }),
     orderNumber,
     status,
-    customer: normalizeCustomer(candidate.customer ?? existing?.customer),
+    customer: normalizeCustomer(candidate.customer ?? existing?.customer, {
+      tolerateInvalidEmail: Boolean(options?.tolerateInvalidCustomerEmail),
+    }),
     items,
     totalPriceCents,
     idempotencyKey: normalizeBoundedText(candidate.idempotencyKey ?? existing?.idempotencyKey, 'Idempotency-Key', {
@@ -357,6 +387,7 @@ export function normalizeZollhausOrder(input: unknown, options?: { now?: string;
       maxLength: 200,
     }),
     email: normalizeEmailStatus(candidate.email ?? existing?.email, now),
+    customerEmail: normalizeEmailStatus(candidate.customerEmail ?? existing?.customerEmail, now),
     createdAt: normalizeIsoTimestamp(candidate.createdAt ?? existing?.createdAt, now),
     updatedAt: now,
     ...(candidate.statusUpdatedAt ?? existing?.statusUpdatedAt

@@ -14,9 +14,27 @@ const EVENT_IMAGE_CONTENT_TYPES = new Set([
 const EVENT_IMAGE_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
 
 export type EventStatus = Event['status'];
+export type EventDetailViewMode = NonNullable<Event['detailViewMode']>;
 
 export function isEventStatus(value: string): value is EventStatus {
   return value === 'planned' || value === 'confirmed' || value === 'completed' || value === 'cancelled';
+}
+
+export function isEventDetailViewMode(value: string): value is EventDetailViewMode {
+  return value === 'none' || value === 'stand3d' || value === 'sponsoring2d';
+}
+
+export function normalizeEventDetailViewMode(value: unknown, fallback: EventDetailViewMode = 'none'): EventDetailViewMode {
+  const candidate = String(value ?? '').trim();
+  return isEventDetailViewMode(candidate) ? candidate : fallback;
+}
+
+export function resolveEventDetailViewMode(event: Pick<Event, 'detailViewMode' | 'standEnabled'>): EventDetailViewMode {
+  if (isEventDetailViewMode(String(event.detailViewMode ?? '').trim())) {
+    return event.detailViewMode as EventDetailViewMode;
+  }
+
+  return event.standEnabled ? 'stand3d' : 'none';
 }
 
 export function normalizeEventStatus(value: unknown, fallback: EventStatus = 'planned'): EventStatus {

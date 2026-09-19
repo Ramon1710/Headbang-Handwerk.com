@@ -1,14 +1,19 @@
 import Link from 'next/link';
-import { restoreOrderStockAction, retryOrderEmailAction, updateOrderStatusAction } from '../../actions';
+import { restoreOrderStockAction, retryCustomerOrderEmailAction, retryOrderEmailAction, updateOrderStatusAction } from '../../actions';
 import { requireZollhausAccess } from '@/lib/cms/auth';
 import { zollhausShellStyles as styles } from '@/components/zollhaus/zollhaus-shell';
 import adminStyles from '@/components/zollhaus/product-admin.module.css';
 import { formatPriceCentsForDisplay } from '@/lib/zollhaus/product-admin';
+import type { ZollhausOrderEmailStatus } from '@/lib/zollhaus/types';
 import { ZOLLHAUS_MANAGED_ORDER_STATUSES, getZollhausOrderEmailStatusLabel, getZollhausOrderStatusLabel, getZollhausManagedOrderById } from '@/lib/zollhaus/order-management';
 
 function getSavedMessage(saved?: string) {
   if (saved === 'email-resent') {
     return 'Die interne Bestellmail wurde erneut versendet.';
+  }
+
+  if (saved === 'customer-email-resent') {
+    return 'Die Kundenbestätigung wurde erneut versendet.';
   }
 
   if (saved === 'stock-restored') {
@@ -20,6 +25,19 @@ function getSavedMessage(saved?: string) {
   }
 
   return null;
+}
+
+function renderEmailStatusDetails(emailStatus: ZollhausOrderEmailStatus) {
+  return (
+    <>
+      <p>Status: {getZollhausOrderEmailStatusLabel(emailStatus.state)}</p>
+      <p>Versandversuche: {emailStatus.attemptCount}</p>
+      {emailStatus.lastAttemptAt ? <p>Letzter Versuch: {new Date(emailStatus.lastAttemptAt).toLocaleString('de-DE')}</p> : null}
+      {emailStatus.sentAt ? <p>Versendet am: {new Date(emailStatus.sentAt).toLocaleString('de-DE')}</p> : null}
+      {emailStatus.lastErrorMessage ? <p>Letzter Fehler: {emailStatus.lastErrorMessage}</p> : null}
+      {emailStatus.providerMessageId ? <p>Provider-Message-ID: {emailStatus.providerMessageId}</p> : null}
+    </>
+  );
 }
 
 export default async function ZollhausAdminOrderDetailPage({
@@ -94,12 +112,20 @@ export default async function ZollhausAdminOrderDetailPage({
             <div className={adminStyles.detailValue}>{getZollhausOrderStatusLabel(order.status)}</div>
           </div>
           <div className={adminStyles.detailCard}>
-            <div className={adminStyles.detailTerm}>E-Mail-Status</div>
+            <div className={adminStyles.detailTerm}>Interne Bestellmail</div>
             <div className={adminStyles.detailValue}>{getZollhausOrderEmailStatusLabel(order.email.state)}</div>
           </div>
           <div className={adminStyles.detailCard}>
-            <div className={adminStyles.detailTerm}>Versandversuche</div>
+            <div className={adminStyles.detailTerm}>Interne Versandversuche</div>
             <div className={adminStyles.detailValue}>{order.email.attemptCount}</div>
+          </div>
+          <div className={adminStyles.detailCard}>
+            <div className={adminStyles.detailTerm}>Kundenbestätigung</div>
+            <div className={adminStyles.detailValue}>{getZollhausOrderEmailStatusLabel(order.customerEmail.state)}</div>
+          </div>
+          <div className={adminStyles.detailCard}>
+            <div className={adminStyles.detailTerm}>Kunden-Versandversuche</div>
+            <div className={adminStyles.detailValue}>{order.customerEmail.attemptCount}</div>
           </div>
           <div className={adminStyles.detailCard}>
             <div className={adminStyles.detailTerm}>Gesamtpreis</div>
@@ -142,52 +168,66 @@ export default async function ZollhausAdminOrderDetailPage({
         </div>
       </section>
 
-      <div className={adminStyles.twoColumnLayout}>
-        <section className={styles.panel}>
-          <div className={adminStyles.stack}>
-            <h3 className={adminStyles.productTitle}>Bestellstatus ändern</h3>
-            <form action={updateOrderStatusAction} className={adminStyles.statusFormGrid}>
-              <input type="hidden" name="orderId" value={order.id} />
-              <div className={adminStyles.field}>
-                <label htmlFor="zollhaus-order-status" className={adminStyles.fieldLabel}>Neuer Status</label>
-                <select id="zollhaus-order-status" name="status" defaultValue={order.status === 'email_sent' || order.status === 'email_failed' ? 'new' : order.status}>
-                  {ZOLLHAUS_MANAGED_ORDER_STATUSES.map((status) => (
-                    <option key={status} value={status}>{getZollhausOrderStatusLabel(status)}</option>
-                  ))}
-                </select>
-              </div>
-              <label className={adminStyles.checkboxOption}>
-                <input type="checkbox" name="statusConfirmed" />
-                Ja, diese Statusänderung soll gespeichert werden
-              </label>
-              <button type="submit" className={adminStyles.primaryButton}>Status speichern</button>
-              {order.statusUpdatedAt ? <p className={adminStyles.orderMeta}>Zuletzt geändert: {new Date(order.statusUpdatedAt).toLocaleString('de-DE')} durch {order.statusUpdatedBy} ({order.statusUpdatedByRole})</p> : null}
-            </form>
-          </div>
-        </section>
-
-        <section className={styles.panel}>
-          <div className={adminStyles.stack}>
-            <h3 className={adminStyles.productTitle}>Interne Bestellmail</h3>
-            <div className={styles.panelBody}>
-              <p>Status: {getZollhausOrderEmailStatusLabel(order.email.state)}</p>
-              <p>Versandversuche: {order.email.attemptCount}</p>
-              {order.email.lastAttemptAt ? <p>Letzter Versuch: {new Date(order.email.lastAttemptAt).toLocaleString('de-DE')}</p> : null}
-              {order.email.sentAt ? <p>Versendet am: {new Date(order.email.sentAt).toLocaleString('de-DE')}</p> : null}
+      <section className={styles.panel}>
+        <div className={adminStyles.stack}>
+          <h3 className={adminStyles.productTitle}>Bestellstatus ändern</h3>
+          <form action={updateOrderStatusAction} className={adminStyles.statusFormGrid}>
+            <input type="hidden" name="orderId" value={order.id} />
+            <div className={adminStyles.field}>
+              <label htmlFor="zollhaus-order-status" className={adminStyles.fieldLabel}>Neuer Status</label>
+              <select id="zollhaus-order-status" name="status" defaultValue={order.status === 'email_sent' || order.status === 'email_failed' ? 'new' : order.status}>
+                {ZOLLHAUS_MANAGED_ORDER_STATUSES.map((status) => (
+                  <option key={status} value={status}>{getZollhausOrderStatusLabel(status)}</option>
+                ))}
+              </select>
             </div>
-            <form action={retryOrderEmailAction} className={adminStyles.statusFormGrid}>
-              <input type="hidden" name="orderId" value={order.id} />
-              <label className={adminStyles.checkboxOption}>
-                <input type="checkbox" name="retryConfirmed" />
-                Ja, die interne Bestellmail soll erneut versendet werden
-              </label>
-              <button type="submit" className={order.email.state === 'sent' || order.email.state === 'sending' ? `${adminStyles.secondaryButton} ${adminStyles.buttonDisabled}` : adminStyles.primaryButton} disabled={order.email.state === 'sent' || order.email.state === 'sending'}>
-                E-Mail erneut senden
-              </button>
-            </form>
+            <label className={adminStyles.checkboxOption}>
+              <input type="checkbox" name="statusConfirmed" />
+              Ja, diese Statusänderung soll gespeichert werden
+            </label>
+            <button type="submit" className={adminStyles.primaryButton}>Status speichern</button>
+            {order.statusUpdatedAt ? <p className={adminStyles.orderMeta}>Zuletzt geändert: {new Date(order.statusUpdatedAt).toLocaleString('de-DE')} durch {order.statusUpdatedBy} ({order.statusUpdatedByRole})</p> : null}
+          </form>
+        </div>
+      </section>
+
+      <section className={styles.panel}>
+        <div className={adminStyles.stack}>
+          <h3 className={adminStyles.productTitle}>Interne Bestellmail</h3>
+          <div className={styles.panelBody}>
+            {renderEmailStatusDetails(order.email)}
           </div>
-        </section>
-      </div>
+          <form action={retryOrderEmailAction} className={adminStyles.statusFormGrid}>
+            <input type="hidden" name="orderId" value={order.id} />
+            <label className={adminStyles.checkboxOption}>
+              <input type="checkbox" name="retryConfirmed" />
+              Ja, die interne Bestellmail soll erneut versendet werden
+            </label>
+            <button type="submit" className={order.email.state === 'sent' || order.email.state === 'sending' ? `${adminStyles.secondaryButton} ${adminStyles.buttonDisabled}` : adminStyles.primaryButton} disabled={order.email.state === 'sent' || order.email.state === 'sending'}>
+              E-Mail erneut senden
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <section className={styles.panel}>
+        <div className={adminStyles.stack}>
+          <h3 className={adminStyles.productTitle}>Kundenbestätigung</h3>
+          <div className={styles.panelBody}>
+            {renderEmailStatusDetails(order.customerEmail)}
+          </div>
+          <form action={retryCustomerOrderEmailAction} className={adminStyles.statusFormGrid}>
+            <input type="hidden" name="orderId" value={order.id} />
+            <label className={adminStyles.checkboxOption}>
+              <input type="checkbox" name="retryConfirmed" />
+              Ja, die Kundenbestätigung soll erneut versendet werden
+            </label>
+            <button type="submit" className={order.customerEmail.state === 'sent' || order.customerEmail.state === 'sending' ? `${adminStyles.secondaryButton} ${adminStyles.buttonDisabled}` : adminStyles.primaryButton} disabled={order.customerEmail.state === 'sent' || order.customerEmail.state === 'sending'}>
+              Kundenbestätigung erneut senden
+            </button>
+          </form>
+        </div>
+      </section>
 
       <section className={styles.panel}>
         <div className={adminStyles.stack}>

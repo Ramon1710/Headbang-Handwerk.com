@@ -106,6 +106,28 @@ export function getEventStandHref(eventId: string) {
   return `/veranstaltungen/${encodeURIComponent(eventId)}/3d-stand`;
 }
 
+export function getEventSponsoringHref(eventId: string) {
+  return `/veranstaltungen/${encodeURIComponent(eventId)}/sponsoring`;
+}
+
+export function resolveEventDetailHref(event: { id: string; detailViewMode?: 'none' | 'stand3d' | 'sponsoring2d'; standEnabled?: boolean }) {
+  const mode = event.detailViewMode === 'none' || event.detailViewMode === 'stand3d' || event.detailViewMode === 'sponsoring2d'
+    ? event.detailViewMode
+    : event.standEnabled
+      ? 'stand3d'
+      : 'none';
+
+  if (mode === 'stand3d') {
+    return getEventStandHref(event.id);
+  }
+
+  if (mode === 'sponsoring2d') {
+    return getEventSponsoringHref(event.id);
+  }
+
+  return null;
+}
+
 export function normalizeExternalUrl(url: string) {
   const trimmed = url.trim();
 

@@ -95,9 +95,10 @@ export function matchesZollhausOrderFilter(order: ZollhausOrder, filter: Zollhau
     case 'cancelled':
       return order.status === 'cancelled';
     case 'email-open':
-      return order.email.state === 'pending' || order.email.state === 'sending';
+      return order.email.state === 'pending' || order.email.state === 'sending'
+        || order.customerEmail.state === 'pending' || order.customerEmail.state === 'sending';
     case 'email-failed':
-      return order.email.state === 'failed';
+      return order.email.state === 'failed' || order.customerEmail.state === 'failed';
     default:
       return true;
   }
@@ -159,7 +160,7 @@ export async function updateZollhausManagedOrderStatus(
         statusUpdatedByRole: actor.role,
         ...(status === 'cancelled' ? { cancelledAt: order.cancelledAt || nowIso } : {}),
       },
-      { existing: order, now: nowIso },
+      { existing: order, now: nowIso, tolerateInvalidCustomerEmail: true },
     );
 
     await transaction.saveOrder(nextOrder);
@@ -203,6 +204,46 @@ export async function retryFailedOrPendingZollhausOrderEmail(
 
   const module = await import('@/lib/zollhaus/order-email');
   return module.retryZollhausOrderEmail(orderId, { store: options?.store, now: options?.now, transport: options?.transport });
+}
+
+export async function retryFailedOrPendingZollhausCustomerOrderEmail(
+  orderId: string,
+  actor: ZollhausAdminActor,
+  options?: {
+    store?: ZollhausCheckoutStore;
+    now?: () => Date;
+    transport?: {
+      send(input: {
+        to: string;
+        subject: string;
+        text: string;
+        html: string;
+        from?: string;
+        replyTo?: string;
+        messageId: string;
+        headers: Record<string, string>;
+      }): Promise<{ messageId?: string | null }>;
+    };
+  },
+) {
+  const order = await getZollhausManagedOrderById(orderId, { store: options?.store });
+
+  if (!order) {
+    throw new Error('Die Bestellung wurde nicht gefunden.');
+  }
+
+  if (order.customerEmail.state === 'sent') {
+    throw new Error('Die Kundenbestätigung wurde bereits erfolgreich versendet.');
+  }
+
+  if (order.customerEmail.state === 'sending') {
+    throw new Error('Die Kundenbestätigung wird bereits versendet.');
+  }
+
+  void actor;
+
+  const module = await import('@/lib/zollhaus/order-email');
+  return module.retryZollhausCustomerOrderConfirmation(orderId, { store: options?.store, now: options?.now, transport: options?.transport });
 }
 
 export async function restoreZollhausOrderStock(

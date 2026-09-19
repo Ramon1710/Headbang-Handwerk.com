@@ -8,6 +8,7 @@ export interface Event {
   festivalName: string;
   description: string;
   status: 'planned' | 'confirmed' | 'completed' | 'cancelled';
+  detailViewMode?: 'none' | 'stand3d' | 'sponsoring2d';
   standEnabled?: boolean;
   ctaText: string;
   ctaUrl?: string;

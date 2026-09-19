@@ -101,7 +101,7 @@
   min-height: 3rem;
   border-radius: 999px;
   padding: 0.78rem 1.2rem;
-  font-weight: 800;
+  font-weight: 700;
   text-decoration: none;
   box-sizing: border-box;
   transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
@@ -164,7 +164,7 @@
 .lineTitle,
 .priceValue,
 .totalValue {
-  font-family: var(--font-sora), 'Segoe UI', sans-serif;
+  font-family: var(--font-zollhaus), Arial, Helvetica, sans-serif;
   letter-spacing: -0.03em;
   color: #1f2528;
 }
@@ -180,7 +180,7 @@
 .priceValue,
 .totalValue {
   font-size: 1.05rem;
-  font-weight: 780;
+  font-weight: 700;
 }
 
 .totalValue {
@@ -220,7 +220,7 @@
   background: #fff3ba;
   color: #584712;
   font-size: 0.78rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -234,7 +234,7 @@
 }
 
 .successNumber {
-  font-family: var(--font-sora), 'Segoe UI', sans-serif;
+  font-family: var(--font-zollhaus), Arial, Helvetica, sans-serif;
   font-size: clamp(1.95rem, 6vw, 2.8rem);
   color: #1f2528;
 }

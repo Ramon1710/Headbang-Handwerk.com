@@ -2,7 +2,7 @@ import { Calendar, MapPin } from 'lucide-react';
 import { Event } from '@/lib/types';
 import type { LiveEditorContent } from '@/lib/cms/schema';
 import { resolveLiveHtml } from '@/lib/cms/live-editor';
-import { getEventStandHref, isExternalUrl, resolveEventCtaUrl } from '@/lib/site';
+import { isExternalUrl, resolveEventCtaUrl, resolveEventDetailHref } from '@/lib/site';
 import { LiveEditableText } from './live-editable-text';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -26,8 +26,7 @@ const EVENT_IMAGE_FALLBACK_SRC = '/Headbang Stand Bild.png';
 export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix }: EventCardProps) {
   const { label, variant } = statusMap[event.status];
   const resolvedKeyPrefix = editorKeyPrefix || `events.cards.${event.id}`;
-  const standHref = getEventStandHref(event.id);
-  const canOpenStand = Boolean(event.standEnabled);
+  const detailHref = resolveEventDetailHref(event);
   const ctaHref = resolveEventCtaUrl(event.ctaUrl, event.ctaText);
   const opensExternalSite = isExternalUrl(ctaHref);
   const imageSrc = event.imageUrl || EVENT_IMAGE_FALLBACK_SRC;
@@ -103,10 +102,10 @@ export function EventCard({ event, isAdmin = false, liveEditor, editorKeyPrefix 
 
   return (
     <div className="rounded-[1.8rem] bg-[linear-gradient(180deg,rgba(28,18,12,0.72)_0%,rgba(12,9,7,0.3)_100%)] p-8 text-center ring-1 ring-white/6 shadow-[0_20px_50px_rgba(0,0,0,0.22)] transition-all duration-300 hover:-translate-y-1 hover:ring-[color:var(--color-accent)]/30">
-      {isAdmin || !canOpenStand ? (
+      {isAdmin || !detailHref ? (
         cardContent
       ) : (
-        <a href={standHref} className="block rounded-[1.2rem] transition focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent)] focus:ring-offset-2 focus:ring-offset-black">
+        <a href={detailHref} className="block rounded-[1.2rem] transition focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent)] focus:ring-offset-2 focus:ring-offset-black">
           {cardContent}
         </a>
       )}

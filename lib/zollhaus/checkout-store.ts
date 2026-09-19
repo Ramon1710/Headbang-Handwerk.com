@@ -69,7 +69,10 @@ async function readLocalCheckoutState() {
         Object.entries(parsed.products || fallback.products).map(([id, product]) => [id, normalizeZollhausProduct(product, { existing: product as ZollhausProduct })]),
       ),
       orders: Object.fromEntries(
-        Object.entries(parsed.orders || {}).map(([id, order]) => [id, normalizeZollhausOrder(order, { existing: order as ZollhausOrder })]),
+        Object.entries(parsed.orders || {}).map(([id, order]) => [id, normalizeZollhausOrder(order, {
+          existing: order as ZollhausOrder,
+          tolerateInvalidCustomerEmail: true,
+        })]),
       ),
       orderRequests: Object.fromEntries(
         Object.entries(parsed.orderRequests || {}).map(([id, orderRequest]) => [id, normalizeZollhausOrderRequest(orderRequest, { existing: orderRequest as ZollhausOrderRequest })]),
@@ -158,11 +161,11 @@ class FirestoreCheckoutStore implements ZollhausCheckoutStore {
         },
         getOrder: async (orderId) => {
           const snapshot = await firestoreTransaction.get(db.doc(`${ZOLLHAUS_ORDERS_COLLECTION_PATH}/${orderId}`));
-          return snapshot.exists ? normalizeZollhausOrder({ id: snapshot.id, ...(snapshot.data() || {}) }) : null;
+          return snapshot.exists ? normalizeZollhausOrder({ id: snapshot.id, ...(snapshot.data() || {}) }, { tolerateInvalidCustomerEmail: true }) : null;
         },
         listOrders: async () => {
           const snapshot = await firestoreTransaction.get(db.collection(ZOLLHAUS_ORDERS_COLLECTION_PATH).orderBy('createdAt', 'desc'));
-          return snapshot.docs.map((entry) => normalizeZollhausOrder({ id: entry.id, ...(entry.data() || {}) }));
+          return snapshot.docs.map((entry) => normalizeZollhausOrder({ id: entry.id, ...(entry.data() || {}) }, { tolerateInvalidCustomerEmail: true }));
         },
         getProducts: async (productIds) => {
           const refs = productIds.map((productId) => db.doc(`${ZOLLHAUS_PRODUCTS_COLLECTION_PATH}/${productId}`));

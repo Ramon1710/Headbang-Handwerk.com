@@ -14,18 +14,25 @@ export function ZollhausShell({ children }: ZollhausShellProps) {
       <div className={styles.frame}>
         <header className={styles.header}>
           <div className={styles.brandArea}>
-            <a href="https://zollhaus-leer.com/" target="_blank" rel="noreferrer noopener" className={styles.brandLink}>
+            <a
+              href="https://zollhaus-leer.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.brandLink}
+              aria-label="Zur offiziellen Zollhaus-Website in einem neuen Tab"
+            >
               <Image
-                src="/zollhaus/zollhaus-logo.svg"
+                src="/zollhaus/branding/zollhaus-logo.webp"
                 alt="Zollhaus – Raum für Kultur"
-                width={420}
-                height={160}
+                width={2048}
+                height={1825}
+                sizes="(max-width: 480px) 110px, (max-width: 1024px) 140px, 160px"
                 className={styles.brandLogo}
                 priority
               />
             </a>
 
-            <a href="https://zollhaus-leer.com/" target="_blank" rel="noreferrer noopener" className={styles.backLink}>
+            <a href="https://zollhaus-leer.com/" target="_blank" rel="noopener noreferrer" className={styles.backLink}>
               Zurück zur Zollhaus-Website
             </a>
           </div>

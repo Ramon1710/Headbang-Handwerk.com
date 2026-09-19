@@ -1,18 +1,16 @@
 import type { Metadata } from 'next';
-import { Manrope, Sora } from 'next/font/google';
+import localFont from 'next/font/local';
 import { ZollhausCartProvider } from '@/components/zollhaus/cart-provider';
 import { ZollhausShell } from '@/components/zollhaus/zollhaus-shell';
 
-const sora = Sora({
-  subsets: ['latin'],
-  variable: '--font-sora',
-  weight: ['600', '700', '800'],
-});
-
-const manrope = Manrope({
-  subsets: ['latin'],
-  variable: '--font-manrope',
-  weight: ['400', '500', '600', '700'],
+const zollhausFont = localFont({
+  src: [
+    { path: './fonts/QuadraatSansOT.otf', weight: '400', style: 'normal' },
+    { path: './fonts/QuadraatSansOT-Bld.otf', weight: '700', style: 'normal' },
+  ],
+  variable: '--font-zollhaus',
+  display: 'swap',
+  fallback: ['Arial', 'Helvetica', 'sans-serif'],
 });
 
 export const metadata: Metadata = {
@@ -30,7 +28,7 @@ export default function ZollhausLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${sora.variable} ${manrope.variable}`} style={{ fontFamily: 'var(--font-manrope), Segoe UI, sans-serif' }}>
+    <div className={zollhausFont.variable}>
       <ZollhausCartProvider>
         <ZollhausShell>{children}</ZollhausShell>
       </ZollhausCartProvider>

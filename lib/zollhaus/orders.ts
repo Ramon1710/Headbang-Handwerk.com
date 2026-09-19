@@ -35,7 +35,7 @@ function readOrderSnapshot(snapshot: QueryDocumentSnapshot | FirebaseFirestore.D
     return null;
   }
 
-  return normalizeZollhausOrder({ id: snapshot.id, ...(snapshot.data() || {}) });
+  return normalizeZollhausOrder({ id: snapshot.id, ...(snapshot.data() || {}) }, { tolerateInvalidCustomerEmail: true });
 }
 
 function readOrderRequestSnapshot(snapshot: QueryDocumentSnapshot | FirebaseFirestore.DocumentSnapshot) {
@@ -130,7 +130,7 @@ export async function updateZollhausOrderStatus(
       ...(options?.cancelledAt ? { cancelledAt: options.cancelledAt } : {}),
       ...(options?.stockRestoredAt ? { stockRestoredAt: options.stockRestoredAt } : {}),
     },
-    { existing: current },
+    { existing: current, tolerateInvalidCustomerEmail: true },
   );
 
   await getOrdersCollection(options?.db).doc(orderId).set(next, { merge: false });
