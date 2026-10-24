@@ -21,7 +21,7 @@ import {
 import { isAdminAuthenticated } from '@/lib/cms/auth';
 import { resolveLiveBoxStyle } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
-import { getUpcomingEvents } from '@/lib/events';
+import { getUpcomingEvents, HOMEPAGE_EVENTS_PREVIEW_LIMIT } from '@/lib/events';
 import {
   HOME_DISPLAY_SETTING_SPECS,
   getVisibleHomeNewsItems,
@@ -194,7 +194,9 @@ export default async function HomePage({
   const heroImageSrc = getImagePreviewSrc(home.heroImage, standBeispielKiImage.src);
   const membershipImageSrc = home.membershipImage.assetUrl;
   const backgroundImageSrc = home.backgroundImage.assetUrl || wackenBackgroundImage.src;
-  const upcomingEvents = getUpcomingEvents(cms.site.events, { limit: 3 });
+  // Startseiten-Vorschau: bewusst auf die naechsten drei kommenden Veranstaltungen begrenzt.
+  // Die vollstaendige Uebersicht auf /veranstaltungen nutzt diese Begrenzung nicht.
+  const upcomingEvents = getUpcomingEvents(cms.site.events, { limit: HOMEPAGE_EVENTS_PREVIEW_LIMIT });
   const nextMobileEvent = upcomingEvents.slice(0, 1);
   const visibleNewsItems = getVisibleHomeNewsItems(home.newsItems, 3);
   const savedMessage = getSavedMessage(params?.homeSaved);

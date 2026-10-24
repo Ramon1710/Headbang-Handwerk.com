@@ -4,7 +4,7 @@ import { EventCard } from '@/components/event-card';
 import { LiveEditableText } from '@/components/live-editable-text';
 import { LiveResizableBox } from '@/components/live-resizable-box';
 import { isAdminAuthenticated } from '@/lib/cms/auth';
-import { getUpcomingEvents, resolveEventDetailViewMode } from '@/lib/events';
+import { getUpcomingEvents, HOMEPAGE_EVENTS_PREVIEW_LIMIT, resolveEventDetailViewMode } from '@/lib/events';
 import { resolveLiveBoxStyle, resolveLiveHtml } from '@/lib/cms/live-editor';
 import { getCmsContent } from '@/lib/cms/storage';
 import { getEventStandHref } from '@/lib/site';
@@ -31,7 +31,10 @@ export default async function VeranstaltungenPage({
   const planned = events.filter((e) => e.status === 'planned');
   const completed = events.filter((e) => e.status === 'completed');
   const cancelled = events.filter((e) => e.status === 'cancelled');
-  const upcomingEvents = getUpcomingEvents(events);
+  // Alle vorschaufaehigen Veranstaltungen ohne Begrenzung zaehlen. Die Begrenzung auf
+  // HOMEPAGE_EVENTS_PREVIEW_LIMIT gilt ausschliesslich fuer die Startseiten-Vorschau
+  // und beschraenkt niemals die vollstaendige Uebersicht auf dieser Seite.
+  const previewEligibleEvents = getUpcomingEvents(events);
 
   function getDetailViewModeLabel(event: (typeof events)[number]) {
     const mode = resolveEventDetailViewMode(event);
@@ -90,7 +93,7 @@ export default async function VeranstaltungenPage({
                   <h2 className="mt-2 text-2xl font-black text-white">Veranstaltungen hinzufügen, entfernen und umschalten</h2>
                   <p className="mt-2 max-w-3xl text-sm leading-7 text-[color:var(--color-muted)]">Änderungen werden direkt ins CMS gespeichert. Der Status-Schalter wechselt zwischen Geplant und Bestätigt.</p>
                   <p className="mt-2 max-w-3xl text-sm leading-7 text-[color:var(--color-muted)]">Das neue Feld detailViewMode ist jetzt führend. standEnabled bleibt nur als kompatibler Spiegel für den 3D-Fall erhalten.</p>
-                  <p className="mt-2 max-w-3xl text-sm leading-7 text-[color:var(--color-muted)]">Nur Veranstaltungen mit strukturiertem Startdatum erscheinen später automatisch in der Startseiten-Vorschau.</p>
+                  <p className="mt-2 max-w-3xl text-sm leading-7 text-[color:var(--color-muted)]">Nur Veranstaltungen mit gueltigem strukturiertem Startdatum erscheinen automatisch in der Startseiten-Vorschau. Die vollstaendige Uebersicht auf dieser Seite zeigt unabhaengig davon immer alle gespeicherten Veranstaltungen.</p>
                 </div>
                 <div className="text-sm font-semibold">
                   {params?.adminSaved ? <p className="rounded-xl border border-green-500/30 bg-green-950/40 px-4 py-3 text-green-200">Änderung gespeichert.</p> : null}
@@ -146,13 +149,13 @@ export default async function VeranstaltungenPage({
                 </div>
               </form>
 
-              {upcomingEvents.length ? (
+              {previewEligibleEvents.length ? (
                 <div className="mt-5 rounded-[1.2rem] border border-emerald-500/20 bg-emerald-950/20 px-4 py-4 text-sm text-emerald-100">
-                  Automatisch vorschaufähig sind aktuell {upcomingEvents.length} Veranstaltung{upcomingEvents.length === 1 ? '' : 'en'} mit gueltigem strukturiertem Datum.
+                  Fuer die Startseiten-Vorschau qualifiziert sind aktuell {previewEligibleEvents.length} Veranstaltung{previewEligibleEvents.length === 1 ? '' : 'en'} mit gueltigem strukturiertem Datum. Die Startseite zeigt davon automatisch nur die naechsten {HOMEPAGE_EVENTS_PREVIEW_LIMIT}. Diese Vorschau begrenzt ausschliesslich die Startseite – die vollstaendige Uebersicht auf /veranstaltungen zeigt weiterhin alle Veranstaltungen, auch Eintraege ohne gueltiges strukturiertes Datum.
                 </div>
               ) : (
                 <div className="mt-5 rounded-[1.2rem] border border-amber-500/20 bg-amber-950/20 px-4 py-4 text-sm text-amber-100">
-                  Aktuell ist keine Veranstaltung fuer die spaetere automatische Startseiten-Vorschau qualifiziert.
+                  Aktuell ist keine Veranstaltung fuer die automatische Startseiten-Vorschau qualifiziert. Das betrifft nur die Startseite: Die vollstaendige Uebersicht auf /veranstaltungen zeigt weiterhin alle gespeicherten Veranstaltungen.
                 </div>
               )}
 
@@ -163,7 +166,7 @@ export default async function VeranstaltungenPage({
                       <input type="hidden" name="id" value={event.id} />
                       {!event.startDate ? (
                         <div className="md:col-span-2 rounded-xl border border-amber-500/25 bg-amber-950/25 px-4 py-3 text-sm text-amber-100">
-                          Dieser bestehende Eintrag hat noch kein strukturiertes Startdatum. Er bleibt sichtbar, erscheint spaeter aber nicht automatisch auf der Startseite.
+                          Hinweis zur Datumskorrektur: Dieser Eintrag hat noch kein gueltiges strukturiertes Startdatum. Er bleibt in der vollstaendigen Uebersicht auf /veranstaltungen sichtbar, erscheint aber nicht in der Startseiten-Vorschau. Bitte oben ein gueltiges Startdatum eintragen und speichern, damit die Veranstaltung auch fuer die Startseite beruecksichtigt wird.
                         </div>
                       ) : null}
                       <input name="title" defaultValue={event.title} className="w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]" />

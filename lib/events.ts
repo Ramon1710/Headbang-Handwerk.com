@@ -104,14 +104,17 @@ function compareEventIdentity(left: Event, right: Event) {
   return left.id.localeCompare(right.id, 'de');
 }
 
+export const HOMEPAGE_EVENTS_PREVIEW_LIMIT = 3;
+
 export function getUpcomingEvents(
   events: Event[],
   options?: { limit?: number; referenceDate?: string }
 ) {
   const referenceDate = normalizeStructuredEventDate(options?.referenceDate) || getBerlinTodayDateString();
-  const limit = Math.max(1, options?.limit ?? 3);
+  const requestedLimit = options?.limit;
+  const limit = typeof requestedLimit === 'number' && Number.isFinite(requestedLimit) ? Math.max(1, Math.floor(requestedLimit)) : undefined;
 
-  return events
+  const eligibleEvents = events
     .map((event, index) => ({ event, index }))
     .filter(({ event }) => {
       if (!event.startDate || !isValidIsoDateString(event.startDate)) {
@@ -150,8 +153,9 @@ export function getUpcomingEvents(
 
       return left.index - right.index;
     })
-    .slice(0, limit)
     .map(({ event }) => event);
+
+  return typeof limit === 'number' ? eligibleEvents.slice(0, limit) : eligibleEvents;
 }
 
 export function validateStructuredEventDates(startDate: string, endDate: string) {
