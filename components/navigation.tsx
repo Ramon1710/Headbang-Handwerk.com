@@ -5,7 +5,7 @@ import type { ComponentProps } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { ChevronDown, Menu, X } from 'lucide-react';
 import type { NavigationLink } from '@/lib/cms/schema';
-import { getNavigationSections, normalizeNavigationPlacement } from '@/lib/site';
+import { getNavigationSections, isExternalUrl, normalizeNavigationPlacement } from '@/lib/site';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 import headbangLogo from '../Headbang Handwerk e.V. Logo Final PNG.png';
@@ -151,6 +151,8 @@ export function Navigation({
                   <a
                     key={link.id || link.href}
                     href={link.href}
+                    target={isExternalUrl(link.href) ? '_blank' : undefined}
+                    rel={isExternalUrl(link.href) ? 'noopener noreferrer' : undefined}
                     onClick={handleNavigate}
                     className={cn(
                       'rounded-md px-3 py-2 text-[0.88rem] font-semibold whitespace-nowrap transition-colors focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[color:var(--color-background)] xl:px-4 xl:text-[0.97rem]',
@@ -160,6 +162,7 @@ export function Navigation({
                     )}
                   >
                     {link.label}
+                    {isExternalUrl(link.href) ? <span className="sr-only"> (öffnet in neuem Tab)</span> : null}
                   </a>
                 ))}
                 <div className="relative" ref={desktopMoreRef}>
@@ -188,6 +191,8 @@ export function Navigation({
                           <a
                             key={link.id || link.href}
                             href={link.href}
+                            target={isExternalUrl(link.href) ? '_blank' : undefined}
+                            rel={isExternalUrl(link.href) ? 'noopener noreferrer' : undefined}
                             onClick={handleNavigate}
                             className={cn(
                               'rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[#120b07]',
@@ -197,6 +202,7 @@ export function Navigation({
                             )}
                           >
                             {link.label}
+                            {isExternalUrl(link.href) ? <span className="sr-only"> (öffnet in neuem Tab)</span> : null}
                           </a>
                         ))}
                       </div>
@@ -248,6 +254,8 @@ export function Navigation({
                       <a
                         key={link.id || link.href}
                         href={link.href}
+                        target={isExternalUrl(link.href) ? '_blank' : undefined}
+                        rel={isExternalUrl(link.href) ? 'noopener noreferrer' : undefined}
                         onClick={handleNavigate}
                         className={cn(
                           'rounded-xl px-4 py-3 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[#120b07]',
@@ -257,6 +265,7 @@ export function Navigation({
                         )}
                       >
                         {link.label}
+                        {isExternalUrl(link.href) ? <span className="sr-only"> (öffnet in neuem Tab)</span> : null}
                       </a>
                     ))}
                     <div className="rounded-xl border border-white/10 bg-black/10">
@@ -281,6 +290,8 @@ export function Navigation({
                             <a
                               key={link.id || link.href}
                               href={link.href}
+                              target={isExternalUrl(link.href) ? '_blank' : undefined}
+                              rel={isExternalUrl(link.href) ? 'noopener noreferrer' : undefined}
                               onClick={handleNavigate}
                               className={cn(
                                 'rounded-xl px-4 py-3 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[#120b07]',
@@ -290,6 +301,7 @@ export function Navigation({
                               )}
                             >
                               {link.label}
+                              {isExternalUrl(link.href) ? <span className="sr-only"> (öffnet in neuem Tab)</span> : null}
                             </a>
                           ))}
                         </div>

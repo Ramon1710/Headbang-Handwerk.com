@@ -1,7 +1,7 @@
 import type { FooterLink, NavigationLink } from '@/lib/cms/schema';
 
 const REMOVED_NAV_HREFS = new Set(['/drei-d-stand', '/partner-unterstuetzerinfo', '/hühnerjagt']);
-export type NavigationItemId = 'home' | 'about' | 'events' | 'gallery' | 'membership' | 'partners' | 'shop' | 'sponsor' | 'donation' | 'game';
+export type NavigationItemId = 'home' | 'about' | 'events' | 'gallery' | 'membership' | 'partners' | 'shop' | 'sponsor' | 'donation' | 'game' | 'appschmiede';
 export type NavigationPlacement = 'primary' | 'more';
 
 interface NavigationItemDefinition {
@@ -22,6 +22,7 @@ const NAVIGATION_ITEMS: NavigationItemDefinition[] = [
   { id: 'sponsor', defaultLabel: 'Sponsor werden', defaultHref: '/sponsoren', defaultPlacement: 'more' },
   { id: 'donation', defaultLabel: 'Spenden', defaultHref: '/spenden', defaultPlacement: 'more' },
   { id: 'game', defaultLabel: 'Spiele', defaultHref: '/game', defaultPlacement: 'more' },
+  { id: 'appschmiede', defaultLabel: '🚀 AppSchmiede', defaultHref: 'https://myappschmiede.com', defaultPlacement: 'more' },
 ];
 
 const NAVIGATION_ITEM_BY_ID = new Map(NAVIGATION_ITEMS.map((item) => [item.id, item]));
@@ -206,7 +207,9 @@ export function normalizeNavigationLinks(links: NavigationLink[]) {
       continue;
     }
 
-    const href = normalizeInternalHref(link.href, definition.defaultHref);
+    const href = isExternalUrl(definition.defaultHref)
+      ? definition.defaultHref
+      : normalizeInternalHref(link.href, definition.defaultHref);
 
     if (!href || REMOVED_NAV_HREFS.has(href)) {
       continue;

@@ -42,6 +42,7 @@ export const defaultCmsContent: CmsContent = {
       { id: 'sponsor', label: 'Sponsor werden', href: '/sponsoren', placement: 'more' },
       { id: 'donation', label: 'Spenden', href: '/spenden', placement: 'more' },
       { id: 'game', label: 'Spiele', href: '/game', placement: 'more' },
+      { id: 'appschmiede', label: '🚀 AppSchmiede', href: 'https://myappschmiede.com', placement: 'more' },
     ],
     navigationCtaLabel: 'Jetzt unterstützen',
     navigationCtaHref: '/sponsoren',
