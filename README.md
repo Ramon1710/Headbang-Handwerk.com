@@ -77,6 +77,49 @@ npm run dev
 stripe listen --forward-to localhost:3000/api/stripe/webhook
 ```
 
+## Kontaktformular: SMTP-Versand
+
+Das Formular unter `/kontakt` sendet über `/api/contact` und die bestehende Nodemailer-Anbindung.
+Der Empfänger ist ausschließlich serverseitig auf `info@headbang-handwerk.de` festgelegt;
+Formularwerte, CMS-Kontaktadresse und andere Empfänger-Variablen ändern ihn nicht.
+Alle Angaben (Name, Unternehmen, E-Mail, Betreff, Interessen, Nachricht) stehen in der Mail.
+Die Besucheradresse wird nur als `Reply-To`, niemals als Absender verwendet.
+Kontaktanfragen werden nicht zusätzlich gespeichert oder mit ihrem Inhalt protokolliert.
+
+Diese Variablen in Vercel für **Production** setzen (für Preview-Tests zusätzlich für **Preview**):
+
+| Variable | Zweck |
+| --- | --- |
+| `SMTP_HOST` | Erforderlich: SMTP-Server des bestehenden Mailanbieters |
+| `SMTP_PORT` | SMTP-Port, standardmäßig `587` (STARTTLS, sofern angeboten); `465` verwendet direkt TLS |
+| `SMTP_USER` | Erforderlich: SMTP-Anmeldename |
+| `SMTP_PASS` | Erforderlich: SMTP-Passwort bzw. vom Anbieter vorgesehenes App-Passwort |
+| `SMTP_FROM` | Beim Anbieter zugelassener/verifizierter Absender, z.B. `Headbang Handwerk <info@headbang-handwerk.de>`; ohne diese Variable wird `SMTP_USER` verwendet, sofern dies eine gültige E-Mail-Adresse ist |
+
+Es werden keine neuen Zugangsdaten und keine Empfänger-Variable benötigt.
+Ist `SMTP_USER` keine E-Mail-Adresse, ist `SMTP_FROM` erforderlich.
+Die Zulassung des Absenders sowie ggf. SPF/DKIM sind beim Mailanbieter zu prüfen.
+Keine SMTP-Zugangsdaten als `NEXT_PUBLIC_*` hinterlegen.
+Nach Codeänderungen **und** nach Änderungen der Vercel-Variablen ist ein neues
+Production-Deployment erforderlich; bestehende Deployments übernehmen neue Variablen nicht.
+
+Erfolg erscheint erst nach positiver SMTP-Annahme inklusive Bestätigung des festen Empfängers.
+Dies ist **keine Bestätigung des tatsächlichen Postfacheingangs**; spätere Bounces oder Spamfilter
+sind weiterhin möglich. Bei Konfigurations-, Validierungs- oder Versandfehlern bleiben die
+Formularwerte erhalten. Während einer laufenden Anfrage verhindert das Formular weitere Übermittlungen.
+Nach einem Verbindungsabbruch kann der Annahmestatus unklar sein; erneutes Senden kann dann eine
+weitere Mail auslösen (keine dauerhafte, deploymentübergreifende Deduplizierung).
+
+Kurzer Funktionstest nach dem Deployment:
+1. `/kontakt` öffnen, alle Felder einschließlich Unternehmen und mehrerer Interessen ausfüllen und absenden.
+2. Während des Versands muss der Senden-Button gesperrt bleiben. Erst nach SMTP-Annahme erscheint die Bestätigung.
+3. Eingang (auch Spam) bei `info@headbang-handwerk.de`, Vollständigkeit der Angaben, zugelassenen Absender
+   und beim Antworten die Besucheradresse prüfen. Bei ausbleibendem Eingang Mailanbieter-Logs/Bounces prüfen.
+4. In einer separaten Preview mit absichtlich fehlender SMTP-Konfiguration den Fehlerfall prüfen:
+   keine Erfolgsmeldung, verständlicher Fehler, alle Eingaben bleiben erhalten.
+5. Automatisierte lokale Prüfungen: `npx tsx --test tests/contact.test.ts` (lokaler SMTP-Testserver,
+   keine echte E-Mail) und `npx tsc --noEmit`.
+
 ## Deployment auf Vercel
 
 Ein neues Deployment kannst du direkt im Terminal mit der Vercel CLI auslösen.

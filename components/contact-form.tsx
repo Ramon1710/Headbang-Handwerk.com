@@ -1,17 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
+import { contactFieldLimits, contactInterestOptions } from '@/lib/contact';
 import { Button } from './ui/button';
-
-const interestOptions = [
-  'Sponsoring Bronze',
-  'Sponsoring Silber',
-  'Sponsoring Gold',
-  'Exklusivpartner',
-  'Bannerfläche',
-  'Allgemeine Anfrage',
-];
 
 export function ContactForm() {
   const [form, setForm] = useState({
@@ -25,6 +17,7 @@ export function ContactForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const submitting = useRef(false);
 
   const toggleInterest = (interest: string) => {
     setForm((prev) => ({
@@ -37,6 +30,8 @@ export function ContactForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
     setLoading(true);
     setError('');
     try {
@@ -45,35 +40,50 @@ export function ContactForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
-      if (!res.ok) throw new Error('Fehler beim Senden');
+      const result: unknown = await res.json();
+      if (!res.ok) {
+        setError(
+          result && typeof result === 'object' && 'error' in result && typeof result.error === 'string'
+            ? result.error
+            : 'Leider konnte die Nachricht nicht versendet werden. Bitte schreibe direkt an info@headbang-handwerk.de.'
+        );
+        return;
+      }
+      if (!result || typeof result !== 'object' || !('success' in result) || result.success !== true
+        || !('status' in result) || result.status !== 'accepted') {
+        throw new Error('Mail acceptance was not confirmed');
+      }
       setSuccess(true);
     } catch {
-      setError('Leider ist ein Fehler aufgetreten. Bitte versuche es erneut oder schreibe uns direkt eine E-Mail.');
+      setError('Der Versand konnte nicht bestätigt werden. Bitte prüfe deine Verbindung oder schreibe direkt an info@headbang-handwerk.de.');
     } finally {
+      submitting.current = false;
       setLoading(false);
     }
   };
 
   if (success) {
     return (
-      <div className="rounded-xl border border-green-700/50 bg-green-950/20 p-8 text-center">
+      <div role="status" className="rounded-xl border border-green-700/50 bg-green-950/20 p-8 text-center">
         <div className="text-4xl mb-4">✅</div>
-        <h3 className="section-title mb-2 text-[1.7rem]">Nachricht gesendet!</h3>
+        <h3 className="section-title mb-2 text-[1.7rem]">Nachricht zum Versand angenommen!</h3>
         <p className="body-copy text-sm">
-          Danke für deine Anfrage. Wir melden uns innerhalb von 1–2 Werktagen bei dir.
+          Unser Maildienst hat deine Nachricht angenommen. Das bestätigt noch nicht die Zustellung im Postfach.
+          Wir melden uns in der Regel innerhalb von 1–2 Werktagen bei dir.
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} aria-busy={loading} className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
           <label className="body-copy mb-1.5 block text-sm">Name *</label>
           <input
             required
             type="text"
+            maxLength={contactFieldLimits.name}
             value={form.name}
             onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
             className="body-copy w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm transition-colors placeholder:text-[#9b8570] focus:border-[color:var(--color-accent)] focus:outline-none"
@@ -84,6 +94,7 @@ export function ContactForm() {
           <label className="body-copy mb-1.5 block text-sm">Unternehmen</label>
           <input
             type="text"
+            maxLength={contactFieldLimits.company}
             value={form.company}
             onChange={(e) => setForm((p) => ({ ...p, company: e.target.value }))}
             className="body-copy w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm transition-colors placeholder:text-[#9b8570] focus:border-[color:var(--color-accent)] focus:outline-none"
@@ -97,6 +108,7 @@ export function ContactForm() {
         <input
           required
           type="email"
+          maxLength={contactFieldLimits.email}
           value={form.email}
           onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
           className="body-copy w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm transition-colors placeholder:text-[#9b8570] focus:border-[color:var(--color-accent)] focus:outline-none"
@@ -109,6 +121,7 @@ export function ContactForm() {
         <input
           required
           type="text"
+          maxLength={contactFieldLimits.subject}
           value={form.subject}
           onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))}
           className="body-copy w-full rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm transition-colors placeholder:text-[#9b8570] focus:border-[color:var(--color-accent)] focus:outline-none"
@@ -119,7 +132,7 @@ export function ContactForm() {
       <div>
         <label className="body-copy mb-2 block text-sm">Ich interessiere mich für</label>
         <div className="flex flex-wrap gap-2">
-          {interestOptions.map((option) => (
+          {contactInterestOptions.map((option) => (
             <button
               key={option}
               type="button"
@@ -142,6 +155,7 @@ export function ContactForm() {
         <textarea
           required
           rows={5}
+          maxLength={contactFieldLimits.message}
           value={form.message}
           onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
           className="body-copy w-full resize-none rounded-lg border border-[color:var(--color-border)] bg-black/30 px-4 py-2.5 text-sm transition-colors placeholder:text-[#9b8570] focus:border-[color:var(--color-accent)] focus:outline-none"
@@ -150,7 +164,7 @@ export function ContactForm() {
       </div>
 
       {error && (
-        <p className="text-red-400 text-sm bg-red-950/20 border border-red-700/30 rounded-lg px-4 py-3">
+        <p role="alert" className="text-red-400 text-sm bg-red-950/20 border border-red-700/30 rounded-lg px-4 py-3">
           {error}
         </p>
       )}

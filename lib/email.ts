@@ -1,6 +1,9 @@
 import nodemailer from 'nodemailer';
+import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 
-let transporterPromise: Promise<nodemailer.Transporter> | null = null;
+export class EmailConfigurationError extends Error {}
+
+let transporterPromise: Promise<nodemailer.Transporter<SMTPTransport.SentMessageInfo>> | null = null;
 
 function createTransporter() {
   const host = process.env.SMTP_HOST;
@@ -8,14 +11,17 @@ function createTransporter() {
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
 
-  if (!host || !user || !pass) {
-    throw new Error('SMTP is not configured');
+  if (!host?.trim() || !user?.trim() || !pass || !Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new EmailConfigurationError('SMTP is not configured correctly');
   }
 
   return nodemailer.createTransport({
     host,
     port,
     secure: port === 465,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 20000,
     auth: {
       user,
       pass,
@@ -38,6 +44,7 @@ export async function sendMailWithMetadata(options: {
   html?: string;
   from?: string;
   replyTo?: string;
+  requireAcceptance?: boolean;
   messageId?: string;
   headers?: Record<string, string>;
   attachments?: Array<{
@@ -59,6 +66,15 @@ export async function sendMailWithMetadata(options: {
     ...(options.headers ? { headers: options.headers } : {}),
     ...(options.attachments?.length ? { attachments: options.attachments } : {}),
   });
+
+  if (options.requireAcceptance && (
+    !result.accepted.some((recipient) => (
+      typeof recipient === 'string' ? recipient : recipient.address
+    )?.toLowerCase() === options.to.toLowerCase())
+    || result.rejected.length > 0
+  )) {
+    throw new Error('SMTP did not accept the recipient');
+  }
 
   return {
     messageId: result.messageId || null,
