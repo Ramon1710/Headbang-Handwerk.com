@@ -99,10 +99,10 @@ export function MerchandiseShop({ products, isAdmin, liveEditor }: MerchandiseSh
   const cartTotal = calculateCartTotal(cartItems, products);
 
   return (
-    <div className="mt-12 space-y-10">
-      <section className="rounded-[1.6rem] border border-[color:var(--color-border)]/80 bg-black/20 p-6 text-left shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-          <div>
+    <div className="merchandise-shop @container mt-12 space-y-10 break-words">
+      <section className="rounded-[1.6rem] border border-[color:var(--color-border)]/80 bg-black/20 p-4 @min-[32rem]:p-6 text-left shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
+        <div className="flex flex-col gap-5 @min-[48rem]:flex-row @min-[48rem]:items-start @min-[48rem]:justify-between">
+          <div className="min-w-0">
             <p className="body-copy text-sm font-semibold uppercase tracking-[0.24em]">Warenkorb</p>
             <h2 className="section-title mt-3 text-[1.9rem]">Artikel sammeln und gesammelt zur Kasse gehen</h2>
             <LiveResizableBox
@@ -123,7 +123,7 @@ export function MerchandiseShop({ products, isAdmin, liveEditor }: MerchandiseSh
               />
             </LiveResizableBox>
           </div>
-          <div className="rounded-[1.2rem] border border-[color:var(--color-border)] bg-black/20 px-5 py-4 text-left lg:min-w-72">
+          <div className="min-w-0 rounded-[1.2rem] border border-[color:var(--color-border)] bg-black/20 px-4 py-4 text-left @min-[48rem]:min-w-72">
             <p className="body-copy text-xs uppercase tracking-[0.2em]">Zwischensumme</p>
             <p className="mt-2 text-3xl font-black text-white">{formatPrice(cartTotal)}</p>
             <p className="body-copy mt-2 text-sm">{cartItems.length} Positionen im Warenkorb</p>
@@ -147,8 +147,8 @@ export function MerchandiseShop({ products, isAdmin, liveEditor }: MerchandiseSh
               const variantLabel = formatVariantLabel(item);
 
               return (
-                <div key={itemKey} className="flex flex-col gap-4 rounded-[1.2rem] border border-white/10 bg-black/20 px-4 py-4 md:flex-row md:items-center md:justify-between">
-                  <div>
+                <div key={itemKey} className="flex flex-col gap-4 rounded-[1.2rem] border border-white/10 bg-black/20 px-4 py-4 @min-[48rem]:flex-row @min-[48rem]:items-center @min-[48rem]:justify-between">
+                  <div className="min-w-0">
                     <h3 className="text-lg font-black text-white">{product.name}</h3>
                     <p className="body-copy mt-1 text-sm">{variantLabel || 'Standardausführung'}</p>
                     {product.estimatedDeliveryTime ? <p className="body-copy mt-1 text-sm">Lieferzeit: {product.estimatedDeliveryTime}</p> : null}
@@ -182,14 +182,14 @@ export function MerchandiseShop({ products, isAdmin, liveEditor }: MerchandiseSh
         )}
       </section>
 
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="grid gap-8 @min-[48rem]:grid-cols-3">
         {products.map((product) => {
           const selection = selectedOptions[product.id];
           const productImages = [product.imageUrl, ...(product.galleryImageUrls || [])].filter((image): image is string => Boolean(image));
           const activeImage = selectedImages[product.id] || productImages[0] || '';
 
           return (
-            <article key={product.id} className="section-shell content-box text-left">
+            <article key={product.id} className="section-shell content-box min-w-0 text-left">
               {activeImage ? (
                 <div className="mb-6">
                   <div className="overflow-hidden rounded-[1.2rem] border border-white/10 bg-black/20">
@@ -213,14 +213,14 @@ export function MerchandiseShop({ products, isAdmin, liveEditor }: MerchandiseSh
                 </div>
               ) : null}
 
-              <div className="flex items-start justify-between gap-4">
-                <div>
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="min-w-0 flex-1 basis-40">
                   {product.badge ? (
                     <p className="body-copy text-sm font-semibold uppercase tracking-[0.24em]">{product.badge}</p>
                   ) : null}
                   <h2 className="section-title mt-3 text-[2rem]">{product.name}</h2>
                 </div>
-                <div className="body-copy rounded-full border border-[color:var(--color-border)] px-4 py-2 text-sm font-black">
+                <div className="body-copy shrink-0 rounded-full border border-[color:var(--color-border)] px-4 py-2 text-sm font-black">
                   {formatPrice(product.price)}
                 </div>
               </div>
@@ -235,7 +235,7 @@ export function MerchandiseShop({ products, isAdmin, liveEditor }: MerchandiseSh
                     <select
                       value={selection?.size || ''}
                       onChange={(event) => setSelectedOptions((current) => ({ ...current, [product.id]: { ...current[product.id], size: event.target.value } }))}
-                      className="body-copy w-full rounded-xl border border-[color:var(--color-border)] bg-black px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]"
+                      className="body-copy min-w-0 w-full rounded-xl border border-[color:var(--color-border)] bg-black px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]"
                     >
                       {product.sizes.map((size) => (
                         <option key={size} value={size} className="bg-black text-white">{size}</option>
@@ -250,7 +250,7 @@ export function MerchandiseShop({ products, isAdmin, liveEditor }: MerchandiseSh
                     <select
                       value={selection?.color || ''}
                       onChange={(event) => setSelectedOptions((current) => ({ ...current, [product.id]: { ...current[product.id], color: event.target.value } }))}
-                      className="body-copy w-full rounded-xl border border-[color:var(--color-border)] bg-black px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]"
+                      className="body-copy min-w-0 w-full rounded-xl border border-[color:var(--color-border)] bg-black px-4 py-3 text-white outline-none focus:border-[color:var(--color-accent)]"
                     >
                       {product.colors.map((color) => (
                         <option key={color} value={color} className="bg-black text-white">{color}</option>
@@ -267,12 +267,12 @@ export function MerchandiseShop({ products, isAdmin, liveEditor }: MerchandiseSh
                     max={10}
                     value={selection?.quantity || 1}
                     onChange={(event) => setSelectedOptions((current) => ({ ...current, [product.id]: { ...current[product.id], quantity: Math.max(1, Number(event.target.value) || 1) } }))}
-                    className="body-copy w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 outline-none focus:border-[color:var(--color-accent)]"
+                    className="body-copy min-w-0 w-full rounded-xl border border-[color:var(--color-border)] bg-black/20 px-4 py-3 outline-none focus:border-[color:var(--color-accent)]"
                   />
                 </label>
               </div>
 
-              <Button onClick={() => handleAddToCart(product)} size="lg" className="mt-7 w-full">
+              <Button onClick={() => handleAddToCart(product)} size="lg" className="mt-7 w-full flex-wrap">
                 <ShoppingCart className="h-4 w-4" /> In den Warenkorb – {formatPrice(product.price * (selection?.quantity || 1))}
               </Button>
             </article>

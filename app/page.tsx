@@ -566,25 +566,27 @@ export default async function HomePage({
                   </div>
                   <Button href="/veranstaltungen" variant="secondary">{home.eventsSectionCtaLabel}</Button>
                 </div>
-                {upcomingEvents.length ? (
-                  <>
-                    <div className="md:hidden" style={{ gap: `${layoutSettings.cardGap}px` }}>
-                      {nextMobileEvent.map((event) => <HomeEventPreviewCard key={event.id} event={event} imageHeight={layoutSettings.eventImageHeight} />)}
+                <div className="flex flex-col gap-10 sm:gap-12">
+                  {upcomingEvents.length ? (
+                    <>
+                      <div className="md:hidden" style={{ gap: `${layoutSettings.cardGap}px` }}>
+                        {nextMobileEvent.map((event) => <HomeEventPreviewCard key={event.id} event={event} imageHeight={layoutSettings.eventImageHeight} />)}
+                      </div>
+                      <div className={cn('hidden', getDesktopPreviewGridClasses(upcomingEvents.length))} style={{ gap: `${layoutSettings.cardGap}px` }}>
+                        {upcomingEvents.map((event) => <HomeEventPreviewCard key={event.id} event={event} imageHeight={layoutSettings.eventImageHeight} />)}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="rounded-[1.7rem] border border-dashed border-white/15 bg-[linear-gradient(180deg,rgba(18,12,9,0.86)_0%,rgba(9,6,4,0.76)_100%)] px-6 py-7 text-[#ead9c5]">
+                      <p className="body-copy whitespace-pre-line">{home.eventsEmptyText}</p>
                     </div>
-                    <div className={cn('hidden', getDesktopPreviewGridClasses(upcomingEvents.length))} style={{ gap: `${layoutSettings.cardGap}px` }}>
-                      {upcomingEvents.map((event) => <HomeEventPreviewCard key={event.id} event={event} imageHeight={layoutSettings.eventImageHeight} />)}
+                  )}
+                  {upcomingEvents.length ? (
+                    <div className="flex justify-center">
+                      <Button href="/veranstaltungen" size="lg">{home.eventsSectionCtaLabel}</Button>
                     </div>
-                  </>
-                ) : (
-                  <div className="rounded-[1.7rem] border border-dashed border-white/15 bg-[linear-gradient(180deg,rgba(18,12,9,0.86)_0%,rgba(9,6,4,0.76)_100%)] px-6 py-7 text-[#ead9c5]">
-                    <p className="body-copy whitespace-pre-line">{home.eventsEmptyText}</p>
-                  </div>
-                )}
-                {upcomingEvents.length ? (
-                  <div className="mt-8 flex justify-center">
-                    <Button href="/veranstaltungen" size="lg">{home.eventsSectionCtaLabel}</Button>
-                  </div>
-                ) : null}
+                  ) : null}
+                </div>
               </section>
             </LiveResizableBox>
 

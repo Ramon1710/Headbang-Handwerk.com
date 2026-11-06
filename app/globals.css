@@ -328,6 +328,10 @@ a {
   }
 }
 
+.merchandise-shop .content-box {
+  padding: clamp(1rem, 3cqw, 1.65rem);
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

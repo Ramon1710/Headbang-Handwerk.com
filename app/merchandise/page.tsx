@@ -106,7 +106,14 @@ export default async function MerchandisePage({
           </section>
         ) : null}
 
-        <section className="section-shell content-box text-center sm:p-10 lg:p-12">
+        <LiveResizableBox
+          boxKey="merchandise.shop.box"
+          initialStyle={resolveLiveBoxStyle(liveEditor, 'merchandise.shop.box')}
+          isAdmin={isAdmin}
+          allowPosition={false}
+          growWithContent
+          className="section-shell content-box break-words text-center sm:p-10 lg:p-12"
+        >
           <LiveResizableBox boxKey="merchandise.intro.box" initialStyle={resolveLiveBoxStyle(liveEditor, 'merchandise.intro.box')} isAdmin={isAdmin} applySavedHeight={false} className="mx-auto max-w-4xl">
             <LiveEditableText
               as="p"
@@ -139,7 +146,7 @@ export default async function MerchandisePage({
             />
           </LiveResizableBox>
           <MerchandiseShop products={merchandise.products} isAdmin={isAdmin} liveEditor={liveEditor} />
-        </section>
+        </LiveResizableBox>
 
         {isAdmin ? (
           <section className="mt-10 space-y-5">

@@ -169,7 +169,7 @@ export function LiveLayoutSaveProvider({
               disabled={isSaving}
               className="rounded-xl bg-[#ff8a28] px-4 py-2 text-sm font-black text-black disabled:opacity-60"
             >
-              {isSaving ? 'Speichert...' : 'Startseite speichern'}
+              {isSaving ? 'Speichert...' : pathname === '/' ? 'Startseite speichern' : 'Layout speichern'}
             </button>
           </div>
           {saveError ? <p className="mt-2 text-sm font-semibold text-red-300">{saveError}</p> : null}

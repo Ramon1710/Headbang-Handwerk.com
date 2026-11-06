@@ -71,6 +71,33 @@ npm run dev
 
 Öffne [http://localhost:3000](http://localhost:3000) im Browser.
 
+## Merchandise: Shopgroesse im Adminmodus
+
+Der gesamte Shop auf `/merchandise` verwendet dieselbe `LiveResizableBox` und
+denselben Layout-Speichermechanismus wie die anderen Inhaltsbereiche. Zuvor waren
+nur einzelne Texte eingebunden; deren automatische Hoehe deaktiviert die
+Resize-Griffe. Der Shop-Gesamtbereich hatte keinen eigenen Resize-Container.
+
+- Im Headbang-Admin-Bearbeitungsmodus die Griffe unten rechts oder unten mittig
+  ziehen und anschliessend **Layout speichern** anklicken.
+- Die Breite bleibt innerhalb des Elterncontainers. Die Hoehe ist beim Shop eine
+  Mindesthoehe, keine feste Begrenzung: Produkte und Warenkorb koennen weiter wachsen.
+- Desktop und Mobile werden unter `site.liveEditor.boxStyles` mit den Schluesseln
+  `merchandise.shop.box` und `merchandise.shop.box@mobile` getrennt gespeichert.
+  Der bestehende Endpunkt `/api/cms/live-editor` speichert in Firebase, lokal ohne
+  Firebase in `.cms/content.json`. Auf Vercel bleibt Firebase erforderlich.
+- Besucher und die Admin-Vorschau `?view=user` verwenden die gespeicherten Masse
+  ohne Bearbeitungsgriffe. Produktspalten und Warenkorb reagieren auf die
+  Containerbreite. Die Fusszeile liegt ausserhalb des Resize-Bereichs.
+- Verschachtelte Textboxen setzen ihre eigenen Layoutvariablen zurueck, damit sie
+  nicht die Groesse des Shop-Gesamtbereichs erben. Andere Seitenschluessel und die
+  bisherige feste Hoehensteuerung bleiben unveraendert.
+
+Regressionstests: `npx tsx --test tests/merchandise-layout.test.ts tests/auth.test.ts`
+und `npx tsc --noEmit --incremental false`.
+Fuer einen vollstaendigen `npm run build` benoetigen auch die bestehenden
+Zollhaus-Seiten eine funktionsfaehige Firebase-Konfiguration.
+
 ## Stripe Webhook (lokal testen)
 
 ```bash

@@ -309,12 +309,10 @@ export function GalleryViewer({ folders, isAdmin = false, initialFolderId = null
                 </div>
               )}
             </div>
-            <div className="flex items-start justify-between gap-4 px-5 py-4">
-              <div>
-                <h3 className="text-xl font-black text-white">{folder.title}</h3>
-                <p className="body-copy mt-2 text-sm">{folder.images.length} Bilder</p>
-              </div>
-              <FolderOpen className="mt-1 h-5 w-5 text-[color:var(--color-accent-soft)]" />
+            <div className="flex flex-col items-center gap-2 px-5 py-4 text-center">
+              <h3 className="w-full break-words text-xl font-black text-white">{folder.title}</h3>
+              <p className="body-copy text-sm">{folder.images.length} Bilder</p>
+              <FolderOpen className="h-5 w-5 shrink-0 text-[color:var(--color-accent-soft)]" />
             </div>
           </button>
         );

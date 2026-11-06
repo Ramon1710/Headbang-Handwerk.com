@@ -15,9 +15,10 @@ interface LiveResizableBoxProps {
   isAdmin: boolean;
   allowPosition?: boolean;
   applySavedHeight?: boolean;
+  growWithContent?: boolean;
 }
 
-export function LiveResizableBox({ boxKey, className, children, initialStyle, isAdmin, allowPosition = true, applySavedHeight = true }: LiveResizableBoxProps) {
+export function LiveResizableBox({ boxKey, className, children, initialStyle, isAdmin, allowPosition = true, applySavedHeight = true, growWithContent = false }: LiveResizableBoxProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [viewport, setViewport] = useState<LiveViewport>('desktop');
@@ -48,18 +49,19 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     const desktopStyle = styles?.desktop;
 
     const nextStyle = {
-      '--live-box-width-desktop': desktopStyle?.width,
-      '--live-box-height-desktop': applySavedHeight ? desktopStyle?.height : undefined,
-      '--live-box-min-height-desktop': applySavedHeight ? desktopStyle?.minHeight : undefined,
-      '--live-box-offset-x-desktop': allowPosition ? desktopStyle?.x : undefined,
-      '--live-box-offset-y-desktop': allowPosition ? desktopStyle?.y : undefined,
+      '--live-box-width-desktop': desktopStyle?.width ?? 'auto',
+      '--live-box-height-desktop': applySavedHeight && !growWithContent ? desktopStyle?.height ?? 'auto' : 'auto',
+      '--live-box-min-height-desktop': applySavedHeight ? desktopStyle?.minHeight ?? (growWithContent ? desktopStyle?.height : undefined) ?? 'auto' : 'auto',
+      '--live-box-offset-x-desktop': allowPosition ? desktopStyle?.x ?? '0px' : '0px',
+      '--live-box-offset-y-desktop': allowPosition ? desktopStyle?.y ?? '0px' : '0px',
       '--live-box-width-mobile': mobileStyle?.width ?? '100%',
-      '--live-box-height-mobile': applySavedHeight ? mobileStyle?.height : undefined,
-      '--live-box-min-height-mobile': applySavedHeight ? mobileStyle?.minHeight : undefined,
-      '--live-box-offset-x-mobile': allowPosition ? mobileStyle?.x : undefined,
-      '--live-box-offset-y-mobile': allowPosition ? mobileStyle?.y : undefined,
+      '--live-box-height-mobile': applySavedHeight && !growWithContent ? mobileStyle?.height ?? 'auto' : 'auto',
+      '--live-box-min-height-mobile': applySavedHeight ? mobileStyle?.minHeight ?? (growWithContent ? mobileStyle?.height : undefined) ?? 'auto' : 'auto',
+      '--live-box-offset-x-mobile': allowPosition ? mobileStyle?.x ?? '0px' : '0px',
+      '--live-box-offset-y-mobile': allowPosition ? mobileStyle?.y ?? '0px' : '0px',
       '--live-box-overflow-x-correction': `${mobileOverflowCorrection}px`,
-      maxWidth: viewport === 'mobile' ? '100%' : undefined,
+      maxWidth: growWithContent || viewport === 'mobile' ? '100%' : undefined,
+      minWidth: growWithContent ? 'min(100%, 20rem)' : undefined,
     } as CSSProperties;
 
     return nextStyle;
@@ -90,6 +92,17 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
         }),
       });
     }, 350);
+  }
+
+  function constrainResizeWidth(width: number, minWidth: number) {
+    if (!growWithContent || !ref.current?.parentElement) {
+      return Math.max(minWidth, width);
+    }
+
+    const parent = ref.current.parentElement;
+    const parentStyle = window.getComputedStyle(parent);
+    const parentWidth = parent.clientWidth - Number.parseFloat(parentStyle.paddingLeft) - Number.parseFloat(parentStyle.paddingRight);
+    return Math.min(parentWidth, Math.max(Math.min(320, parentWidth), width));
   }
 
   useEffect(() => {
@@ -267,7 +280,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     const currentY = currentStyle?.y;
 
     function handlePointerMove(moveEvent: PointerEvent) {
-      const nextWidth = Math.max(minWidth, startWidth + (moveEvent.clientX - startX));
+      const nextWidth = constrainResizeWidth(startWidth + (moveEvent.clientX - startX), minWidth);
       const nextHeight = Math.max(minHeight, startHeight + (moveEvent.clientY - startY));
 
       updateViewportStyle(
@@ -281,7 +294,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     }
 
     function finishResize(endClientX: number, endClientY: number) {
-      const nextWidth = Math.max(minWidth, startWidth + (endClientX - startX));
+      const nextWidth = constrainResizeWidth(startWidth + (endClientX - startX), minWidth);
       const nextHeight = Math.max(minHeight, startHeight + (endClientY - startY));
       document.body.style.userSelect = '';
 
@@ -337,7 +350,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     const currentY = currentStyle?.y;
 
     function handlePointerMove(moveEvent: PointerEvent) {
-      const nextWidth = Math.max(minWidth, startWidth + (moveEvent.clientX - startX));
+      const nextWidth = constrainResizeWidth(startWidth + (moveEvent.clientX - startX), minWidth);
       const nextHeight = Math.max(minHeight, startHeight + (moveEvent.clientY - startY));
 
       updateViewportStyle(
@@ -351,7 +364,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
     }
 
     function finishResize(endClientX: number, endClientY: number) {
-      const nextWidth = Math.max(minWidth, startWidth + (endClientX - startX));
+      const nextWidth = constrainResizeWidth(startWidth + (endClientX - startX), minWidth);
       const nextHeight = Math.max(minHeight, startHeight + (endClientY - startY));
       document.body.style.userSelect = '';
 
@@ -390,7 +403,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
   return (
     <div
       ref={ref}
-      className="live-resizable-box relative mx-auto w-full min-h-0 min-w-0 self-start justify-self-stretch"
+      className={`live-resizable-box relative mx-auto w-full min-h-0 min-w-0 self-start justify-self-stretch${growWithContent ? ' flex flex-col' : ''}`}
       style={buildResponsiveStyle(boxStyles)}
       title={isAdmin ? allowPosition ? 'Klick zum Bearbeiten, unten rechts Größe ändern, oben mittig verschieben' : 'Klick zum Bearbeiten, unten rechts Größe ändern' : undefined}
     >
@@ -405,7 +418,7 @@ export function LiveResizableBox({ boxKey, className, children, initialStyle, is
           </span>
         </button>
       ) : null}
-      <div className={`relative h-full w-full overflow-x-hidden ${className}`}>
+      <div className={`relative ${growWithContent ? 'flex-1' : 'h-full'} w-full overflow-x-hidden ${className}`}>
         {children}
       </div>
       {isAdmin && applySavedHeight ? (
